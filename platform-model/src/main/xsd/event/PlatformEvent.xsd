@@ -1,0 +1,81 @@
+<xs:schema targetNamespace="http://org/trpr/platform/model/event"
+     xmlns="http://org/trpr/platform/model/event" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+     xmlns:common="http://org/trpr/platform/model/common"
+     elementFormDefault="qualified">
+     <xs:import
+          namespace="http://org/trpr/platform/model/common"
+          schemaLocation="../common/BusinessEntity.xsd" />
+
+	<xs:element name="PlatformEvent">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformEventType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+
+	<xs:complexType name="PlatformEventType">
+    	<xs:complexContent>
+        	<xs:extension base="common:BusinessEntityType">
+                    <xs:sequence>
+                         <xs:element name="eventType" type="xs:string" minOccurs="1" />
+                         <xs:element name="eventStatus" type="xs:string" minOccurs="0" />
+                         <xs:element name="createdDate" type="xs:dateTime" minOccurs="1" />
+                         <xs:element name="eventMessage" type="xs:string" minOccurs="1" />
+                         <xs:element name="eventSource" type="xs:string" minOccurs="1" />
+                         <xs:element name="hostName" type="xs:string" minOccurs="0" />
+                    </xs:sequence>
+               </xs:extension>
+          </xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="PlatformNotification">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformNotificationType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+
+	<xs:complexType name="PlatformNotificationType">
+          <xs:complexContent>
+               <xs:extension base="PlatformEventType">
+                    <xs:sequence>
+                         <xs:element name="notificationTargets"
+                              type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+                         <xs:element name="notificationSubject"
+                              type="xs:string" minOccurs="0" />
+                    </xs:sequence>
+               </xs:extension>
+          </xs:complexContent>
+    </xs:complexType>
+
+	<xs:element name="PlatformAlert">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformAlertType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+
+    <xs:complexType name="PlatformAlertType">
+          <xs:complexContent>
+               <xs:extension base="PlatformEventType">
+                    <xs:sequence>
+                         <xs:element name="severity" type="Severity"
+                              minOccurs="1" />
+                    </xs:sequence>
+               </xs:extension>
+          </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="Severity">
+          <xs:restriction base="xs:string">
+               <xs:enumeration value="INFO"></xs:enumeration>
+               <xs:enumeration value="WARNING"></xs:enumeration>
+               <xs:enumeration value="ERROR"></xs:enumeration>
+               <xs:enumeration value="FATAL"></xs:enumeration>
+          </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

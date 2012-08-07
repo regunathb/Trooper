@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://org/trpr/platform/model/common"
+	xmlns="http://org/trpr/platform/model/common"
+	elementFormDefault="qualified">
+
+	<xs:element name="BusinessEntity">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="BusinessEntityType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+	
+	<xs:complexType name="BusinessEntityType">
+		<xs:sequence minOccurs="0">
+			<xs:element name="entityIdentifier" type="EntityIdentifierType" />
+			<xs:element name="entityName" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="EntityIdentifierType">
+		<xs:sequence minOccurs="0">
+			<xs:element name="uniqueId" type="xs:long" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+		
+</xs:schema>
