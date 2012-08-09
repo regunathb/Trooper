@@ -45,10 +45,10 @@ public abstract class RuntimeConstants {
 	public static final String TEST = "TEST";
 	
 	/** The Application name identifier JVM system property*/
-	public static final String CCELL_APP_NAME="org.trpr.application.name";
+	public static final String TRPR_APP_NAME="org.trpr.application.name";
 	
 	/** The runtime keep-alive background thread name */
-	public static final String BOOTSTRAP_BACKGROUND_THREADNAME = "CCell-Bgrnd-Thread";
+	public static final String BOOTSTRAP_BACKGROUND_THREADNAME = "Trpr-Bgrnd-Thread";
 	
 	/**
 	 * Identifiers for the framework variables as defined during Bootstrap

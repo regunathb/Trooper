@@ -45,7 +45,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	 * The pre-defined name for the Commons bean application context. String should be unique and not the same as any name defined by users for
 	 * application contexts loaded via this BootstrapExtension
 	 */
-	private static final String COMMON_BEANS_CONTEXT_NAME = "~~~CcellPlatformCommonBeansContext~~~";
+	private static final String COMMON_BEANS_CONTEXT_NAME = "~~~TrprPlatformCommonBeansContext~~~";
 	
 	/** The Logger instance for this class  */
 	private static final Logger LOGGER = LogFactory.getLogger(ApplicationContextFactory.class);
