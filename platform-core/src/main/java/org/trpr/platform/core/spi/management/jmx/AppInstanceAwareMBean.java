@@ -19,7 +19,7 @@ import org.trpr.platform.core.PlatformConstants;
 
 /**
  * Class <code>AppInstanceAwareMBean</code> class is an implementation of {@link InstanceAwareMBean} interface that derives the MBean name from  
- * the JVM system property identified by PlatformConstants.CCELL_APP_NAME. 
+ * the JVM system property identified by PlatformConstants.TRPR_APP_NAME. 
  * 
  * @author Regunath B
  * @version 1.0, 17/05/2012
@@ -27,12 +27,12 @@ import org.trpr.platform.core.PlatformConstants;
 public class AppInstanceAwareMBean implements InstanceAwareMBean {
 
 	/**
-	 * Interface method implementation. Returns null or the JVM system property identified by PlatformConstants.CCELL_APP_NAME.
+	 * Interface method implementation. Returns null or the JVM system property identified by PlatformConstants.TRPR_APP_NAME.
 	 * Ignores the passed in managed bean instance and its identifier
 	 * @see InstanceAwareMBean#getMBeanNameSuffix(Object, String)
 	 */
 	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
-		return System.getProperty(PlatformConstants.CCELL_APP_NAME);
+		return System.getProperty(PlatformConstants.TRPR_APP_NAME);
 	}
 
 }

@@ -32,7 +32,7 @@ public abstract class PlatformConstants {
 	public static final String FILE_SEPARATOR_VALUE = "file.separator";
 
 	/** The Application name identifier as a JVM system property*/
-	public static final String CCELL_APP_NAME="org.trpr.application.name";
+	public static final String TRPR_APP_NAME="org.trpr.application.name";
 	
 	/** The generic logger logical names for loggers*/
 	public static final String PERF_LOGGER_CATEGORY="org.trpr.platform.core.spi.logging.PerformanceLogger";
