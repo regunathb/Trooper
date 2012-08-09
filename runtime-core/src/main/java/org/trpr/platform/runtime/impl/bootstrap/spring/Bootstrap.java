@@ -239,9 +239,9 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 			this.container = bootstrapInfo.getContainer();
 			setPlatformVariablesFromConfig(bootstrapInfo);
 			
-			// export the RuntimeConstants.CCELL_APP_NAME property, if set, to System properties for use in JMX export
+			// export the RuntimeConstants.TRPR_APP_NAME property, if set, to System properties for use in JMX export
 			try {
-				System.setProperty(RuntimeConstants.CCELL_APP_NAME,RuntimeVariables.getVariable(RuntimeConstants.CCELL_APP_NAME));
+				System.setProperty(RuntimeConstants.TRPR_APP_NAME,RuntimeVariables.getVariable(RuntimeConstants.TRPR_APP_NAME));
 			} catch (Exception e) {
 				// Catch and consume this Exception. Only impact is on JMX binding name as exported by BootstrapModelMBeanExporter
 			}
@@ -344,7 +344,7 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	 * Populates all the bootstrap variables from the bootstrap configuration
 	 */
 	private void setPlatformVariablesFromConfig(BootstrapInfo bootstrapInfo) {
-		runtimeVariables.setVariable(RuntimeConstants.CCELL_APP_NAME, bootstrapInfo.getApplicationName());
+		runtimeVariables.setVariable(RuntimeConstants.TRPR_APP_NAME, bootstrapInfo.getApplicationName());
 		runtimeVariables.setVariable(RuntimeConstants.PROJECTS_ROOT, bootstrapInfo.getProjectsRoot());
 		runtimeVariables.setVariable(RuntimeConstants.NATURE, bootstrapInfo.getRuntimeNature());
 		if (bootstrapInfo.getComponentContainerClassName() != null) {
