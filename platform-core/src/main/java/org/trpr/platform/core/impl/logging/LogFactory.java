@@ -39,7 +39,7 @@ public abstract class LogFactory {
 	public static void configureLogging(File logConfigFile) throws Exception {
 		ch.qos.logback.classic.LoggerContext context = (ch.qos.logback.classic.LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
 		ch.qos.logback.classic.joran.JoranConfigurator jc = new ch.qos.logback.classic.joran.JoranConfigurator();
-		jc.setContext(context);
+		jc.setContext(context); 
 		context.reset();
 		jc.doConfigure(logConfigFile);
 	}
