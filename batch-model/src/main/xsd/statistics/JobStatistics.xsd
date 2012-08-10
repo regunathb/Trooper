@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema targetNamespace="http://org/trpr/platform/batch/model/statistics/jobstatistics"
+   xmlns="http://org/trpr/platform/batch/model/statistics/jobstatistics"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   xmlns:common="http://org/trpr/platform/model/common"
+   elementFormDefault="qualified">
+
+	<xs:import namespace="http://org/trpr/platform/model/common"
+		schemaLocation="./../../../../../platform-model/src/main/xsd/common/BusinessEntity.xsd" />
+
+	<xs:element name="JobStatistics">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="JobStatisticsType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+
+   <xs:complexType name="JobStatisticsType">
+   	<xs:complexContent>
+		<xs:extension base="common:BusinessEntityType">
+			<xs:sequence>
+			   <xs:element name="hostIP" type="xs:string" minOccurs="0"/>
+			   <xs:element name="hostStartTimeStamp"  type="xs:dateTime" minOccurs="0"/>
+			   <xs:element name="jobName" type="xs:string" minOccurs="0"/>
+			   <xs:element name="jobStatus" type="xs:string" minOccurs="0"/>
+			   <xs:element name="jobMessage" type="xs:string" minOccurs="0"/>
+			   <xs:element name="jobStepInError" type="xs:string" minOccurs="0"/>
+			   <xs:element name="jobStartTimeStamp"  type="xs:dateTime" minOccurs="0"/>
+			   <xs:element name="jobEndTimestamp"  type="xs:dateTime" minOccurs="0"/>
+  			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>	
+   </xs:complexType>
+  
+ </xs:schema>
