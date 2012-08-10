@@ -97,6 +97,7 @@ public class SpringContainerImpl implements Container {
 		if(this.componentContainer != null){
 			LOGGER.info("** Starting a component container of type : " + this.componentContainer.getClass().getName() + " **");
 			this.componentContainer.init();
+			this.componentContainer.setLoadedBootstrapExtensions(this.bootstrapExtensions);
 		} else {
 			LOGGER.info("No component container configured for this runtime instance.");			
 		}				
