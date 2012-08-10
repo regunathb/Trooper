@@ -33,13 +33,13 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
  */
 public abstract class AbstractBootstrapExtension implements BootstrapExtension {
 	
-	/** The name placeholder*/
+	/** The name place-holder*/
 	private String name;
 
 	/** List of dependency BootstrapExtensionS that have been initialized and are ready to use*/
 	private List<BootstrapExtension> dependencyBEList = new LinkedList<BootstrapExtension>();
 	
-	/** The optional properties placeholder*/
+	/** The optional properties place-holder*/
 	private Map<String, String> properties = new HashMap<String, String>();
 
 	/**
@@ -98,7 +98,7 @@ public abstract class AbstractBootstrapExtension implements BootstrapExtension {
 	}
 	
 	/**
-	 * Returns the depedency BootstrapExtension identified by the specified name
+	 * Returns the dependency BootstrapExtension identified by the specified name
 	 * @param beName the name of the BootstrapExtension as specified in {@link BootstrapExtensionInfo#getBeName()}
 	 * @return the dependency BootstrapExtension
 	 * @throws PlatformException in case no matching BootstrapExtension with specified name exists

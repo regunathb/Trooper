@@ -19,6 +19,8 @@ import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
+import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
+import org.trpr.platform.runtime.spi.container.Container;
 
 /**
  * The <code>ComponentContainer</code> is a container for Components in the Trooper runtime. A Component may represent any business feature or 
@@ -56,5 +58,11 @@ public interface ComponentContainer extends PlatformEventProducer {
 	 * @param bootstrapEvent PlatformEvent of type defined by {@link RuntimeConstants#BOOTSTRAPMONITOREDEVENT}
 	 */
 	public void publishBootstrapEvent(PlatformEvent bootstrapEvent);
+	
+	/**
+	 * Sets the BootstrapExtension instances loaded by the {@link Container} on this ComponentContainer
+	 * @param bootstrapExtensions BootstrapExtension instances that were successfully loaded before this ComponentContainer
+	 */
+	public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions);
 
 }

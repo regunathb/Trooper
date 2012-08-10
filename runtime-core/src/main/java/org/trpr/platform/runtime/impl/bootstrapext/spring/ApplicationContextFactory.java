@@ -40,7 +40,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 
 	/** The prefix to be added to file absolute paths when loading Spring XMLs using the FileSystemXmlApplicationContext*/
 	private static final String FILE_PREFIX = "file:";
-	
+		
 	/**
 	 * The pre-defined name for the Commons bean application context. String should be unique and not the same as any name defined by users for
 	 * application contexts loaded via this BootstrapExtension
@@ -50,7 +50,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	/** The Logger instance for this class  */
 	private static final Logger LOGGER = LogFactory.getLogger(ApplicationContextFactory.class);
 	
-	/** Bootstrap outcome indicator. Initialzed by default to continue. May be overriden by outcome of {@link #init()} */
+	/** Bootstrap outcome indicator. Initialized by default to continue. May be overridden by outcome of {@link #init()} */
 	private int bootstrapOutcome = BootstrapExtension.CONTINUE_BOOTSTRAP;
 
 	/**
@@ -108,7 +108,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	 * Returns the common Spring beans application context that is intended as parent of all application contexts created by the runtime
 	 * @return the AbstractApplicationContext for the XML identified by {@link RuntimeConstants#COMMON_SPRING_BEANS_CONFIG}
 	 */
-	private AbstractApplicationContext getCommonBeansContext() {
+	public AbstractApplicationContext getCommonBeansContext() {
 		// commonBeansContext is the base context for all application contexts, so load it if not loaded already.
 		AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
 		if (commonBeansContext == null) { 
