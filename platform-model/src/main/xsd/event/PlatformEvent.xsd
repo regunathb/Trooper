@@ -36,19 +36,37 @@
 			</xs:complexContent>               
 	    </xs:complexType>		
 	</xs:element>
-
+    
+	<!-- Notification types-->
+	
 	<xs:complexType name="PlatformNotificationType">
           <xs:complexContent>
                <xs:extension base="PlatformEventType">
                     <xs:sequence>
-                         <xs:element name="notificationTargets"
-                              type="xs:string" minOccurs="1" maxOccurs="unbounded" />
-                         <xs:element name="notificationSubject"
-                              type="xs:string" minOccurs="0" />
+                         <xs:element name="notificationType" type="NotificationType" minOccurs="1" />
+                         <xs:element name="notificationTargets" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+                         <xs:element name="notificationSubject" type="xs:string" minOccurs="0" />
+                         <xs:element name="notificationContent" type="NotificationContentType" minOccurs="1" />
                     </xs:sequence>
                </xs:extension>
           </xs:complexContent>
     </xs:complexType>
+    	
+	<xs:simpleType name="NotificationType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="EMAIL"></xs:enumeration>
+			<xs:enumeration value="SMS"></xs:enumeration>
+			<xs:enumeration value="BOTH"></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="NotificationContentType">
+		<xs:sequence>		
+			<xs:element name="textContent" type="xs:string" minOccurs="0" />														
+		</xs:sequence>	
+	</xs:complexType>
+	
+	<!--  End Notification types-->    
 
 	<xs:element name="PlatformAlert">
 		<xs:complexType>
