@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://org/trpr/platform/service/model/common/warning" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://org/trpr/platform/service/model/common/warning" 
+	xmlns:common="http://org/trpr/platform/model/common" 
+	elementFormDefault="qualified">
+	<xs:import 
+		namespace="http://org/trpr/platform/model/common" 
+		schemaLocation="./../../../../../platform-model/src/main/xsd/common/BusinessEntity.xsd" />
+		
+	<xs:complexType name="WarningSummary">
+		<xs:choice>
+			<xs:element name="businessEntityWarningDetail" minOccurs="0" 
+				maxOccurs="unbounded" type="BusinessEntityWarningDetail"/>
+			<xs:element name="serviceRequestWarningDetail" minOccurs="0" 
+				maxOccurs="unbounded" type="ServiceRequestWarningDetail"/>
+		</xs:choice>
+	</xs:complexType>
+	
+	<xs:complexType name="WarningDetail" abstract="true">
+		<xs:sequence>
+			<xs:element name="WarningBlock" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:attribute name="warningCode" type="xs:int" 
+						use="required"/>
+					<xs:attribute name="warningName" type="xs:string" use="required"/>
+					<xs:attribute name="fieldName" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ServiceRequestWarningDetail">
+		<xs:complexContent>
+			<xs:extension base="WarningDetail"/>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="BusinessEntityWarningDetail">
+		<xs:complexContent>
+			<xs:extension base="WarningDetail">
+				<xs:sequence>
+					<xs:element name="businessEntity" 
+						type="common:BusinessEntityType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+</xs:schema>

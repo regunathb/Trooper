@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xs:schema
+	targetNamespace="http://org/trpr/platform/service/model/common/status"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://org/trpr/platform/service/model/common/status"
+	elementFormDefault="qualified">
+	
+	<xs:complexType name="Status">
+		<xs:sequence>
+			<xs:element name="code" type="xs:int" minOccurs="1" maxOccurs="1" />
+			<xs:element name="message" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="supplementaryCode" type="xs:int" minOccurs="0" maxOccurs="1" />
+			<xs:element name="supplementaryMessage" type="xs:string" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>
