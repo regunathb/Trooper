@@ -6,15 +6,7 @@
           namespace="http://org/trpr/platform/model/common"
           schemaLocation="../common/BusinessEntity.xsd" />
 
-	<xs:element name="PlatformEvent">
-		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="PlatformEventType"/>
-			</xs:complexContent>               
-	    </xs:complexType>		
-	</xs:element>
-
-	<xs:complexType name="PlatformEventType">
+	<xs:complexType name="PlatformEvent">
     	<xs:complexContent>
         	<xs:extension base="common:BusinessEntityType">
                     <xs:sequence>
@@ -28,31 +20,23 @@
                </xs:extension>
           </xs:complexContent>
 	</xs:complexType>
-
-	<xs:element name="PlatformNotification">
-		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="PlatformNotificationType"/>
-			</xs:complexContent>               
-	    </xs:complexType>		
-	</xs:element>
     
 	<!-- Notification types-->
 	
-	<xs:complexType name="PlatformNotificationType">
+	<xs:complexType name="PlatformNotification">
           <xs:complexContent>
-               <xs:extension base="PlatformEventType">
+               <xs:extension base="PlatformEvent">
                     <xs:sequence>
-                         <xs:element name="notificationType" type="NotificationType" minOccurs="1" />
+                         <xs:element name="notificationType" type="Notification" minOccurs="1" />
                          <xs:element name="notificationTargets" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
                          <xs:element name="notificationSubject" type="xs:string" minOccurs="0" />
-                         <xs:element name="notificationContent" type="NotificationContentType" minOccurs="1" />
+                         <xs:element name="notificationContent" type="NotificationContent" minOccurs="1" />
                     </xs:sequence>
                </xs:extension>
           </xs:complexContent>
     </xs:complexType>
     	
-	<xs:simpleType name="NotificationType">
+	<xs:simpleType name="Notification">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="EMAIL"></xs:enumeration>
 			<xs:enumeration value="SMS"></xs:enumeration>
@@ -60,7 +44,7 @@
 		</xs:restriction>
 	</xs:simpleType>
 	
-	<xs:complexType name="NotificationContentType">
+	<xs:complexType name="NotificationContent">
 		<xs:sequence>		
 			<xs:element name="textContent" type="xs:string" minOccurs="0" />														
 		</xs:sequence>	
@@ -68,17 +52,9 @@
 	
 	<!--  End Notification types-->    
 
-	<xs:element name="PlatformAlert">
-		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="PlatformAlertType"/>
-			</xs:complexContent>               
-	    </xs:complexType>		
-	</xs:element>
-
-    <xs:complexType name="PlatformAlertType">
+    <xs:complexType name="PlatformAlert">
           <xs:complexContent>
-               <xs:extension base="PlatformEventType">
+               <xs:extension base="PlatformEvent">
                     <xs:sequence>
                          <xs:element name="severity" type="Severity"
                               minOccurs="1" />
