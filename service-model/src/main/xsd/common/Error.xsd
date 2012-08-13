@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://org/trpr/platform/service/model/common/error" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://org/trpr/platform/service/model/common/error" 
+	xmlns:common="http://org/trpr/platform/model/common" 
+	elementFormDefault="qualified">
+	<xs:import 
+		namespace="http://org/trpr/platform/model/common" 
+		schemaLocation="./../../../../../platform-model/src/main/xsd/common/BusinessEntity.xsd" />
+		
+	<xs:complexType name="ErrorSummary">
+		<xs:choice>
+			<xs:element name="businessEntityErrorDetail" minOccurs="0" 
+				maxOccurs="unbounded" type="BusinessEntityErrorDetail"/>
+			<xs:element name="serviceRequestErrorDetail" minOccurs="0" 
+				maxOccurs="unbounded" type="ServiceRequestErrorDetail"/>
+		</xs:choice>
+	</xs:complexType>
+	
+	<xs:complexType name="ErrorDetail" abstract="true">
+		<xs:sequence>
+			<xs:element name="ErrorBlock" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:attribute name="errorCode" type="xs:int" use="required"/>
+					<xs:attribute name="errorName" type="xs:string" use="required"/>
+					<xs:attribute name="fieldName" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ServiceRequestErrorDetail">
+		<xs:complexContent>
+			<xs:extension base="ErrorDetail"/>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="BusinessEntityErrorDetail">
+		<xs:complexContent>
+			<xs:extension base="ErrorDetail">
+				<xs:sequence>
+					<xs:element name="businessEntity" 
+						type="common:BusinessEntityType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+</xs:schema>

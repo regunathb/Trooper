@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<xs:schema
+	targetNamespace="http://org/trpr/platform/service/model/common/platformServiceResponse"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://org/trpr/platform/service/model/common/platformServiceResponse"
+	xmlns:status="http://org/trpr/platform/service/model/common/status"
+	xmlns:error="http://org/trpr/platform/service/model/common/error"
+	xmlns:warning="http://org/trpr/platform/service/model/common/warning"
+	xmlns:request="http://org/trpr/platform/service/model/common/platformServiceRequest"
+	xmlns:platformEvent="http://org/trpr/platform/model/event"
+	elementFormDefault="qualified">
+	
+	<xs:import namespace="http://org/trpr/platform/service/model/common/status" schemaLocation="Status.xsd" />
+	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="PlatformServiceRequest.xsd" />
+	<xs:import namespace="http://org/trpr/platform/service/model/common/error" schemaLocation="Error.xsd" />
+	<xs:import namespace="http://org/trpr/platform/service/model/common/warning" schemaLocation="Warning.xsd" />	
+	<xs:import
+		namespace="http://org/trpr/platform/model/event"
+		schemaLocation="./../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
+		
+	<xs:element name="PlatformServiceResponse" type="PlatformServiceResponseType" />
+	
+	<xs:complexType name="PlatformServiceResponseType" abstract="true">
+		<xs:sequence>
+			<xs:element name="status" type="status:Status" minOccurs="1" maxOccurs="1" />
+			<xs:element name="platformServiceRequest" type="request:PlatformServiceRequestType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="errorSummary" type="error:ErrorSummary" minOccurs="0" maxOccurs="1" />
+			<xs:element name="warningSummary" type="warning:WarningSummary" minOccurs="0" maxOccurs="1" />
+			<xs:element name="events" type="platformEvent:PlatformEventType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="SecurityFailureResponse">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PlatformServiceResponseType">
+					<xs:sequence />
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+</xs:schema>

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://org/trpr/platform/service/model/common/platformExceptionResponse"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://org/trpr/platform/service/model/common/platformExceptionResponse"
+	xmlns:response="http://org/trpr/platform/service/model/common/platformServiceResponse"
+	elementFormDefault="qualified">
+	
+	<xs:import
+		namespace="http://org/trpr/platform/service/model/common/platformServiceResponse"
+		schemaLocation="PlatformServiceResponse.xsd" />
+	
+	<xs:element name="PlatformExceptionResponse" type="PlatformExceptionResponseType" />
+	
+	<xs:complexType name="PlatformExceptionResponseType">
+		<xs:complexContent>
+			<xs:extension base="response:PlatformServiceResponseType">
+				<xs:sequence>
+					<xs:element name="requestInformation" type="RequestInformationTypeType" minOccurs="1" maxOccurs="1" />
+					<xs:element name="exceptionSummary" type="ExceptionSummaryTypeType" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="RequestInformationType" type="RequestInformationTypeType" />
+	
+	<xs:complexType name="RequestInformationTypeType">
+		<xs:sequence>
+			<xs:element name="requestData" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="serviceName" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="ExceptionSummaryType" type="ExceptionSummaryTypeType" />
+	
+	<xs:complexType name="ExceptionSummaryTypeType">
+		<xs:sequence>
+			<xs:element name="errorMessage" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="stackTrace" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>

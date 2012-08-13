@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<xs:schema
+	targetNamespace="http://org/trpr/platform/service/model/common/platformServiceRequest"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://org/trpr/platform/service/model/common/platformServiceRequest"
+	elementFormDefault="qualified">
+
+	<xs:element name="PlatformServiceRequest" type="PlatformServiceRequestType" />
+
+	<xs:complexType name="PlatformServiceRequestType" abstract="true">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="version" use="optional" type="versionType" default="LATEST"/>
+	</xs:complexType>
+	
+	<xs:simpleType name="versionType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+.[0-9]+|LATEST|" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

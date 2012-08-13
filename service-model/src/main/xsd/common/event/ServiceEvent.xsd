@@ -1,0 +1,50 @@
+<xs:schema targetNamespace="http://org/trpr/platform/service/model/common/event"
+	xmlns="http://org/trpr/platform/service/model/common/event"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:platformEvent="http://org/trpr/platform/model/event"
+	elementFormDefault="qualified">
+	<xs:import namespace="http://org/trpr/platform/model/event"
+		schemaLocation="./../../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
+		
+	<xs:complexType name="ServiceEventType">
+		<xs:complexContent>
+			<xs:extension base="platformEvent:PlatformEventType">
+				<xs:sequence>
+					<xs:element name="serviceKey" type="xs:string" minOccurs="1" />
+					<xs:element name="stageStarttime" type="xs:dateTime" />
+					<xs:element name="StageEndtime" type="xs:dateTime" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+    <xs:complexType name="ServiceAlertType">
+        <xs:complexContent>
+            <xs:extension base="platformEvent:PlatformAlertType">
+                <xs:sequence>
+                    <xs:element name="serviceKey" type="xs:string" minOccurs="1" />
+                    <xs:element name="stageStarttime" type="xs:dateTime" />
+                    <xs:element name="StageEndtime" type="xs:dateTime" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+	
+	<!-- Utility types for capturing audit trails -->	
+	<xs:complexType name="AuditDetailsType">
+		<xs:sequence>		
+			<xs:element name="columnDetails" type="ColumnDetailsType" minOccurs="1" maxOccurs="unbounded"/>																		
+		</xs:sequence>	
+	</xs:complexType>
+	
+	<xs:complexType name="ColumnDetailsType">
+		<xs:sequence>		
+			<xs:element name="columnName" type="xs:string" minOccurs="1"/>
+			<xs:element name="oldValue" type="xs:string"  minOccurs="1"/>
+			<xs:element name="newValue" type="xs:string"  minOccurs="0"/>															
+		</xs:sequence>	
+	</xs:complexType>
+	<!-- End Utility types for capturing audit trails -->
+	
+		
+</xs:schema>
