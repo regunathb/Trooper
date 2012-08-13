@@ -5,8 +5,14 @@
 	xmlns="http://org/trpr/platform/service/model/common/platformServiceRequest"
 	elementFormDefault="qualified">
 
-	<xs:element name="PlatformServiceRequest" type="PlatformServiceRequestType" />
-
+	<xs:element name="PlatformServiceRequest">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformServiceRequestType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+	
 	<xs:complexType name="PlatformServiceRequestType" abstract="true">
 		<xs:sequence>
 			<xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1" />
