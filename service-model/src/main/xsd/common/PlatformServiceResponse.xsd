@@ -18,8 +18,14 @@
 		namespace="http://org/trpr/platform/model/event"
 		schemaLocation="./../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
 		
-	<xs:element name="PlatformServiceResponse" type="PlatformServiceResponseType" />
-	
+	<xs:element name="PlatformServiceResponse">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformServiceResponseType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
+
 	<xs:complexType name="PlatformServiceResponseType" abstract="true">
 		<xs:sequence>
 			<xs:element name="status" type="status:Status" minOccurs="1" maxOccurs="1" />
