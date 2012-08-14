@@ -6,9 +6,9 @@
 	<xs:import namespace="http://org/trpr/platform/model/event"
 		schemaLocation="./../../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
 		
-	<xs:complexType name="ServiceEventType">
+	<xs:complexType name="ServiceEvent">
 		<xs:complexContent>
-			<xs:extension base="platformEvent:PlatformEventType">
+			<xs:extension base="platformEvent:PlatformEvent">
 				<xs:sequence>
 					<xs:element name="serviceKey" type="xs:string" minOccurs="1" />
 					<xs:element name="stageStarttime" type="xs:dateTime" />
@@ -18,9 +18,9 @@
 		</xs:complexContent>
 	</xs:complexType>
 	
-    <xs:complexType name="ServiceAlertType">
+    <xs:complexType name="ServiceAlert">
         <xs:complexContent>
-            <xs:extension base="platformEvent:PlatformAlertType">
+            <xs:extension base="platformEvent:PlatformAlert">
                 <xs:sequence>
                     <xs:element name="serviceKey" type="xs:string" minOccurs="1" />
                     <xs:element name="stageStarttime" type="xs:dateTime" />
@@ -31,13 +31,13 @@
     </xs:complexType>
 	
 	<!-- Utility types for capturing audit trails -->	
-	<xs:complexType name="AuditDetailsType">
+	<xs:complexType name="AuditDetails">
 		<xs:sequence>		
-			<xs:element name="columnDetails" type="ColumnDetailsType" minOccurs="1" maxOccurs="unbounded"/>																		
+			<xs:element name="columnDetails" type="ColumnDetails" minOccurs="1" maxOccurs="unbounded"/>																		
 		</xs:sequence>	
 	</xs:complexType>
 	
-	<xs:complexType name="ColumnDetailsType">
+	<xs:complexType name="ColumnDetails">
 		<xs:sequence>		
 			<xs:element name="columnName" type="xs:string" minOccurs="1"/>
 			<xs:element name="oldValue" type="xs:string"  minOccurs="1"/>

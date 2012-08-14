@@ -32,7 +32,7 @@
 			<xs:element name="platformServiceRequest" type="request:PlatformServiceRequestType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="errorSummary" type="error:ErrorSummary" minOccurs="0" maxOccurs="1" />
 			<xs:element name="warningSummary" type="warning:WarningSummary" minOccurs="0" maxOccurs="1" />
-			<xs:element name="events" type="platformEvent:PlatformEventType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="events" type="platformEvent:PlatformEvent" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	
