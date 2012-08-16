@@ -9,7 +9,13 @@
 		namespace="http://org/trpr/platform/service/model/common/platformServiceResponse"
 		schemaLocation="PlatformServiceResponse.xsd" />
 	
-	<xs:element name="PlatformExceptionResponse" type="PlatformExceptionResponseType" />
+    <xs:element name="PlatformExceptionResponse">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="PlatformExceptionResponseType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
 	
 	<xs:complexType name="PlatformExceptionResponseType">
 		<xs:complexContent>
@@ -31,7 +37,13 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:element name="ExceptionSummaryType" type="ExceptionSummaryTypeType" />
+	<xs:element name="ExceptionSummaryType">
+		<xs:complexType>
+			<xs:complexContent>
+               <xs:extension base="ExceptionSummaryTypeType"/>
+			</xs:complexContent>               
+	    </xs:complexType>		
+	</xs:element>
 	
 	<xs:complexType name="ExceptionSummaryTypeType">
 		<xs:sequence>
