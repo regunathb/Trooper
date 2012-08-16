@@ -53,12 +53,12 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	private static final String DEFAULT_EVENT_PRODUCER = "platformEventProducer";
 	
     /** The common batch beans context*/
-    private static AbstractApplicationContext commonBatchBeansContext;    
+    private AbstractApplicationContext commonBatchBeansContext;    
     
 	/**
-	 * The Spring application context that would hold all job instances loaded by this container
+	 * The list of Spring application contexts that would hold all job instances loaded by this container
 	 */
-    private static List<AbstractApplicationContext> jobsContext = new LinkedList<AbstractApplicationContext>();	
+    private List<AbstractApplicationContext> jobsContextList = new LinkedList<AbstractApplicationContext>();	
     
     /** Local reference for all BootstrapExtensionS loaded by the Container and set on this ComponentContainer*/
     private BootstrapExtension[] loadedBootstrapExtensions;
@@ -97,18 +97,18 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 				break;
 			}
 		}
-		SpringBatchComponentContainer.commonBatchBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
+		this.commonBatchBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
 				appContextFactory.getCommonBeansContext());	
 		// add the common batch beans to the contexts list
-		SpringBatchComponentContainer.jobsContext.add(SpringBatchComponentContainer.commonBatchBeansContext);
+		this.jobsContextList.add(this.commonBatchBeansContext);
 		
 		// locate and load the individual job bean XML files using the common batch beans context as parent
 		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
 		for (File jobBeansFile : jobBeansFiles) {
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
 			// to relative path
-			SpringBatchComponentContainer.jobsContext.add(new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobBeansFile.getAbsolutePath()},
-					SpringBatchComponentContainer.commonBatchBeansContext));
+			this.jobsContextList.add(new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobBeansFile.getAbsolutePath()},
+					this.commonBatchBeansContext));
 		}
 		
 	}
@@ -118,10 +118,10 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 * @see ComponentContainer#destroy()
 	 */
 	public void destroy() throws PlatformException {
-		for (AbstractApplicationContext context : SpringBatchComponentContainer.jobsContext) {
+		for (AbstractApplicationContext context : this.jobsContextList) {
 			context.close();
 		}
-		SpringBatchComponentContainer.jobsContext = null;		
+		this.jobsContextList = null;		
 	}
 	
 	/**
@@ -130,7 +130,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 * Note that typically no consumers are registered when running this container
 	 */ 
 	public void publishEvent(PlatformEvent event) {
-		PlatformEventProducer publisher= (PlatformEventProducer)SpringBatchComponentContainer.commonBatchBeansContext.getBean(DEFAULT_EVENT_PRODUCER);
+		PlatformEventProducer publisher= (PlatformEventProducer)this.commonBatchBeansContext.getBean(DEFAULT_EVENT_PRODUCER);
 		publisher.publishEvent(event);
 	}
 	    
