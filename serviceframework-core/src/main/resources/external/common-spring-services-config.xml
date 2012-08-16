@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+
+	<!-- Start Event Framework beans -->
+	<!-- 
+		Note that there can only be one bean by name "applicationEventMulticaster" as per Spring design.
+		It is recommended to use the PlatformEventMulticaster and ServiceEventProducerImpl, and an implementation of ServiceEventConsumer.
+		A more basic ApplicationEventMulticaster with no support for subscriptions may be defined as below:
+		
+	 	<bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+		</bean>		 	
+	 -->
+	<!-- This event producer bean is declared primarily for publishing Bootstrap lifecycle events -->
+	<bean id="platformEventProducer" class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
+	</bean>  	
+	<!-- This event consumer bean is declared primarily for consuming Bootstrap lifecycle events -->
+	<bean id="bootstrapMonitor" class="org.trpr.platform.runtime.impl.event.BootstrapProgressMonitor">
+	</bean>  	
+	<!-- End Event Framework beans -->
+	
+	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
+		 Needed to export the "serviceStatisticsGatherer" as a JMX MBean   
+	-->
+	<bean id="serviceStatisticsExporter" parent="mbeansExporter">	
+	<property name="beans">
+	    <map>
+		<entry key="bean:name=serviceStatisticsGatherer" value-ref="serviceStatisticsGatherer"/>
+            </map>
+        </property>
+	</bean>
+	
+	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer">
+	</bean>
+	
+	<bean id="serviceContext" class="org.trpr.platform.servicefw.ServiceContext">
+	</bean>
+
+	<bean id="serviceRegistry" class="org.trpr.platform.servicefw.ServiceRegistry">
+	</bean>
+
+</beans>
