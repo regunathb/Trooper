@@ -33,6 +33,9 @@ public class ServiceKeyImpl implements ServiceKey, Serializable {
 
 	private static final long serialVersionUID = 4130555022337001738L;
 	
+	/** The separator char i.e '_' between service name and its version*/
+	private static final String SERVICE_VERSION_SEPARATOR= "_";	
+	
 	/** Name part of the this ServiceKey */
 	private String name;
 	
@@ -123,6 +126,7 @@ public class ServiceKeyImpl implements ServiceKey, Serializable {
 	public String toString(){
 		StringBuffer serviceKey = new StringBuffer();
 		serviceKey.append(this.name);
+		serviceKey.append(SERVICE_VERSION_SEPARATOR);
 		serviceKey.append(this.version);
 		return serviceKey.toString();
 		

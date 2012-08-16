@@ -36,11 +36,12 @@ public interface ServiceCompartment<T extends PlatformServiceRequest, S extends 
 	
 	/**
 	 * Conduit point for calling the associated service.
+	 * @param service the Service instance to invoke
 	 * @param req the Service Request
 	 * @return ServiceResponse the service response
 	 * @throws ServiceException exception thrown in case of error in service invocation
 	 */
-	public ServiceResponse<S> processRequest(ServiceRequest<T> req) throws ServiceException;
+	public ServiceResponse<S> processRequest(Service<T,S> service, ServiceRequest<T> req) throws ServiceException;
 	
 	/**
 	 * Signals service execution start
