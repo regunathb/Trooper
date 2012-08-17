@@ -142,9 +142,14 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			// We look up only bean names of ServiceS
 			String[] serviceBeanIds = entry.getValue().getBeanNamesForType(Service.class);
 			for (String serviceBeanId : serviceBeanIds) {
-				String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
-				// TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
-				serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], entry.getKey(), ServiceFrameworkConstants.DEFAULT_DOMAIN);
+				try {
+					String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
+					// TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
+					serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], entry.getKey(), ServiceFrameworkConstants.DEFAULT_DOMAIN);		
+				} catch (Exception ex) {
+					// the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
+					throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
+				}
 			}
 		}
 		
