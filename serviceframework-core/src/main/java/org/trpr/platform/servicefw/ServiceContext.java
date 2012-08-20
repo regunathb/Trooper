@@ -27,6 +27,7 @@ import org.trpr.platform.servicefw.spi.ServiceContainer;
 import org.trpr.platform.servicefw.spi.ServiceKey;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
+import org.trpr.platform.spi.task.TaskManager;
 
 /**
  * The <code>ServiceContext</code> class defines a set of methods that a service may use to communicate 
@@ -52,6 +53,9 @@ public class ServiceContext<T,S,P extends PlatformServiceRequest,R extends Platf
 	 * The ServiceContainer instance that initialized this ServiceContext
 	 */
 	private ServiceContainer<P,R> serviceContainer;
+	
+	/** The TaskManager implementation to use for Task execution*/
+	private TaskManager taskManager;
 	
 	/**
 	 * Signals start of execution of the specified service request by the service 
@@ -136,7 +140,14 @@ public class ServiceContext<T,S,P extends PlatformServiceRequest,R extends Platf
 	public ServiceContainer<P,R> getServiceContainer() {
 		return this.serviceContainer;
 	}
-	
+	@SuppressWarnings("rawtypes")
+	public TaskManager getTaskManager() {
+		return this.taskManager;
+	}
+	@SuppressWarnings("rawtypes")
+	public void setTaskManager(TaskManager taskManager) {
+		this.taskManager = taskManager;
+	}   
 	/** End setter/getter methods*/
 	
 }

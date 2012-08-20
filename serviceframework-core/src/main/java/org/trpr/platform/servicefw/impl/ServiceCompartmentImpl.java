@@ -120,30 +120,14 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 
 	@SuppressWarnings("unchecked")
 	public ServiceResponse processRequest(Service service, ServiceRequest request) throws ServiceException {
+
 		ServiceResponse response = null;
 		incrementUsageCounter();
-		long executionStartTime = System.currentTimeMillis();
 		
 		// invokes the service 
 		response = invokeService(service, request);
 		decrementUsageCounter();
 		
-		// synchronized block as this is a single instance through which all calls to the service bean is routed.
-		// This class is not thread safe as a consequence and the instance variables need to be modified inside a synchronized block
-		synchronized(this) {
-			this.lastServiceRequestResponseTime = (System.currentTimeMillis() - executionStartTime);
-			if (this.lastServiceRequestResponseTime < this.minimumResponseTime ||
-				this.minimumResponseTime == INVALID_STATISTICS_VALUE) {
-				this.minimumResponseTime = this.lastServiceRequestResponseTime;
-			}
-			if (this.lastServiceRequestResponseTime > this.maximumResponseTime) {
-				this.maximumResponseTime = this.lastServiceRequestResponseTime;
-			}
-			this.cumulativeResponseTime += this.lastServiceRequestResponseTime;
-			if (String.valueOf(ServiceFrameworkConstants.FAILURE_STATUS_CODE).equalsIgnoreCase(((ServiceResponseImpl)response).getStatusCode())) {
-				this.errorRequestsCounts += 1;
-			}
-		}
 		return response;
 	}
 

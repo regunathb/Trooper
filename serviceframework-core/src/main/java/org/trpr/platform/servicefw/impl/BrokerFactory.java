@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import org.trpr.platform.servicefw.ServiceRegistry;
 import org.trpr.platform.servicefw.common.ServiceException;
 import org.trpr.platform.servicefw.spi.Broker;
+import org.trpr.platform.servicefw.spi.ServiceContainer;
 import org.trpr.platform.servicefw.spi.ServiceInfo;
 import org.trpr.platform.servicefw.spi.ServiceKey;
 
@@ -45,24 +46,27 @@ public class BrokerFactory {
 	private static final String CLOSING_BRACES = ">]";
 	private static final String SECTION_DEMARCATION = "\n******************************************************";
 	
+	/** The ServiceContainer instance for initalizing the BrokerImpl*/
+	private static ServiceContainer serviceContainer;
+	
 	/** The ServiceRegistry instance for looking up ServiceInfo details*/
-	private ServiceRegistry serviceRegistry;
+	private static ServiceRegistry serviceRegistry;
 	
 	/**
 	 * Returns a Broker implementation that is relevant to the specified service key.
 	 * @param ServiceKey based on which a Broker instance is returned
 	 * @return Broker implementation relevant to the service key specified
 	 */
-	public Broker getBroker(ServiceKey serviceKey) throws ServiceException {
+	public static Broker getBroker(ServiceKey serviceKey) throws ServiceException {
 		return findBroker(serviceKey);
 	}
 
 	/** Helper method to get broker that is relevant to the specified service request */
 	@SuppressWarnings("rawtypes")
-	private Broker findBroker(ServiceKey serviceKey)throws ServiceException {
+	private static Broker findBroker(ServiceKey serviceKey)throws ServiceException {
 		Broker brokerToReturn = null;
 		
-		ServiceInfo serviceInfo = this.serviceRegistry.getServiceInfo(serviceKey);
+		ServiceInfo serviceInfo = BrokerFactory.serviceRegistry.getServiceInfo(serviceKey);
 		// if service info not found i.e not a valid service key or the service configuration is in error, throw a
 		// ServiceException
 		if (serviceInfo == null) {
@@ -70,15 +74,16 @@ public class BrokerFactory {
 		}		
 		
 		brokerToReturn = new BrokerImpl(serviceInfo);
+		((BrokerImpl)brokerToReturn).setServiceContainer(BrokerFactory.serviceContainer);
 		return brokerToReturn;		
 	}
 	
-	/** Getter/Setter methods */
-	public ServiceRegistry getServiceRegistry() {
-		return this.serviceRegistry;
-	}
-	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
+	/** Static Setter methods */
+	public static void setServiceContainer(ServiceContainer serviceContainer) {
+		BrokerFactory.serviceContainer = serviceContainer;
+	}	
+	public static void setServiceRegistry(ServiceRegistry serviceRegistry) {
+		BrokerFactory.serviceRegistry = serviceRegistry;
 	}	
 	/** End getter/setter methods */
 	
@@ -86,7 +91,7 @@ public class BrokerFactory {
 	 * Helper method to construct a ServiceException message for invocation of a
 	 * non-existent service
 	 */
-	private String getMissingServiceMessage(ServiceKey serviceKey) {
+	private static String getMissingServiceMessage(ServiceKey serviceKey) {
 		StringBuffer buffer = new StringBuffer();
 		String hostName = null;
 		try {
@@ -99,7 +104,7 @@ public class BrokerFactory {
 		buffer.append(SECTION_DEMARCATION);
 		buffer.append(YOU_INVOKED + serviceKey);
 		buffer.append(SERVICES_AVAILABLE);
-		for (ServiceInfo serviceInfo : this.serviceRegistry.getAllServiceInfos()) {
+		for (ServiceInfo serviceInfo : BrokerFactory.serviceRegistry.getAllServiceInfos()) {
 			buffer.append("\n");
 			buffer.append(SERVICE_NAME + serviceInfo.getServiceKey());
 			buffer.append(PROJECT + serviceInfo.getProjectName());

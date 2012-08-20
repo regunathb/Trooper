@@ -34,7 +34,11 @@
 	</bean>
 	
 	<bean id="serviceContext" class="org.trpr.platform.servicefw.ServiceContext">
+		<property name="taskManager" ref="taskManager" />
 	</bean>
+
+	<bean id="taskManager" class="org.trpr.platform.impl.task.SimpleTaskManager">
+	</bean>	
 
 	<bean id="serviceRegistry" class="org.trpr.platform.servicefw.ServiceRegistry">
 	</bean>

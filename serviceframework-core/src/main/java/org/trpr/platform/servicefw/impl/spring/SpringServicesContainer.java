@@ -40,6 +40,8 @@ import org.trpr.platform.servicefw.ServiceContext;
 import org.trpr.platform.servicefw.ServiceRegistry;
 import org.trpr.platform.servicefw.common.ServiceException;
 import org.trpr.platform.servicefw.common.ServiceFrameworkConstants;
+import org.trpr.platform.servicefw.impl.AbstractServiceImpl;
+import org.trpr.platform.servicefw.impl.BrokerFactory;
 import org.trpr.platform.servicefw.impl.ServiceCompartmentImpl;
 import org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer;
 import org.trpr.platform.servicefw.spi.Service;
@@ -50,6 +52,7 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
+import org.trpr.platform.spi.task.TaskManager;
 
 /**
  * The <code>SpringServicesContainer</code> class is a {@link ServiceContainer} implementation that uses Spring to manage the service implementations.
@@ -85,6 +88,12 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	private static final String SERVICE_CONTEXT_BEAN = "serviceContext";
 	private static final String SERVICE_REGISTRY_BEAN = "serviceRegistry";
 	
+	/** The ServiceContext initialized by this ServiceContainer*/
+	private ServiceContext serviceContext;
+	
+	/** The ServiceRegistry initialized by this ServiceContainer*/
+	private ServiceRegistry serviceRegistry;
+		
     /** The common batch beans context*/
     private AbstractApplicationContext commonServiceBeansContext;    	
 	/**
@@ -107,18 +116,10 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void init() throws PlatformException {
-		// get the commons beans context by locating the ApplicationContextFactory bootstrap extension
-		ApplicationContextFactory appContextFactory = null;
-		for (BootstrapExtension be : this.loadedBootstrapExtensions) {
-			if (be.getClass().isAssignableFrom(BootstrapExtension.class)) {
-				appContextFactory = (ApplicationContextFactory)be;
-				break;
-			}
-		}
 		// The common service beans context is loaded first using the Platform common beans context as parent
 		String commonContextFile = FILE_PREFIX + FileLocator.findUniqueFile(ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG).getAbsolutePath();		
 		this.commonServiceBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
-				appContextFactory.getCommonBeansContext());	
+				ApplicationContextFactory.getCommonBeansContext());	
 		// add the common service beans to the contexts map using the predefined name as the key
 		this.servicesContextMap.put(COMMON_SERVICES_BEANS_CONTEXT_NAME, this.commonServiceBeansContext);
 		
@@ -131,10 +132,16 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 					(new String[]{FILE_PREFIX + serviceBeansFile.getAbsolutePath()},this.commonServiceBeansContext));
 		}
 		// now initialize context, statistics gatherer and registry
-		((ServiceContext)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_CONTEXT_BEAN)).setServiceContainer(this);
+		this.serviceContext = (ServiceContext)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_CONTEXT_BEAN);
+		this.serviceContext.setServiceContainer(this);
 		((ServiceStatisticsGatherer)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_STATISTICS_BEAN)).setServiceContainer(this);
 		
-		ServiceRegistry serviceRegistry = (ServiceRegistry)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_REGISTRY_BEAN);
+		this.serviceRegistry = (ServiceRegistry)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_REGISTRY_BEAN);
+		
+		// Set this ServiceContainer and ServiceRegistry on the BrokerFactory TODO : Need a better way of doing this
+		BrokerFactory.setServiceContainer(this);
+		BrokerFactory.setServiceRegistry(this.serviceRegistry);
+		
 		// register all service infos with the registry
 		Iterator<Entry<String, AbstractApplicationContext>> entrysetIterator = this.servicesContextMap.entrySet().iterator();
 		while (entrysetIterator.hasNext()) {
@@ -145,7 +152,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 				try {
 					String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
 					// TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
-					serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], entry.getKey(), ServiceFrameworkConstants.DEFAULT_DOMAIN);		
+					this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], entry.getKey(), ServiceFrameworkConstants.DEFAULT_DOMAIN);		
 				} catch (Exception ex) {
 					// the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
 					throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
@@ -157,7 +164,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		// create ServiceCompartment instances for the located services
 		this.serviceCompartments = new HashMap<ServiceKey, ServiceCompartment<T,S>>();
 		this.serviceInfos = new HashMap<ServiceKey, ServiceInfo>();
-		for(ServiceInfo serviceInfo : serviceRegistry.getAllServiceInfos()) {
+		for(ServiceInfo serviceInfo : this.serviceRegistry.getAllServiceInfos()) {
 			ServiceKey 	serviceKey=serviceInfo.getServiceKey();
 			serviceInfos.put(serviceKey,serviceInfo);
 			ServiceCompartment<T,S> serviceCompartment= new ServiceCompartmentImpl<T,S>(serviceInfo);
@@ -180,9 +187,6 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		serviceCompartments.clear();
 		serviceInfos=null;
 		serviceCompartments=null;
-		for (AbstractApplicationContext context : this.servicesContextMap.values()) {
-			context.close();
-		}
 		this.servicesContextMap.clear();
 		this.servicesContextMap = null;		
 	}
@@ -201,7 +205,8 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 * @see ServiceContainer#getCompartment(ServiceKey)
 	 */
 	public ServiceCompartment<T,S> getCompartment(ServiceKey serviceKey) {
-		return (ServiceCompartment<T,S>)serviceCompartments.get(serviceKey);
+		// always get the service key resolved from the service registry
+		return (ServiceCompartment<T,S>)serviceCompartments.get(this.serviceRegistry.getServiceInfo(serviceKey).getServiceKey());
 	}
 
 	/**
@@ -209,7 +214,8 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 * @see ServiceContainer#getServiceInfo(ServiceKey)
 	 */
 	public ServiceInfo getServiceInfo(ServiceKey serviceKey) {
-		return (ServiceInfo)serviceInfos.get(serviceKey);
+		// always get the service key resolved from the service registry
+		return (ServiceInfo)serviceInfos.get(this.serviceRegistry.getServiceInfo(serviceKey).getServiceKey());
 	}
 
 	/**
@@ -221,8 +227,10 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			ServiceRequest request) throws ServiceException {
 		ServiceCompartment serviceCompartment = getCompartment(serviceInfo.getServiceKey());
 		for (AbstractApplicationContext context : this.servicesContextMap.values()) {
-			Service service = (Service)context.getBean(serviceInfo.getServiceKey().toString());
-			if (service != null) {
+			if (context.containsBean(serviceInfo.getServiceKey().toString())) {
+				AbstractServiceImpl service = (AbstractServiceImpl)context.getBean(serviceInfo.getServiceKey().toString());
+				service.setServiceContext(this.serviceContext);
+				service.setTaskManager(this.serviceContext.getTaskManager());
 				return serviceCompartment.processRequest(service,request);
 			}
 		}
@@ -285,7 +293,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
     public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions) {
     	this.loadedBootstrapExtensions = bootstrapExtensions;
     }
-	
+    	
 	/**
 	 * Helper method to return the project name derived from the config file path
 	 */
