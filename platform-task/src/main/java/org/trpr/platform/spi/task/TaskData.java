@@ -41,6 +41,8 @@ public abstract class TaskData <T extends BusinessEntity,S extends Resource> {
 	 */
 	public void addEntity(T... entities) {
 		for (T entity : entities) {
+			// if entity name is not specified, set the fully qualified class name as the entity name
+			entity.setEntityName(entity.getEntityName() == null ? entity.getClass().getName(): entity.getEntityName());
 			this.entitiesList.add(entity);
 		}		
 	}

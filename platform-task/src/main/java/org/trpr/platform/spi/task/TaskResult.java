@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.trpr.platform.model.common.BusinessEntity;
+import org.trpr.platform.spi.execution.ExecutionSummary;
 import org.trpr.platform.spi.execution.ResultCode;
 import org.trpr.platform.spi.execution.Severity;
 
@@ -29,10 +30,13 @@ import org.trpr.platform.spi.execution.Severity;
  * @version 1.0, 04/06/2012
  */
 
-public abstract class TaskResult<T extends BusinessEntity> {
+public class TaskResult<T extends BusinessEntity> {
 	
 	/** The TaskResultCode denoting outcome of execution */
 	private TaskResultCode resultCode;
+	
+	/** The Task execution summary */
+	private ExecutionSummary executionSummary;
 	
 	/** The list of entities containing task execution application data*/
 	private List<T> entitiesList = new LinkedList<T>();	
@@ -66,6 +70,12 @@ public abstract class TaskResult<T extends BusinessEntity> {
 	/** ===== Start Getter/Setter methods*/
 	public TaskResultCode getResultCode() {
 		return this.resultCode;
+	}
+	public ExecutionSummary getExecutionSummary() {
+		return this.executionSummary;
+	}
+	public void setExecutionSummary(ExecutionSummary executionSummary) {
+		this.executionSummary = executionSummary;
 	}
 	public void setResultCode(TaskResultCode resultCode) {
 		this.resultCode = resultCode;
