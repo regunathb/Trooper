@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://org/trpr/platform/example/model/entity/earthling" xmlns="http://org/trpr/platform/example/model/entity/earthling"
+	targetNamespace="http://org/trpr/example/model/entity/earthling" xmlns="http://org/trpr/example/model/entity/earthling"
 	xmlns:common="http://org/trpr/platform/model/common"
 	elementFormDefault="qualified">
 
@@ -9,7 +9,7 @@
 
 	<xs:complexType name="Earthling">
 		<xs:complexContent>
-			<xs:extension base="common:BusinessEntityType">
+			<xs:extension base="common:BusinessEntity">
 				<xs:sequence>
 					<xs:element name="firstName" type="xs:string" />
 					<xs:element name="lastName" type="xs:string" />
