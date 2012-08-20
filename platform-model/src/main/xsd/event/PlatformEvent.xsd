@@ -8,7 +8,7 @@
 
 	<xs:complexType name="PlatformEvent">
     	<xs:complexContent>
-        	<xs:extension base="common:BusinessEntityType">
+        	<xs:extension base="common:BusinessEntity">
                     <xs:sequence>
                          <xs:element name="eventType" type="xs:string" minOccurs="1" />
                          <xs:element name="eventStatus" type="xs:string" minOccurs="0" />
