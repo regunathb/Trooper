@@ -92,7 +92,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		// get the commons beans context by locating the ApplicationContextFactory bootstrap extension
 		ApplicationContextFactory appContextFactory = null;
 		for (BootstrapExtension be : this.loadedBootstrapExtensions) {
-			if (be.getClass().isAssignableFrom(BootstrapExtension.class)) {
+			if (BootstrapExtension.class.isAssignableFrom(be.getClass())) {
 				appContextFactory = (ApplicationContextFactory)be;
 				break;
 			}
