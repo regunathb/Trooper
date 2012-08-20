@@ -107,7 +107,7 @@ public class Criteria {
 			sb.append("Param Name : ");
 			sb.append(paramKey);
 			sb.append("\nParam Value : ");
-			if (this.paramsMap.get(paramKey) != null && this.paramsMap.get(paramKey).getClass().isAssignableFrom(List.class)) {
+			if (this.paramsMap.get(paramKey) != null && List.class.isAssignableFrom(this.paramsMap.get(paramKey).getClass())) {
 				StringUtils.join((List)this.paramsMap.get(paramKey), ";");
 			} else {
 				sb.append(this.paramsMap.get(paramKey));
