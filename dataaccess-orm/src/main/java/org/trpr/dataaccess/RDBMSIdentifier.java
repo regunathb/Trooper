@@ -59,7 +59,7 @@ public class RDBMSIdentifier implements Identifier {
 	 * Interface method implementation. Returns true if the Long value of this Identifier matches with that of the specified Identifier 
 	 */
 	public boolean equals(Identifier anotherIdentifier) {
-		if (!anotherIdentifier.getClass().isAssignableFrom(RDBMSIdentifier.class)) {
+		if (!RDBMSIdentifier.class.isAssignableFrom(anotherIdentifier.getClass())) {
 			return false;
 		}
 		return (((RDBMSIdentifier)anotherIdentifier).getObjectId().longValue() == this.getObjectId().longValue());
