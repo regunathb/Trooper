@@ -3,15 +3,7 @@
 	xmlns="http://org/trpr/platform/model/common"
 	elementFormDefault="qualified">
 
-	<xs:element name="BusinessEntity">
-		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="BusinessEntityType"/>
-			</xs:complexContent>               
-	    </xs:complexType>		
-	</xs:element>
-	
-	<xs:complexType name="BusinessEntityType">
+	<xs:complexType name="BusinessEntity">
 		<xs:sequence minOccurs="0">
 			<xs:element name="entityIdentifier" type="EntityIdentifierType" />
 			<xs:element name="entityName" type="xs:string" />
