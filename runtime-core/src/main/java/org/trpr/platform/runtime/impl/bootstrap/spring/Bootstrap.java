@@ -292,6 +292,10 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	 * @see BootstrapManagedBean#destroy()
 	 */
 	public void destroy() throws Exception {
+		if (this.backgroundThreadState == EXIT) {
+			// do nothing if already in EXIT state
+			return;
+		}
 		System.out.println("** Trooper runtime shutdown initiated....**");
 		this.stop();
 		// notify the background thread to exit

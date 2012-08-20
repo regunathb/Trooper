@@ -96,8 +96,8 @@ public class SpringContainerImpl implements Container {
 		}			
 		if(this.componentContainer != null){
 			LOGGER.info("** Starting a component container of type : " + this.componentContainer.getClass().getName() + " **");
-			this.componentContainer.init();
 			this.componentContainer.setLoadedBootstrapExtensions(this.bootstrapExtensions);
+			this.componentContainer.init();
 		} else {
 			LOGGER.info("No component container configured for this runtime instance.");			
 		}				
@@ -148,7 +148,7 @@ public class SpringContainerImpl implements Container {
 			} catch (Exception e) {
 				LOGGER.error("Error in loading BootStrap Extension File. Ignoring contents of : " + beFile.getAbsolutePath() + " .Error message : " + e.getMessage(), e);
 			}
-		}
+		}		
 		this.bootstrapExtensions = (BootstrapExtension[]) beManager.loadBootstrapExtensions().toArray(new BootstrapExtension[0]);
 	}
 	

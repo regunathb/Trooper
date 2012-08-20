@@ -56,7 +56,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	/**
 	 * Map of created Spring application contexts.
 	 */
-	private Map<String, AbstractApplicationContext> appContextMap = new HashMap<String, AbstractApplicationContext>();
+	private static Map<String, AbstractApplicationContext> appContextMap = new HashMap<String, AbstractApplicationContext>();
 	
 	/**
 	 * Interface method implementation. Creates and loads a Spring ApplicationContext for each property specified in {@link #getAllProperties()}
@@ -74,7 +74,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 				// Set the commons beans context as the parent of all application contexts created through this ApplicationContextFactory
 				AbstractApplicationContext appContext = new FileSystemXmlApplicationContext(new String[] {FILE_PREFIX + 
 						springBeansFile.getAbsolutePath()}, getCommonBeansContext());
-				this.appContextMap.put(key.toLowerCase(), appContext);
+				ApplicationContextFactory.appContextMap.put(key.toLowerCase(), appContext);
 				
 			} catch (Exception e) { // blanket catch for all checked and unchecked exceptions
 				LOGGER.error("Error loading ApplicationContext. [Name][Path] : [" + key + "][" + fileName + "].Error is : "+ e.getMessage(),e);
@@ -97,27 +97,28 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	 * @see org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension#destroy()
 	 */
 	public void destroy() {
-		for (AbstractApplicationContext appContext : this.appContextMap.values()) {
+		for (AbstractApplicationContext appContext : ApplicationContextFactory.appContextMap.values()) {
 			appContext.close();
 			appContext = null;
 		}
-		appContextMap.clear();
+		ApplicationContextFactory.appContextMap.clear();
 	}
 
 	/**
 	 * Returns the common Spring beans application context that is intended as parent of all application contexts created by the runtime
 	 * @return the AbstractApplicationContext for the XML identified by {@link RuntimeConstants#COMMON_SPRING_BEANS_CONFIG}
+	 * TODO : Need a better way than to expose this than as a static method.
 	 */
-	public AbstractApplicationContext getCommonBeansContext() {
+	public static AbstractApplicationContext getCommonBeansContext() {
 		// commonBeansContext is the base context for all application contexts, so load it if not loaded already.
-		AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
+		AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)ApplicationContextFactory.appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
 		if (commonBeansContext == null) { 
 			File springBeansFile = FileLocator.findUniqueFile(RuntimeConstants.COMMON_SPRING_BEANS_CONFIG);
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
 			// to relative path
 			commonBeansContext = new FileSystemXmlApplicationContext(FILE_PREFIX + 
 					springBeansFile.getAbsolutePath());
-			appContextMap.put(COMMON_BEANS_CONTEXT_NAME.toLowerCase(), commonBeansContext);
+			ApplicationContextFactory.appContextMap.put(COMMON_BEANS_CONTEXT_NAME.toLowerCase(), commonBeansContext);
 		}
 		return commonBeansContext;
 	}
