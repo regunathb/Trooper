@@ -9,17 +9,9 @@
 		namespace="http://org/trpr/platform/service/model/common/platformServiceResponse"
 		schemaLocation="PlatformServiceResponse.xsd" />
 	
-    <xs:element name="PlatformExceptionResponse">
-		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="PlatformExceptionResponseType"/>
-			</xs:complexContent>               
-	    </xs:complexType>		
-	</xs:element>
-	
 	<xs:complexType name="PlatformExceptionResponseType">
 		<xs:complexContent>
-			<xs:extension base="response:PlatformServiceResponseType">
+			<xs:extension base="response:PlatformServiceResponse">
 				<xs:sequence>
 					<xs:element name="requestInformation" type="RequestInformationTypeType" minOccurs="1" maxOccurs="1" />
 					<xs:element name="exceptionSummary" type="ExceptionSummaryTypeType" minOccurs="1" maxOccurs="1" />
