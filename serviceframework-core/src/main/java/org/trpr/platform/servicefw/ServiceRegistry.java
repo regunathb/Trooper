@@ -72,7 +72,7 @@ public class ServiceRegistry {
 				if (ServiceKey.LATEST_VERSION.equalsIgnoreCase(serviceKey.getVersion())) {
 					// If latest version is being requested, then, loop through rest of service info and find the one
 					// with highest service version
-					if (serviceInfo == null || (Float.parseFloat(serviceInfo.getServiceKey().getVersion()) > 
+					if (serviceInfo == null || (Float.parseFloat(serviceInfo.getServiceKey().getVersion()) >= 
 						Float.parseFloat(serviceInfo.getServiceKey().getVersion())) ) {
 							return serviceInfo;
 					}

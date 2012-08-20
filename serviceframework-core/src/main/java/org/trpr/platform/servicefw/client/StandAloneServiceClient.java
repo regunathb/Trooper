@@ -17,7 +17,6 @@ package org.trpr.platform.servicefw.client;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -58,14 +57,15 @@ public class StandAloneServiceClient {
      * 
 	 * @param args args[0] - Bootstrap configuration path 
 	 *             args[1] - Service Name
-	 *             args[2] - Service Request file path             
+	 *             args[2] - Service Request class name 
+	 *             args[3] - Service Request file path            
 	 * @throws PlatformException 
 	 */
 	public static void main(String[] args) throws PlatformException {
 
 		//validate the service information
-		if(args.length < 2) {
-			LOGGER.error("Service information is not sufficient. bootstrap config path, service name and service" +
+		if(args.length < 3) {
+			LOGGER.error("Service information is not sufficient. bootstrap config path, service name, service request class name and service " +
 					"request file path are required parameters");
 			throw new PlatformException("Service information is not sufficient");
 		}
@@ -73,7 +73,8 @@ public class StandAloneServiceClient {
 		//	get Service information
 		String bootstrapConfigPath = args[0];
 		String serviceName = args[1];
-		String serviceRequestFileName = args[2];
+		String serviceRequestClass = args[2];
+		String serviceRequestFileName = args[3];
 		
 		ServiceResponse<? extends PlatformServiceResponse> serviceResponse = null;
 		
@@ -88,16 +89,25 @@ public class StandAloneServiceClient {
 			String requestXML = new FileUtils().readFromFile(serviceRequestFileName);
 			
 			// unmarshall XML String
-			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)new XMLTranscoderImpl().unmarshal(requestXML,PlatformServiceRequest.class);
+			Class requestClazz = null;
+			try {
+				requestClazz = Class.forName(serviceRequestClass);
+			} catch (Exception e) {
+				LOGGER.error("Unable to find type : " + serviceRequestClass, e);
+				return;
+			}
+			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)new XMLTranscoderImpl().unmarshal(requestXML,requestClazz);
 	
 			// log service request information
 			LOGGER.debug("Service Name : " + serviceName);
 			LOGGER.debug("Service Version: " + platformServiceRequest.getVersion());
+			LOGGER.debug("Service Request Class: " + serviceRequestClass);
 			LOGGER.debug("Service Request: \n" + requestXML);
 			
 			// invoke Service
 			ServiceRequest<? extends PlatformServiceRequest> serviceRequest = new ServiceRequestImpl<PlatformServiceRequest>(platformServiceRequest, serviceName,platformServiceRequest.getVersion());
 			serviceResponse = new BrokerFactory().getBroker(new ServiceKeyImpl(serviceName, platformServiceRequest.getVersion())).invokeService(serviceRequest);
+			
 		    PlatformServiceResponse platformServiceResponse = serviceResponse.getResponseData();
 			
 		    // Marshall java object
@@ -153,10 +163,7 @@ public class StandAloneServiceClient {
 		String osName = System.getProperty("os.name");
 		try {
 			if (osName.startsWith("Mac OS")) {
-				Class fileMgr = Class.forName("com.apple.eio.FileManager");
-				Method openURL = fileMgr.getDeclaredMethod("openURL",
-						new Class[] { String.class });
-				openURL.invoke(null, new Object[] { url });
+				Runtime.getRuntime().exec("open " + url);
 			} else if (osName.startsWith("Windows")) {
 				Runtime.getRuntime().exec(
 						"rundll32 url.dll,FileProtocolHandler " + url);

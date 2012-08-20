@@ -167,8 +167,8 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 			Object[] statValues = new Object[attributeNames.length];
 			statValues[0] = stat.getServiceName();
 			statValues[1] = stat.getServiceVersion();
-			statValues[2] = stat.getStartupTimeStamp();
-			statValues[3] = stat.getLastCalledTimestamp();
+			statValues[2] = stat.getStartupTimeStamp().getTime();
+			statValues[3] = stat.getLastCalledTimestamp().getTime();
 			statValues[4] = stat.getActiveRequestsCount();
 			statValues[5] = stat.getTotalRequestsCount();
 			statValues[6] = stat.getAverageResponseTime();
