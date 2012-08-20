@@ -41,7 +41,7 @@
 			<xs:extension base="WarningDetail">
 				<xs:sequence>
 					<xs:element name="businessEntity" 
-						type="common:BusinessEntityType"/>
+						type="common:BusinessEntity"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
