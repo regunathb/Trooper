@@ -49,9 +49,6 @@ public class GreetingService extends AbstractServiceImpl<GreetingServiceRequest,
 	 */
 	private static final Logger LOGGER = LogFactory.getLogger(GreetingService.class);
 	
-	/** Sets the service information */  
-	private static final String SERVICE_NAME="GreetingService";
-	
 	/**
 	 *No args Constructor 
 	 */
@@ -87,15 +84,14 @@ public class GreetingService extends AbstractServiceImpl<GreetingServiceRequest,
 		}	   
 
 	    // Greet the earthling
-		String header = "Hello" + ":" + SERVICE_NAME + " " ;
-		header += earthling.getFirstName() + " " + earthling.getLastName() + "; Your date of birth is " + earthling.getDateOfBirth().getTime();
+		String header = "Hello" + ": " + earthling.getFirstName() + " " + earthling.getLastName() + "; Your date of birth is " + earthling.getDateOfBirth().getTime();
 		greetingServiceResponse.setHeader(header);
 		LOGGER.info("**** GreetingService execution : " + ServiceFrameworkConstants.SUCCESS_STATUS_MESSAGE + " ****");
 			
 		populateStatus(true, greetingServiceResponse);
 							
 		// set the request in the response always for its use in service chaining
-		//greetingServiceResponse.setPlatformServiceRequest(greetingServiceRequest);
+		greetingServiceResponse.setPlatformServiceRequest(greetingServiceRequest);
 		
 		ServiceResponseImpl<GreetingServiceResponse> serviceResponse = new ServiceResponseImpl<GreetingServiceResponse>(String.valueOf(ServiceFrameworkConstants.SUCCESS_STATUS_CODE));
 		serviceResponse.setResponseData(greetingServiceResponse);
