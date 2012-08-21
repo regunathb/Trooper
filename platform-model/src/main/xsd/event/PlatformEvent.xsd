@@ -6,6 +6,14 @@
           namespace="http://org/trpr/platform/model/common"
           schemaLocation="../common/BusinessEntity.xsd" />
 
+	<xs:element name="PlatformEventXML">
+		<xs:complexType>
+    		<xs:sequence>  
+      			<xs:element name="platformEvent" type="PlatformEvent" />  
+    		</xs:sequence>               
+	    </xs:complexType>		
+   	</xs:element>
+
 	<xs:complexType name="PlatformEvent">
     	<xs:complexContent>
         	<xs:extension base="common:BusinessEntity">
