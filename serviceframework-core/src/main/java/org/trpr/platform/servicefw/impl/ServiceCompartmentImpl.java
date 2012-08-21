@@ -120,15 +120,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 
 	@SuppressWarnings("unchecked")
 	public ServiceResponse processRequest(Service service, ServiceRequest request) throws ServiceException {
-
-		ServiceResponse response = null;
-		incrementUsageCounter();
-		
-		// invokes the service 
-		response = invokeService(service, request);
-		decrementUsageCounter();
-		
-		return response;
+		return invokeService(service, request);
 	}
 
 	/**
