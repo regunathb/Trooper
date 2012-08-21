@@ -17,6 +17,7 @@ package org.trpr.platform.servicefw.client;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -58,14 +59,15 @@ public class StandAloneServiceClient {
 	 * @param args args[0] - Bootstrap configuration path 
 	 *             args[1] - Service Name
 	 *             args[2] - Service Request class name 
-	 *             args[3] - Service Request file path            
+	 *             args[3] - Service Response class name            
+	 *             args[4] - Service Request file path            
 	 * @throws PlatformException 
 	 */
 	public static void main(String[] args) throws PlatformException {
 
 		//validate the service information
-		if(args.length < 3) {
-			LOGGER.error("Service information is not sufficient. bootstrap config path, service name, service request class name and service " +
+		if(args.length < 4) {
+			LOGGER.error("Service information is not sufficient. bootstrap config path, service name, service request class name, service response class name and service " +
 					"request file path are required parameters");
 			throw new PlatformException("Service information is not sufficient");
 		}
@@ -74,7 +76,8 @@ public class StandAloneServiceClient {
 		String bootstrapConfigPath = args[0];
 		String serviceName = args[1];
 		String serviceRequestClass = args[2];
-		String serviceRequestFileName = args[3];
+		String serviceResponseClass = args[3];
+		String serviceRequestFileName = args[4];
 		
 		ServiceResponse<? extends PlatformServiceResponse> serviceResponse = null;
 		
@@ -89,14 +92,20 @@ public class StandAloneServiceClient {
 			String requestXML = new FileUtils().readFromFile(serviceRequestFileName);
 			
 			// unmarshall XML String
-			Class requestClazz = null;
-			try {
-				requestClazz = Class.forName(serviceRequestClass);
-			} catch (Exception e) {
-				LOGGER.error("Unable to find type : " + serviceRequestClass, e);
-				return;
+			Class requestClazz = Class.forName(serviceRequestClass);
+			
+			// get the request getter method
+			Method[] requestMethods = requestClazz.getDeclaredMethods();
+			Method requestGetterMethod = null;
+			for (Method m : requestMethods) {
+				if (m.getName().indexOf("ServiceRequest") > 0) {
+					requestGetterMethod = m;
+					break;
+				}
 			}
-			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)new XMLTranscoderImpl().unmarshal(requestXML,requestClazz);
+			
+			Object requestXMLObject = new XMLTranscoderImpl().unmarshal(requestXML,requestClazz);
+			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)requestGetterMethod.invoke(requestXMLObject, new Object[0]);
 	
 			// log service request information
 			LOGGER.debug("Service Name : " + serviceName);
@@ -108,17 +117,33 @@ public class StandAloneServiceClient {
 			ServiceRequest<? extends PlatformServiceRequest> serviceRequest = new ServiceRequestImpl<PlatformServiceRequest>(platformServiceRequest, serviceName,platformServiceRequest.getVersion());
 			serviceResponse = new BrokerFactory().getBroker(new ServiceKeyImpl(serviceName, platformServiceRequest.getVersion())).invokeService(serviceRequest);
 			
-		    PlatformServiceResponse platformServiceResponse = serviceResponse.getResponseData();
+		
+			Object responseXMLObject = null;
+			responseXMLObject = Class.forName(serviceResponseClass).newInstance(); 
 			
+			// get the request getter method
+			Class responseClazz = Class.forName(serviceResponseClass);
+			Method[] responseMethods = responseClazz.getDeclaredMethods();
+			Method responseSetterMethod = null;
+			for (Method m : responseMethods) {
+				System.out.println(m.getName());
+				if (m.getName().startsWith("set") && m.getName().indexOf("ServiceResponse") > 0) {
+					responseSetterMethod = m;
+					break;
+				}
+			}
+			// set the PlatformServiceResponse on the response XML object
+			responseSetterMethod.invoke(responseXMLObject, serviceResponse.getResponseData());
+
 		    // Marshall java object
-			String responseXML = new XMLTranscoderImpl().marshal(platformServiceResponse);
+			String responseXML = new XMLTranscoderImpl().marshal(responseXMLObject);
 			LOGGER.debug(serviceName + " Response: \n" + responseXML);
 			
 			// write response in web browser
 			writeResponseinBrowser(serviceName, responseXML);
 			
-		} catch(IOException e) {
-			LOGGER.error("IOException thrown while reading the file " + serviceRequestFileName, e);
+		} catch(Throwable e) {
+			LOGGER.error("Exception running the service", e);
 			throw new PlatformException(e);
 		} finally {
 			try {

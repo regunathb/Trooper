@@ -10,9 +10,15 @@
 	<description>Trooper Service Model</description>
 
 	<dependencies>
-        <!-- Third party dependencies -->
-	</dependencies>	
-	
+        <!-- Trooper dependencies -->
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-model</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+			<type>jar</type>
+		</dependency>        
+	</dependencies>		
 	<build>
 	
 		<resources>
