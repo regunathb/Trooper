@@ -7,19 +7,19 @@
 	   xmlns:earthling="http://org/trpr/example/model/entity/earthling"
 	   elementFormDefault="qualified">
   
-  <xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceRequest.xsd"/>
-  <xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceResponse.xsd"/>
-  <xs:import namespace="http://org/trpr/example/model/entity/earthling" schemaLocation="../../entity/Earthling.xsd"/>
+	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceRequest.xsd"/>
+  	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceResponse.xsd"/>
+  	<xs:import namespace="http://org/trpr/example/model/entity/earthling" schemaLocation="../../entity/Earthling.xsd"/>
 	
-	<xs:element name="GreetingServiceRequest">
+	<xs:element name="GreetingServiceRequestXML">
 		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="GreetingServiceRequestType"/>
-			</xs:complexContent>               
+    		<xs:sequence>  
+      			<xs:element name="greetingServiceRequest" type="GreetingServiceRequest" />  
+    		</xs:sequence>               
 	    </xs:complexType>		
-	</xs:element>
-	
-	<xs:complexType name="GreetingServiceRequestType">
+   	</xs:element>
+   	
+	<xs:complexType name="GreetingServiceRequest">
 		<xs:complexContent>
 			<xs:extension base="request:PlatformServiceRequest">
 				<xs:sequence>
@@ -29,15 +29,15 @@
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="GreetingServiceResponse">
+	<xs:element name="GreetingServiceResponseXML">
 		<xs:complexType>
-			<xs:complexContent>
-               <xs:extension base="GreetingServiceResponseType"/>
-			</xs:complexContent>               
+    		<xs:sequence>  
+      			<xs:element name="greetingServiceResponse" type="GreetingServiceResponse" />  
+    		</xs:sequence>               
 	    </xs:complexType>		
    	</xs:element>
-   	
-	<xs:complexType name="GreetingServiceResponseType">
+   				
+	<xs:complexType name="GreetingServiceResponse">
 		<xs:complexContent>
 			<xs:extension base="response:PlatformServiceResponse">
 				<xs:sequence>
@@ -45,6 +45,6 @@
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
-      	</xs:complexType>
+    </xs:complexType>
 
 </xs:schema>
