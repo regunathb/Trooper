@@ -98,7 +98,7 @@ public class StandAloneServiceClient {
 			Method[] requestMethods = requestClazz.getDeclaredMethods();
 			Method requestGetterMethod = null;
 			for (Method m : requestMethods) {
-				if (m.getName().indexOf("ServiceRequest") > 0) {
+				if (m.getName().startsWith("get") && m.getName().indexOf("ServiceRequest") > 0) {
 					requestGetterMethod = m;
 					break;
 				}
