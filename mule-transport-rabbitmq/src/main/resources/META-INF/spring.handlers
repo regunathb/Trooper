@@ -1,0 +1,1 @@
+http\://www.mulesource.org/schema/mule/rabbitmq/2.2=org.trpr.mule.transport.rabbitmq.config.RabbitmqNamespaceHandler
