@@ -86,7 +86,8 @@ public class GreetingService extends AbstractServiceImpl<GreetingServiceRequest,
 	    // Greet the earthling
 		String header = "Hello" + ": " + earthling.getFirstName() + " " + earthling.getLastName() + "; Your date of birth is " + earthling.getDateOfBirth().getTime();
 		greetingServiceResponse.setHeader(header);
-		LOGGER.info("**** GreetingService execution : " + ServiceFrameworkConstants.SUCCESS_STATUS_MESSAGE + " ****");
+		LOGGER.debug("**** GreetingService execution : " + ServiceFrameworkConstants.SUCCESS_STATUS_MESSAGE + " ****");
+		LOGGER.info(header);
 			
 		populateStatus(true, greetingServiceResponse);
 							
