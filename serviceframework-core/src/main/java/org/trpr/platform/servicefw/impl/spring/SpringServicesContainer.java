@@ -223,8 +223,6 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			ServiceRequest request) throws ServiceException {
 		ServiceCompartment serviceCompartment = getCompartment(serviceInfo.getServiceKey());
 		AbstractServiceImpl service = (AbstractServiceImpl)this.servicesContext.getBean(serviceInfo.getServiceKey().toString());
-		service.setServiceContext(this.serviceContext);
-		service.setTaskManager(this.serviceContext.getTaskManager());
 		return serviceCompartment.processRequest(service,request);
 	}
 
