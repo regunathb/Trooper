@@ -56,19 +56,16 @@
 		    <artifactId>mule-module-spring-config</artifactId>
 		    <version>${org.mule.version}</version>
 		</dependency>
-
 		<dependency>
 		    <groupId>org.mule.modules</groupId>
 		    <artifactId>commonretrypolicies</artifactId>
 		    <version>${org.mule.version}</version>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 		    <groupId>org.mule.transports</groupId>
 		    <artifactId>mule-transport-rabbitmq</artifactId>
 		    <version>${org.mule.version}</version>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 		    <groupId>org.mule.modules</groupId>
 		    <artifactId>mule-module-spring-extras</artifactId>
