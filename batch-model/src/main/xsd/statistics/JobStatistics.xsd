@@ -18,7 +18,7 @@
 
    <xs:complexType name="JobStatisticsType">
    	<xs:complexContent>
-		<xs:extension base="common:BusinessEntityType">
+		<xs:extension base="common:BusinessEntity">
 			<xs:sequence>
 			   <xs:element name="hostIP" type="xs:string" minOccurs="0"/>
 			   <xs:element name="hostStartTimeStamp"  type="xs:dateTime" minOccurs="0"/>
