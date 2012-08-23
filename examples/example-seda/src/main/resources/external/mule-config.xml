@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:rabbitmq="http://www.mulesource.org/schema/mule/rabbitmq/2.2"
+	xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.2 classpath:packaged/xsd/mule.xsd
+       http://www.mulesource.org/schema/mule/rabbitmq/2.2 classpath:packaged/xsd/mule-rabbitmq.xsd
+	   http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd">
+
+	<!--
+		Sample end-point configuration for durable end-point i.e. durable exchange, queue and messages. DONOT use this for SEDA configurations. 
+		<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://enrol:direct/?queue=greetingInput&amp;durable=true"/>
+	 -->
+	 
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoInputEndpoint" address="amqp://myexchange:direct/?queue=echoInput"/>
+	
+	<custom-transformer name="EarthlingToGreetingServiceRequest" class="org.trpr.example.seda.greeting.mule.transformer.EarthlingToGreetingServiceRequestTransformer"/>
+	<custom-transformer name="ServiceResponseToEchoServiceRequest" class="org.trpr.example.seda.echo.mule.transformer.GreetingSerResToEchoSerReqTransformer"/>
+	
+	<!-- Sample Mule model demonstrating chaining of Trooper services -->
+	<model name="greetingModel">
+		<custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
+			<spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
+		</custom-exception-strategy>
+		<service name="GreetingMuleService">
+			<inbound>
+				<inbound-endpoint ref="GreetingInputEndpoint" transformer-refs="EarthlingToGreetingServiceRequest"/>
+			</inbound>
+			<pooled-component>
+		        <method-entry-point-resolver>
+		        	<include-entry-point method="processRequest" />
+		        </method-entry-point-resolver>
+				<!-- This bean is defined in spring-services-config.xml of this project -->
+				<spring-object bean="greetingService_1.0" />
+			</pooled-component>
+			<outbound>
+				<!-- Service Responses that contain error status are filtered out by this router -->
+				<custom-outbound-router class="org.trpr.platform.seda.impl.mule.router.ErrorResponseFilteringRouter">
+					<outbound-endpoint ref="EchoInputEndpoint"/>					
+				</custom-outbound-router>
+			</outbound>
+		</service>
+		<service name="EchoMuleService">
+			<inbound>
+				<inbound-endpoint ref="EchoInputEndpoint" transformer-refs="ServiceResponseToEchoServiceRequest"/>
+			</inbound>
+			<pooled-component>
+		        <method-entry-point-resolver>
+		        	<include-entry-point method="processRequest" />
+		        </method-entry-point-resolver>
+				<!-- This bean is defined in spring-services-config.xml of this project -->
+				<spring-object bean="echoService_1.0" />
+			</pooled-component>
+		</service>
+	</model>
+
+    <rabbitmq:connector name="LocalhostRabbitMQConnector">
+        <spring:property name="host" value="localhost" />
+        <spring:property name="virtualHost" value="/" />
+        <spring:property name="port" value="5672" />
+        <spring:property name="username" value="guest" />
+        <spring:property name="password" value="guest" />
+        <spring:property name="retryPolicyTemplate">
+            <spring:bean
+                class="org.mule.modules.common.retry.policies.ExhaustingRetryPolicyTemplate">
+                <spring:property name="sleepTime" value="2000" />
+                <spring:property name="retryLimit" value="100" />
+            </spring:bean>
+        </spring:property>
+        <custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
+            <spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
+        </custom-exception-strategy>
+    </rabbitmq:connector>
+</mule>
+
