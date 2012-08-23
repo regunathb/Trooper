@@ -52,7 +52,7 @@ public class EchoTask extends AbstractTask {
 	 */
 	protected void doExecute() {
 		Earthling earthling = (Earthling) this.getTaskData().getEntityByName(Earthling.class.getName())[0];
-		LOGGER.info("Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth());
+		LOGGER.info("Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth().getTime());
 	}
 	
 }

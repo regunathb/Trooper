@@ -60,7 +60,7 @@ public class EchoService extends AbstractServiceImpl<EchoServiceRequest, EchoSer
 	    EchoServiceResponse echoServiceResponse = new EchoServiceResponse();				
 	    Earthling earthling = (Earthling)echoServiceRequest.getEarthling();
 
-		String echo = "Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth();
+		String echo = "Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth().getTime();
 		echoServiceResponse.setEcho(echo);		
 		populateStatus(true, echoServiceResponse);
 					
