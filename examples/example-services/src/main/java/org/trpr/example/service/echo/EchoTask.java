@@ -14,41 +14,45 @@
  * limitations under the License.
  */
 
-package org.trpr.example.service.greeting;
+package org.trpr.example.service.echo;
 
 import org.trpr.example.model.entity.earthling.Earthling;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.impl.task.AbstractTask;
 import org.trpr.platform.spi.task.Resource;
 
 /**
- * The GreetingTask defines the Task to be executed by the GeetingService
+ * The EchoTask defines the Task that will be executed by the EchoService
  * 
  * @author Regunath B
- * @version 1.0, 17/08/2012
+ * @version 1.0, 23/08/2012
  * 
  */
-public class GreetingTask extends AbstractTask {
+public class EchoTask extends AbstractTask {
+
+	/** Logger variable */
+	private static final Logger LOGGER = LogFactory.getLogger(EchoTask.class);
 	
 	/** Default serial version UID*/
 	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Constructor for this task
-	 * @param earthling the Earthling to greet
+	 * @param earthling the Earthling to echo
 	 * @param id the Task identifier
 	 */
-	public GreetingTask(GreetingTaskData<Earthling, Resource> taskData, String id) {
+	public EchoTask(EchoTaskData<Earthling, Resource> taskData, String id) {
 		super(id);
 		this.setTaskData(taskData);
 	}
 
 	/**
-	 * Implementation of doExecute method. Work is delegated to the {@link GreetingValidationStrategy}
+	 * Implementation of doExecute method. This task just returns the person object back
 	 */
 	protected void doExecute() {
 		Earthling earthling = (Earthling) this.getTaskData().getEntityByName(Earthling.class.getName())[0];
-		GreetingValidationStrategy greetingValidationStrategy = new GreetingValidationStrategy(earthling);
-		this.result.setExecutionSummary(greetingValidationStrategy.validate());	
+		LOGGER.info("Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth());
 	}
 	
 }
