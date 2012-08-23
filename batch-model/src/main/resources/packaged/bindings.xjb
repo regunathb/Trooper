@@ -8,6 +8,7 @@
 			  parseMethod="javax.xml.bind.DatatypeConverter.parseDate"
 			  printMethod="javax.xml.bind.DatatypeConverter.printDate"
 			/>
+			<jaxb:serializable uid="1" />
 		</jaxb:globalBindings>
 	</jaxb:bindings>
 	
