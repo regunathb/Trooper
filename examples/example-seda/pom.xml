@@ -1,0 +1,180 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.trpr</groupId>
+	<artifactId>example-seda</artifactId>
+	<name>Example Orchestration</name>
+	<version>1.0-SNAPSHOT</version>
+	<description>Trooper Example Orchestration</description>
+
+	<properties>
+		<org.springframework.version>3.0.0.RELEASE</org.springframework.version>
+		<org.mule.version>2.2.1</org.mule.version>		
+	</properties>
+
+	<dependencies>
+	
+		<!-- Third party dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+		  	<artifactId>slf4j-api</artifactId>
+		  	<version>1.6.4</version>
+		</dependency>		
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.mule</groupId>
+		    <artifactId>mule-core</artifactId>
+		    <version>${org.mule.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.mule.modules</groupId>
+		    <artifactId>mule-module-spring-config</artifactId>
+		    <version>${org.mule.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.mule.modules</groupId>
+		    <artifactId>commonretrypolicies</artifactId>
+		    <version>${org.mule.version}</version>
+		</dependency>		
+		<dependency>
+		    <groupId>org.mule.transports</groupId>
+		    <artifactId>mule-transport-rabbitmq</artifactId>
+		    <version>${org.mule.version}</version>
+		</dependency>		
+		<dependency>
+		    <groupId>org.mule.modules</groupId>
+		    <artifactId>mule-module-spring-extras</artifactId>
+		    <version>${org.mule.version}</version>
+		</dependency>		
+						
+		<!-- Trooper dependencies -->
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-model</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>runtime-core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>service-model</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-integration</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>integration-rabbitmq</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-task</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>serviceframework-core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>serviceframework-seda</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>example-models</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>example-services</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+				
+	</dependencies>
+	
+	<build>
+
+		<sourceDirectory>src/main/java</sourceDirectory>
+		
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+			</resource>
+		</resources>
+		
+		<plugins>		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+
+					<includes>
+						<include>packaged/**/*</include>
+						<include>org/**/*</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>			
+		</plugins>
+		
+	</build>
+	
+</project>
