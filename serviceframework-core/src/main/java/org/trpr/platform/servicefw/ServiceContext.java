@@ -55,6 +55,7 @@ public class ServiceContext<T,S,P extends PlatformServiceRequest,R extends Platf
 	private ServiceContainer<P,R> serviceContainer;
 	
 	/** The TaskManager implementation to use for Task execution*/
+	@SuppressWarnings("rawtypes")
 	private TaskManager taskManager;
 	
 	/**
