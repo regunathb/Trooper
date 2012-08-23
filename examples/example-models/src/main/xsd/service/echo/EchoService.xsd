@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://org/trpr/example/model/service/echoService"
+           xmlns="http://org/trpr/example/model/service/echoService"
+	   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   xmlns:request="http://org/trpr/platform/service/model/common/platformServiceRequest"
+	   xmlns:response="http://org/trpr/platform/service/model/common/platformServiceResponse"
+	   xmlns:earthling="http://org/trpr/example/model/entity/earthling"
+	   elementFormDefault="qualified">
+  
+	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceRequest.xsd"/>
+  	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceResponse.xsd"/>
+  	<xs:import namespace="http://org/trpr/example/model/entity/earthling" schemaLocation="../../entity/Earthling.xsd"/>
+	
+	<xs:element name="EchoServiceRequestXML">
+		<xs:complexType>
+    		<xs:sequence>  
+      			<xs:element name="echoServiceRequest" type="EchoServiceRequest" />  
+    		</xs:sequence>               
+	    </xs:complexType>		
+   	</xs:element>
+   	
+	<xs:complexType name="EchoServiceRequest">
+		<xs:complexContent>
+			<xs:extension base="request:PlatformServiceRequest">
+				<xs:sequence>
+					<xs:element name="earthling" type="earthling:Earthling"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="EchoServiceResponseXML">
+		<xs:complexType>
+    		<xs:sequence>  
+      			<xs:element name="echoServiceResponse" type="EchoServiceResponse" />  
+    		</xs:sequence>               
+	    </xs:complexType>		
+   	</xs:element>
+   				
+	<xs:complexType name="EchoServiceResponse">
+		<xs:complexContent>
+			<xs:extension base="response:PlatformServiceResponse">
+				<xs:sequence>
+					<xs:element name="echo" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>
