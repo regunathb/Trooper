@@ -19,13 +19,15 @@ package org.trpr.platform.servicefw.impl.spring;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.UrlResource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
@@ -52,7 +54,6 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
-import org.trpr.platform.spi.task.TaskManager;
 
 /**
  * The <code>SpringServicesContainer</code> class is a {@link ServiceContainer} implementation that uses Spring to manage the service implementations.
@@ -70,11 +71,6 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	/** The prefix to be added to file absolute paths when loading Spring XMLs using the FileSystemXmlApplicationContext*/
 	private static final String FILE_PREFIX = "file:";
 	
-	/**
-	 * The pre-defined hash key string for the common Service bean application context. String should be unique and not the same as any project name defined
-	 */
-	private static final String COMMON_SERVICES_BEANS_CONTEXT_NAME = "~~~TrprPlatformCommonServiceBeansContext~~~";
-	
 	/** The separator char i.e '_' between service name and its version*/
 	private static final String SERVICE_VERSION_SEPARATOR= "_";
 	
@@ -89,6 +85,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	private static final String SERVICE_REGISTRY_BEAN = "serviceRegistry";
 	
 	/** The ServiceContext initialized by this ServiceContainer*/
+	@SuppressWarnings("rawtypes")
 	private ServiceContext serviceContext;
 	
 	/** The ServiceRegistry initialized by this ServiceContainer*/
@@ -96,10 +93,11 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		
     /** The common batch beans context*/
     private AbstractApplicationContext commonServiceBeansContext;    	
+    
 	/**
-	 * The list of Spring application contexts that would hold all service declarations from all services
+	 * The Spring application context that would hold all service declarations from all services
 	 */
-    private Map<String, AbstractApplicationContext> servicesContextMap = new HashMap<String,AbstractApplicationContext>();	
+    private AbstractApplicationContext servicesContext;	
 		
 	/** Collection of ServiceCompartments */
 	private HashMap<ServiceKey, ServiceCompartment<T,S>> serviceCompartments = null;
@@ -120,17 +118,18 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		String commonContextFile = FILE_PREFIX + FileLocator.findUniqueFile(ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG).getAbsolutePath();		
 		this.commonServiceBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
 				ApplicationContextFactory.getCommonBeansContext());	
-		// add the common service beans to the contexts map using the predefined name as the key
-		this.servicesContextMap.put(COMMON_SERVICES_BEANS_CONTEXT_NAME, this.commonServiceBeansContext);
 		
-		// locate and load the individual services bean XML files using the common service beans context as parent
-		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);					
+		// load the service beans and set the commons bean context as the parent
+		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);	
+		List<String> fileNamesList = new LinkedList<String>();
 		for (File serviceBeansFile : serviceBeansFiles) {
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
 			// to relative path
-			this.servicesContextMap.put(this.getProjectName(serviceBeansFile.getAbsolutePath()), new FileSystemXmlApplicationContext
-					(new String[]{FILE_PREFIX + serviceBeansFile.getAbsolutePath()},this.commonServiceBeansContext));
+			fileNamesList.add(FILE_PREFIX + serviceBeansFile.getAbsolutePath());
 		}
+		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
+				this.commonServiceBeansContext);		
+		
 		// now initialize context, statistics gatherer and registry
 		this.serviceContext = (ServiceContext)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_CONTEXT_BEAN);
 		this.serviceContext.setServiceContainer(this);
@@ -143,20 +142,18 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		BrokerFactory.setServiceRegistry(this.serviceRegistry);
 		
 		// register all service infos with the registry
-		Iterator<Entry<String, AbstractApplicationContext>> entrysetIterator = this.servicesContextMap.entrySet().iterator();
-		while (entrysetIterator.hasNext()) {
-			Entry<String, AbstractApplicationContext> entry = entrysetIterator.next();
-			// We look up only bean names of ServiceS
-			String[] serviceBeanIds = entry.getValue().getBeanNamesForType(Service.class);
-			for (String serviceBeanId : serviceBeanIds) {
-				try {
-					String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
-					// TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
-					this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], entry.getKey(), ServiceFrameworkConstants.DEFAULT_DOMAIN);		
-				} catch (Exception ex) {
-					// the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
-					throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
-				}
+		String[] serviceBeanIds = this.servicesContext.getBeanNamesForType(Service.class);
+		for (String serviceBeanId : serviceBeanIds) {
+			try {
+				// find the project name from the Resource that was used to load the bean
+				String projectName = this.getProjectName(((UrlResource)((AbstractBeanDefinition)
+						this.servicesContext.getBeanFactory().getBeanDefinition(serviceBeanId)).getResource()).getFile().getAbsolutePath());
+				String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
+				// TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
+				this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], projectName, ServiceFrameworkConstants.DEFAULT_DOMAIN);		
+			} catch (Exception ex) {
+				// the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
+				throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
 			}
 		}
 		
@@ -187,8 +184,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		serviceCompartments.clear();
 		serviceInfos=null;
 		serviceCompartments=null;
-		this.servicesContextMap.clear();
-		this.servicesContextMap = null;		
+		this.servicesContext = null;		
 	}
 	
 	/**
@@ -226,15 +222,10 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	public ServiceResponse invokeService(ServiceInfo serviceInfo,
 			ServiceRequest request) throws ServiceException {
 		ServiceCompartment serviceCompartment = getCompartment(serviceInfo.getServiceKey());
-		for (AbstractApplicationContext context : this.servicesContextMap.values()) {
-			if (context.containsBean(serviceInfo.getServiceKey().toString())) {
-				AbstractServiceImpl service = (AbstractServiceImpl)context.getBean(serviceInfo.getServiceKey().toString());
-				service.setServiceContext(this.serviceContext);
-				service.setTaskManager(this.serviceContext.getTaskManager());
-				return serviceCompartment.processRequest(service,request);
-			}
-		}
-		return null;
+		AbstractServiceImpl service = (AbstractServiceImpl)this.servicesContext.getBean(serviceInfo.getServiceKey().toString());
+		service.setServiceContext(this.serviceContext);
+		service.setTaskManager(this.serviceContext.getTaskManager());
+		return serviceCompartment.processRequest(service,request);
 	}
 
 	/**
@@ -244,12 +235,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 * @see ServiceEventProducer#publishEvent(PlatformEvent, String)
 	 */
 	public void publishEvent(PlatformEvent event, String endpointURI) {
-		for (AbstractApplicationContext context : this.servicesContextMap.values()) {
-			PlatformEventProducer publisher = (PlatformEventProducer)context.getBean(DEFAULT_EVENT_PRODUCER);
-			if (publisher != null) {
-				publisher.publishEvent(event);
-			}
-		}
+		((PlatformEventProducer)this.servicesContext.getBean(DEFAULT_EVENT_PRODUCER)).publishEvent(event);
 	}
 
 	/**
@@ -293,7 +279,14 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
     public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions) {
     	this.loadedBootstrapExtensions = bootstrapExtensions;
     }
-    	
+    
+	/**
+	 * Returns the services context.
+	 * @return the services application context
+	 */
+	protected  AbstractApplicationContext getServicesContext() {
+		return this.servicesContext;
+	}    
 	/**
 	 * Helper method to return the project name derived from the config file path
 	 */
