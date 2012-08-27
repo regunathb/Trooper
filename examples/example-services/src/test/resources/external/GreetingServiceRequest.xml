@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns4:GreetingServiceRequestXML xmlns:ns2="http://org/trpr/platform/model/common" xmlns="http://org/trpr/platform/service/model/common/platformServiceRequest" xmlns:ns4="http://org/trpr/example/model/service/greetingService" xmlns:ns3="http://org/trpr/example/model/entity/earthling" xmlns:ns9="http://org/trpr/platform/service/model/common/warning" xmlns:ns5="http://org/trpr/platform/model/event" xmlns:ns6="http://org/trpr/platform/service/model/common/status" xmlns:ns10="http://org/trpr/platform/service/model/common/platformExceptionResponse" xmlns:ns7="http://org/trpr/platform/service/model/common/platformServiceResponse" xmlns:ns8="http://org/trpr/platform/service/model/common/error">
+    <ns4:greetingServiceRequest>
+        <ns4:earthling>
+            <ns3:firstName>Regunath</ns3:firstName>
+            <ns3:lastName>B</ns3:lastName>
+            <ns3:dateOfBirth>2020-08-21+05:30</ns3:dateOfBirth>
+        </ns4:earthling>
+    </ns4:greetingServiceRequest>
+</ns4:GreetingServiceRequestXML>
