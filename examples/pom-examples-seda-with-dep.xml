@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.trpr</groupId>
+	<artifactId>trooper-examples</artifactId>
+	<name>Trooper Examples</name>
+	<packaging>pom</packaging>
+	<version>1.0-SNAPSHOT</version>
+
+	<modules>		
+		<module>../platform-core</module>
+		<module>../platform-model</module>
+		<module>../platform-integration</module>
+		<module>../platform-task</module>
+		<module>../runtime-core</module>
+		<module>../service-model</module>
+		<module>../serviceframework-core</module>
+		<module>../serviceframework-seda</module>
+		<module>example-models</module>
+		<module>example-services</module>
+        <module>example-seda</module>
+		<module>../integration-rabbitmq</module>		
+	</modules>
+			
+</project>
