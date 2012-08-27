@@ -11,7 +11,7 @@
 
 	<!--
 		Sample end-point configuration for durable end-point i.e. durable exchange, queue and messages. DONOT use this for SEDA configurations. 
-		<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://enrol:direct/?queue=greetingInput&amp;durable=true"/>
+		<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput&amp;durable=true"/>
 	 -->
 	 
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
