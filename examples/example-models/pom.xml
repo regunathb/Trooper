@@ -27,7 +27,6 @@
 		</dependency>        
 	</dependencies>	
 	
-	
 	<build>
 	
 		<resources>
