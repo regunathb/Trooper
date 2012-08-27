@@ -10,21 +10,7 @@
 	<description>Trooper Example Models</description>
 
 	<dependencies>
-        <!-- Trooper dependencies -->
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-model</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>provided</scope>
-			<type>jar</type>
-		</dependency>        
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>service-model</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>provided</scope>
-			<type>jar</type>
-		</dependency>        
+        <!-- Third party dependencies -->
 	</dependencies>	
 	
 	<build>
