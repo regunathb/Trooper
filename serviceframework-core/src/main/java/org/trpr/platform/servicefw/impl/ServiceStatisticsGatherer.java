@@ -51,7 +51,7 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
  * @author Regunath B
  * @version 1.0, 18 Jan 2011
  */
-@ManagedResource(objectName = "spring.application:application=Trooper-Service-Statistics,type=ServiceStatisticsGatherer,name=ServiceStatisticsGatherer", description = "Service Invocation Statistics")
+@ManagedResource(objectName = "spring.application:application=Trooper-Service-Statistics,type=ServiceStatisticsGatherer,name=ServiceStatisticsGatherer-", description = "Service Invocation Statistics")
 public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 	
 	/**
