@@ -126,7 +126,6 @@ public class StandAloneServiceClient {
 			Method[] responseMethods = responseClazz.getDeclaredMethods();
 			Method responseSetterMethod = null;
 			for (Method m : responseMethods) {
-				System.out.println(m.getName());
 				if (m.getName().startsWith("set") && m.getName().indexOf("ServiceResponse") > 0) {
 					responseSetterMethod = m;
 					break;
