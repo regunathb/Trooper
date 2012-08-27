@@ -21,6 +21,7 @@
 		<module>example-models</module>
 		<module>example-services</module>
         <module>example-seda</module>
+        <module>../mule-transport-rabbitmq</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
