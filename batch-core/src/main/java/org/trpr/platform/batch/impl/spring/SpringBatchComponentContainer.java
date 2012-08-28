@@ -89,16 +89,8 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		// to relative path
 		// The common batch beans context is loaded first using the Platform common beans context as parent
 		String commonContextFile = FILE_PREFIX + FileLocator.findUniqueFile(BatchFrameworkConstants.COMMON_BATCH_CONFIG).getAbsolutePath();
-		// get the commons beans context by locating the ApplicationContextFactory bootstrap extension
-		ApplicationContextFactory appContextFactory = null;
-		for (BootstrapExtension be : this.loadedBootstrapExtensions) {
-			if (BootstrapExtension.class.isAssignableFrom(be.getClass())) {
-				appContextFactory = (ApplicationContextFactory)be;
-				break;
-			}
-		}
 		this.commonBatchBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
-				appContextFactory.getCommonBeansContext());	
+				ApplicationContextFactory.getCommonBeansContext());	
 		// add the common batch beans to the contexts list
 		this.jobsContextList.add(this.commonBatchBeansContext);
 		

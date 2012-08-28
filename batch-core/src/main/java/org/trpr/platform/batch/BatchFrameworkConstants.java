@@ -30,7 +30,6 @@ public abstract class BatchFrameworkConstants {
 	 * Constants for the conventions on config file names
 	 */
 	public static final String COMMON_BATCH_CONFIG = "common-batch-config.xml";
-
 	public static final String SPRING_BATCH_CONFIG = "spring-batch-config.xml";
 	
 }
