@@ -83,11 +83,10 @@ public class MuleServicesContainer extends SpringServicesContainer {
 	}
 	
 	/**
-	 * Overriden superclass method. Calls super.destroy() and also closes the MuleContext
+	 * Overriden superclass method. Closes the MuleContext and then invokes {@link #resetContainer()}
 	 * @see SpringServicesContainer#destroy()
 	 */
 	public void destroy() throws PlatformException {
-		super.destroy();
 		try {
 			this.muleContext.stop();
 		} catch (MuleException e) {
@@ -96,6 +95,8 @@ public class MuleServicesContainer extends SpringServicesContainer {
 		}
 		this.muleContext.dispose();
 		this.muleContext = null;
+		// now invoke superclass clean up code
+		this.resetContainer();
 	}
 	
 	/**
