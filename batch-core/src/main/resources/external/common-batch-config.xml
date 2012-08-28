@@ -25,7 +25,7 @@
 	</bean>
 
 	<!-- JMX interface bean for job administration.-->
-	<bean id="jobAdministrator" class="org.trpr.platform.batch.impl.JobAdministrator">
+	<bean id="jobAdministrator" class="org.trpr.platform.batch.impl.spring.jmx.JobAdministrator">
 		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobOperator" ref="jobOperator"/>
 	</bean>
