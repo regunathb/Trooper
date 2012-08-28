@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.trpr.platform.batch.impl;
+package org.trpr.platform.batch.impl.spring.jmx;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
