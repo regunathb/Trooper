@@ -175,16 +175,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 * @see ServiceContainer#destroy()
 	 */
 	public void destroy() throws PlatformException {
-		for (Iterator<ServiceKey> it = serviceCompartments.keySet().iterator(); it.hasNext();) { 
-			ServiceKey key = (ServiceKey) it.next(); 
-			ServiceCompartment<T,S> serviceCompartment = (ServiceCompartment<T,S>) serviceCompartments.get(key); 
-			serviceCompartment.destroy();
-		}
-		serviceInfos.clear();
-		serviceCompartments.clear();
-		serviceInfos=null;
-		serviceCompartments=null;
-		this.servicesContext = null;		
+		this.resetContainer();
 	}
 	
 	/**
@@ -284,7 +275,29 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 */
 	protected  AbstractApplicationContext getServicesContext() {
 		return this.servicesContext;
-	}    
+	}  
+	
+	/**
+	 * Resets the constituents of this ComponentContainer
+	 * @throws PlatformException
+	 */
+	protected void resetContainer() throws PlatformException {
+		for (Iterator<ServiceKey> it = serviceCompartments.keySet().iterator(); it.hasNext();) { 
+			ServiceKey key = (ServiceKey) it.next(); 
+			ServiceCompartment<T,S> serviceCompartment = (ServiceCompartment<T,S>) serviceCompartments.get(key); 
+			serviceCompartment.destroy();
+		}
+		serviceInfos.clear();
+		serviceCompartments.clear();
+		serviceInfos=null;
+		serviceCompartments=null;
+		// do not change the below order of closing app contexts. Always close children first before the parent context
+		this.servicesContext.close();
+		this.servicesContext = null;				
+		this.commonServiceBeansContext.close();
+		this.commonServiceBeansContext = null;
+	}
+	
 	/**
 	 * Helper method to return the project name derived from the config file path
 	 */

@@ -119,16 +119,12 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 	}
 	
 	/** The Spring JMX managed attribute that returns the service stats as a JMX supported type*/
-	private TabularDataSupport serviceInvocationStatistics;
+	private TabularDataSupport serviceInvocationStatistics = new TabularDataSupport(tableType);
 	
 	/** The ServiceContainer for this class*/
 	@SuppressWarnings("rawtypes")
 	private ServiceContainer serviceContainer;
 	
-	public ServiceStatisticsGatherer() {
-		serviceInvocationStatistics = new TabularDataSupport(tableType);
-	}
-
 	/**
 	 * The JMX interface method for reading the managed attribute containing service invocation statistics.
 	 * @return TabularDataSupport JMX type containing a row each of {@link ServiceStatistics} wrapped as JMX type CompositeData
