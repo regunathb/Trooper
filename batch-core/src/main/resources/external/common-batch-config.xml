@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+
+	<!-- This event producer bean is declared primarily for publishing Bootstrap lifecycle events -->
+	<bean id="platformEventProducer" class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
+	</bean>  	
+	
+	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
+		 Needed to export the "jobAdministrator" as a JMX MBean.   
+	-->
+	<bean id="jobAdministratorExporter" parent="mbeansExporter">	
+		<property name="beans">
+			<map>
+				<entry key="bean:name=jobAdministrator" value-ref="jobAdministrator"/>
+            </map>
+        </property>
+	</bean>
+
+	<!-- JMX interface bean for job administration.-->
+	<bean id="jobAdministrator" class="org.trpr.platform.batch.impl.JobAdministrator">
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobOperator" ref="jobOperator"/>
+	</bean>
+
+	<!--
+		Configuring Common Batch Job TransactionManager.
+	-->
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<!-- Configuring Common Batch Job Repository.  -->
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<!-- Configuring Common Batch Job explorer  -->
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<!-- Inject the JobRepository's Factory bean instead of the bean itself as required by the JobExplorer's Factory bean -->
+		<property name="repositoryFactory" ref="&amp;jobRepository" />
+	</bean>
+	
+	<!-- Configuring Common Batch Job Registry.  -->
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />	
+	
+	<!-- Bean for registering the jobs with the JobRegistry -->
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>		
+
+	<!-- Configuring Common Batch Job Launcher.  -->
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<!--<property name="taskExecutor" ref="asyncTasksExecutor"/>-->
+	</bean>
+	
+	<!-- The Job operator bean for launching adhoc jobs -->
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobLauncher" ref="jobLauncher"/>
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<!-- Async Task executor used in all jobs -->
+	<!--<bean id="asyncTasksExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />-->
+	
+	<!-- The incrementer to be used by all jobs -->
+	<bean id="incrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer" />	
+
+</beans>
