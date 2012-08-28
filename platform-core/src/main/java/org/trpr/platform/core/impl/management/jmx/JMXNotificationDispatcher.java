@@ -39,7 +39,7 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
  * @author Regunath B
  * @version 1.0, 17/05/2012
  */
-@ManagedResource(objectName = "spring.application:type=Trooper,application=JMX-Notification-Dispatcher,name=Default-Dispatcher", description = "Trooper JMX Notification Dispatcher")
+@ManagedResource(objectName = "spring.application:type=Trooper,application=JMX-Notification-Dispatcher,name=Default-Dispatcher-", description = "Trooper JMX Notification Dispatcher")
 @ManagedNotifications(value=@ManagedNotification(name="TrprNotifications", description="Trooper Notifications", notificationTypes={"javax.management.Notification"}))
 public class JMXNotificationDispatcher extends AppInstanceAwareMBean implements NotificationPublisherAware {
 
