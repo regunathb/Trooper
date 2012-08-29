@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.spi.spring.filter;
+package org.trpr.platform.batch.spi.spring.transformer;
 
 import org.springframework.batch.item.ItemProcessor;
 
 /**
- * The <code>ItemFilter</code> extends the Spring Batch {@link ItemProcessor} used for filtering out data items passed to item processors.
- * Implementations of this type return <code>null</code> when {@link #process(Object) is invoked and the item has been filtered.
+ * The <code>ItemTransformer</code> extends the Spring Batch {@link ItemProcessor} and is used for transforming or filtering out data items passed to it.
+ * As a transformer, this processor converts the input data into another type. As a filter, this processor returns <code>null</code> when {@link #process(Object) 
+ * is invoked.
  * 
  * @author Regunath B
  * @version 1.0, 28 Aug 2012
  */
-public interface ItemFilter<I,O> extends ItemProcessor<I,O> {
+public interface ItemTransformer<I,O> extends ItemProcessor<I,O> {
 
 }

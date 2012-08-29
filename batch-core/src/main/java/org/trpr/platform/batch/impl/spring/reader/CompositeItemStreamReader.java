@@ -23,6 +23,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 import org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader;
 
 /**
@@ -34,7 +36,7 @@ import org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader;
  * @author Regunath B
  * @version 1.0, 28 Aug 2012
  */
-public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T> {
+public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, InitializingBean {
 	
 	/** The delegate that does the actual data reading*/
 	private BatchItemStreamReader<T> delegate;
@@ -97,6 +99,14 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T> {
 	public void update(ExecutionContext context) throws ItemStreamException {
 		this.delegate.update(context);
 	}
+	
+	/**
+	 * Interface method implementation. Ensures that the BatchItemStreamReader delegate has been set and is not null
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(delegate, "The 'delegate' may not be null");
+	}	
 	
 	/** Getter/setter methods */
 	public BatchItemStreamReader<T> getDelegate() {
