@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema targetNamespace="http://org/trpr/platform/service/model/common/statistics"
+   xmlns="http://org/trpr/platform/service/model/common/statistics"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   xmlns:common="http://org/trpr/platform/model/common"
+   elementFormDefault="qualified">
+
+	<xs:import namespace="http://org/trpr/platform/model/common"
+		schemaLocation="./../../../../../../platform-model/src/main/xsd/common/BusinessEntity.xsd" />
+
+   <xs:complexType name="ServiceStatistics">
+   	<xs:complexContent>
+		<xs:extension base="common:BusinessEntity">
+			<xs:sequence>
+			   <xs:element name="hostIP" type="xs:string" minOccurs="0"/>
+			   <xs:element name="serviceName" type="xs:string" minOccurs="0"/>
+			   <xs:element name="serviceVersion" type="xs:string" minOccurs="0"/>
+			   <xs:element name="startupTimeStamp"  type="xs:dateTime" minOccurs="0"/>
+			   <xs:element name="lastCalledTimestamp"  type="xs:dateTime" minOccurs="0"/>
+			   <xs:element name="activeRequestsCount"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="totalRequestsCount"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="averageResponseTime"  type="xs:long" minOccurs="0"/> 
+			   <xs:element name="minimumResponseTime"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="maximumResponseTime"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="lastServiceRequestResponseTime"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="errorRequestsCount"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="successRequestsCount"  type="xs:long" minOccurs="0"/> 	   			   
+  			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>	
+   </xs:complexType>
+  
+ </xs:schema>
