@@ -27,9 +27,10 @@ import java.util.List;
  */
 public interface ItemAggregator<T> extends Iterator<List<T>> {
 
-		/**
-		 * Adds data to this data aggregator
-		 * @param data List containing data to be aggregated or grouped
-		 */
-		public void addData(List<T> data);
+	/**
+	 * Adds data to this data aggregator
+	 * @param data List containing data to be aggregated or grouped
+	 */
+	public void addData(List<T> data);
+	
 }
