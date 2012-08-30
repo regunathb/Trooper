@@ -44,7 +44,7 @@ public class CompositeItemProcessor <I, O> implements ItemProcessor<I, O>, Initi
 	public O process(I item) throws Exception {
 		Object result = item;
 		for (ItemProcessor<Object, Object> delegate : delegates) {
-			if (result == null) {
+			if (result == null) { // an ItemTransformer has filtered out the data
 				return null;
 			}
 			result = delegate.process(result);
