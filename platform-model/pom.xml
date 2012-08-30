@@ -35,12 +35,13 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
+						        <mkdir dir="${basedir}/src/main/java" />
 								<exec executable="xjc">
-									<arg value="src/main/xsd" />
+									<arg value="${basedir}/src/main/xsd" />
 									<arg value="-d" />
-									<arg value="src/main/java" />
+									<arg value="${basedir}/src/main/java" />
 									<arg value="-b" />
-									<arg value="src/main/resources/packaged" />
+									<arg value="${basedir}/src/main/resources/packaged" />
 								</exec>
 							</tasks>
 						</configuration>
