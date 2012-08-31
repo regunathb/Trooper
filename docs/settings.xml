@@ -37,11 +37,12 @@
       </pluginRepositories>
       <id>artifactory</id>
     </profile>
-<!-- jboss.org config start -->
+    
+	<!-- Public repos config start start -->
 
     <profile>
 
-      <id>jboss-public-repository</id>
+      <id>dep-public-repositories</id>
 
       <repositories>
         <repository>
@@ -105,84 +106,49 @@
       </repositories>
 
       <pluginRepositories>
-
         <pluginRepository>
-
           <id>jboss-public-repository-group</id>
-
           <name>JBoss Public Maven Repository Group</name>
-
           <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-
           <layout>default</layout>
-
           <releases>
-
             <enabled>true</enabled>
             <updatePolicy>always</updatePolicy>
-
-
           </releases>
-
           <snapshots>
-
             <enabled>true</enabled>
-
             <updatePolicy>never</updatePolicy>
-
           </snapshots>
-
         </pluginRepository>
-
       </pluginRepositories>
-
     </profile>
-
 
     <profile>
-
       <id>jboss-deprecated-repository</id>
-
       <repositories>
-
         <repository>
-
           <id>jboss-deprecated-repository</id>
-
           <name>JBoss Deprecated Maven Repository</name>
-
           <url>https://repository.jboss.org/nexus/content/repositories/deprecated/</url>
-
           <layout>default</layout>
-
           <releases>
-
             <enabled>true</enabled>
             <updatePolicy>always</updatePolicy>
-
-
           </releases>
-
           <snapshots>
-
             <enabled>false</enabled>
             <updatePolicy>always</updatePolicy>
-
           </snapshots>
-
         </repository>
-
       </repositories>
-
     </profile>
-
-    <!-- jboss.org config end -->
+    <!-- Public repos config end -->
 
 
   </profiles>
   <activeProfiles>
     <activeProfile>artifactory</activeProfile>
-    <activeProfile>jboss-public-repository</activeProfile>
+    <activeProfile>dep-public-repositories</activeProfile>
   </activeProfiles>
 
   <servers>
