@@ -13,6 +13,26 @@
 		<org.mule.version>2.2.1</org.mule.version>		
 	</properties>
 
+	<dependencyManagement>
+	    <dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+			  	<artifactId>slf4j-api</artifactId>
+			  	<version>1.6.4</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.slf4j</groupId>
+			  <artifactId>jcl-over-slf4j</artifactId>
+			  <version>1.6.4</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.slf4j</groupId>
+			  <artifactId>slf4j-log4j12</artifactId>
+			  <version>1.6.4</version>
+			</dependency>
+	    </dependencies>
+	</dependencyManagement>
+	
 	<dependencies>
 	
 		<!-- Third party dependencies -->
@@ -50,6 +70,16 @@
 		    <groupId>org.mule</groupId>
 		    <artifactId>mule-core</artifactId>
 		    <version>${org.mule.version}</version>
+		    <exclusions>
+	        	<exclusion> <!-- Remove Log4j as it conflicts with slf4j 1.6.4 -->
+		      	  <groupId>org.slf4j</groupId> 
+		          <artifactId>slf4j-log4j12</artifactId>
+		        </exclusion>
+	        	<exclusion> <!-- Remove JCL bridge as it conflicts with slf4j 1.6.4 -->
+		      	  <groupId>org.slf4j</groupId> 
+		          <artifactId>jcl104-over-slf4j</artifactId>
+		        </exclusion>
+		    </exclusions>				    
 		</dependency>
 		<dependency>
 		    <groupId>org.mule.modules</groupId>
