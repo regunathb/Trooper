@@ -13,6 +13,21 @@
 		<org.springframework.batch.version>2.1.1.RELEASE</org.springframework.batch.version>
 	</properties>
 
+	<dependencyManagement>
+	    <dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+		  	<artifactId>slf4j-api</artifactId>
+		  	<version>1.6.4</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>jcl-over-slf4j</artifactId>
+		  <version>1.6.4</version>
+		</dependency>
+	    </dependencies>
+	</dependencyManagement>
+	
 	<dependencies>
 	
 		<!-- Third party dependencies -->
