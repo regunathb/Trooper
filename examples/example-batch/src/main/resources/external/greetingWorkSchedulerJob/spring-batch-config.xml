@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+
+	<!--
+		Configuring the Greeting Job Scheduler Bean that will be executed when the trigger fires.
+	-->
+	<bean name="greetingJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="org.trpr.example.batch.example.GreetingJob" />
+		<property name="group" value="quartz-batch" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="jobName" value-ref="greetingJob" />
+				<entry key="jobLocator" value-ref="jobRepository" />
+				<entry key="jobLauncher" value-ref="jobLauncher" />
+			</map>
+		</property>
+	</bean>
+	
+	<!--
+		Associating the Greeting Job with a Quartz
+		Cron Trigger. Triggers define when a job is executed.
+		Executes every 1 minute
+	-->
+	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="greetingJobDetailBean" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!--
+		A list of Triggers to be scheduled and executed by Quartz for
+	-->
+	<bean
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="greetingJobCronTrigger" />
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+		Greeting Job Task Executor Multi-Threaded-Pool Configuration.
+	-->
+	<bean id="greetingJobTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="50" />
+	</bean>	
+	
+	<!--
+		Multi-Threaded Greeting Batch Job configuration
+	-->
+	<batch:job id="greetingJob" incrementer="incrementer">
+		<batch:step id="greetingJobStep">
+			<batch:tasklet task-executor="greetingJobTaskExecutor">
+				<batch:chunk reader="greetingDataReader" processor="greetingDataProcessor" writer="greetingDataWriter" commit-interval="1"/>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+	
+</beans>
