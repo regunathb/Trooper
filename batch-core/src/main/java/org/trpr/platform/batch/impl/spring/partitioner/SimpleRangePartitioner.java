@@ -39,8 +39,8 @@ public class SimpleRangePartitioner implements Partitioner {
 	private static final String PARTITION_KEY = "partition";
 	
 	/** ExecutionContext key names */
-	private static final String TOTAL_PARTITIIONS = "totalPartitions";
-	private static final String PARTITION_INDEX = "partitionIndex";
+	public static final String TOTAL_PARTITIIONS = "totalPartitions";
+	public static final String PARTITION_INDEX = "partitionIndex";
 
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> map = new HashMap<String, ExecutionContext>(gridSize);
