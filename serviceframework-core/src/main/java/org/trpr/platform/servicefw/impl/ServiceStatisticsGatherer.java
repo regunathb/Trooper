@@ -164,7 +164,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 			statValues[0] = stat.getServiceName();
 			statValues[1] = stat.getServiceVersion();
 			statValues[2] = stat.getStartupTimeStamp().getTime();
-			statValues[3] = stat.getLastCalledTimestamp().getTime();
+			statValues[3] = stat.getLastCalledTimestamp() == null ? null : stat.getLastCalledTimestamp().getTime();
 			statValues[4] = stat.getActiveRequestsCount();
 			statValues[5] = stat.getTotalRequestsCount();
 			statValues[6] = stat.getAverageResponseTime();
@@ -204,9 +204,11 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 			Calendar startupTimeStamp = Calendar.getInstance();
 			startupTimeStamp.setTimeInMillis(serviceCompartment.getStartupTimeStamp());
 			servicesStatistics[i].setStartupTimeStamp(startupTimeStamp);
-			Calendar lastCalledTimeStamp = Calendar.getInstance();
-			lastCalledTimeStamp.setTimeInMillis(serviceCompartment.getLastCalledTimestamp() <= 0 ? null : 
-				serviceCompartment.getLastCalledTimestamp());
+			Calendar lastCalledTimeStamp = null;
+			if (serviceCompartment.getLastCalledTimestamp() != ServiceCompartmentImpl.INVALID_STATISTICS_VALUE) {
+				lastCalledTimeStamp = Calendar.getInstance();
+				lastCalledTimeStamp.setTimeInMillis(serviceCompartment.getLastCalledTimestamp());
+			}
 			servicesStatistics[i].setLastCalledTimestamp(lastCalledTimeStamp);
 			servicesStatistics[i].setActiveRequestsCount(serviceCompartment.getActiveRequestsCount());
 			servicesStatistics[i].setTotalRequestsCount(serviceCompartment.getTotalRequestsCount());
