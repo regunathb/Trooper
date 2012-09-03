@@ -13,8 +13,8 @@
 		Configuring the Greeting Job Scheduler Bean that will be executed when the trigger fires.
 	-->
 	<bean name="greetingJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
-		<property name="jobClass" value="org.trpr.example.batch.example.GreetingJob" />
-		<property name="group" value="quartz-batch" />
+		<property name="jobClass" value="org.trpr.platform.batch.impl.spring.job.BatchJob" />
+		<property name="group" value="sample-batch" />
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="jobName" value-ref="greetingJob" />
@@ -47,6 +47,14 @@
 	</bean>
 	
 	<!--
+		The simple task executor for the partition execution
+	-->
+	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+	
+	<!-- The range based partitioner bean -->
+	<bean id="partitioner" class="org.trpr.platform.batch.impl.spring.partitioner.SimpleRangePartitioner"/>
+	
+	<!--
 		Greeting Job Task Executor Multi-Threaded-Pool Configuration.
 	-->
 	<bean id="greetingJobTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
@@ -60,10 +68,66 @@
 	-->
 	<batch:job id="greetingJob" incrementer="incrementer">
 		<batch:step id="greetingJobStep">
-			<batch:tasklet task-executor="greetingJobTaskExecutor">
-				<batch:chunk reader="greetingDataReader" processor="greetingDataProcessor" writer="greetingDataWriter" commit-interval="1"/>
-			</batch:tasklet>
+			<batch:partition step="step1" partitioner="partitioner">
+				<batch:handler grid-size="1" task-executor="taskExecutor" />
+			</batch:partition>
 		</batch:step>
 	</batch:job>
+
+	<batch:step id="step1" xmlns="http://www.springframework.org/schema/batch">
+		<batch:tasklet task-executor="greetingJobTaskExecutor">
+			<batch:chunk reader="compositeGreetingDataReader" processor="compositeGreetingDataProcessor" writer="compositeGreetingDataWriter" commit-interval="1"/>
+		</batch:tasklet>
+	</batch:step>		
+
+	<bean id="compositeGreetingDataReader" class="org.trpr.platform.batch.impl.spring.reader.CompositeItemStreamReader">
+		<constructor-arg><ref bean="greetingDataReader"/></constructor-arg>
+	</bean>	
+	<bean id="compositeGreetingDataProcessor" class="org.trpr.platform.batch.impl.spring.processor.CompositeItemProcessor">
+		<property name="delegates">
+			<list>
+				<ref bean="greetingDataProcessor" />
+			</list>
+		</property>
+	</bean>		
+	<bean id="compositeGreetingDataWriter" class="org.trpr.platform.batch.impl.spring.writer.CompositeItemWriter">
+		<property name="delegates">
+			<list>
+				<ref bean="greetingDataWriter" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="greetingDataReader" class="org.trpr.example.batch.greeting.reader.GreetingJobReader">
+		<property name="batchSize" value="10" />
+	</bean>	
+	
+	<bean id="greetingDataProcessor" class="org.trpr.example.batch.greeting.processor.GreetingJobProcessor"/>
+		
+	<bean id="greetingDataWriter" class="org.trpr.example.batch.greeting.writer.GreetingJobWriter">
+		<property name="publisher" ref="greetingMessagePublisher" />
+	</bean>
+	
+	<!-- Rabbit configuration for publishing to queue -->
+	<bean id="greetingMessagePublisher" class="org.trpr.platform.integration.impl.messaging.RabbitMQMessagePublisherImpl">
+		<property name="rabbitMQConfigurations">
+			<list>
+				<ref bean="greetingQueueConfiguration" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="greetingQueueConfiguration" class="org.trpr.platform.integration.impl.messaging.RabbitMQConfiguration">
+        <property name="userName" value="guest" />
+        <property name="password" value="guest" />
+        <property name="hostName" value="localhost" />
+        <property name="virtualHost" value="/" />
+        <property name="exchangeName" value="myexchange" />
+		<property name="queueName" value="greetingInput" />
+		<property name="exchangeType" value="direct" />
+		<property name="routingKey" value="greetingInput" />
+        <property name="portNumber" value="5672" />
+	</bean>
+	<!-- End Rabbit configuration for publishing to queue -->	
 	
 </beans>
