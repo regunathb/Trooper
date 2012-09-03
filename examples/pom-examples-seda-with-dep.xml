@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>org.trpr</groupId>
-	<artifactId>trooper-examples</artifactId>
-	<name>Trooper Examples</name>
+	<artifactId>trooper-examples-seda</artifactId>
+	<name>Trooper SEDA Examples</name>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 
