@@ -116,7 +116,7 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	}	
 
 	/** The Spring JMX managed attribute that returns the batch stats as a JMX supported type*/
-	private TabularDataSupport batchInvocationStatistics;	
+	private TabularDataSupport batchInvocationStatistics = new TabularDataSupport(tableType);	
 
 	/** The host IP placeholder */
 	private String hostIP;
@@ -132,7 +132,6 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 
 	/** Constructor for this class*/
 	public JobAdministrator() {
-		batchInvocationStatistics = new TabularDataSupport(tableType);
 		// get the host IP
 		try {
 			this.hostIP = InetAddress.getLocalHost().getHostAddress();
@@ -197,13 +196,13 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 		for (JobStatistics stat : stats) {
 			Object[] statValues = new Object[ATTRIBUTE_NAMES.length];
 			statValues[0] = stat.getHostIP();
-			statValues[1] = stat.getHostStartTimeStamp();
+			statValues[1] = stat.getHostStartTimeStamp().getTime();
 			statValues[2] = stat.getJobName();
 			statValues[3] = stat.getJobStatus();
 			statValues[4] = stat.getJobStepInError();
 			statValues[5] = stat.getJobMessage();
-			statValues[6] = stat.getJobStartTimeStamp();
-			statValues[7] = stat.getJobEndTimestamp();
+			statValues[6] = stat.getJobStartTimeStamp().getTime();
+			statValues[7] = stat.getJobEndTimestamp().getTime();
 			CompositeData compositeData;
 			try {
 				compositeData = new CompositeDataSupport(compositeType, ATTRIBUTE_NAMES, statValues);

@@ -60,6 +60,9 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	public synchronized T read() throws Exception, UnexpectedInputException, ParseException {
 		if (this.boundedQueue.isEmpty()) {
 			T[] items = this.delegate.batchRead();
+			if (items == null) { // no more data to read
+				return null;
+			}
 			for (T item : items) {
 				this.boundedQueue.add(item);
 			}
