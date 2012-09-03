@@ -5,7 +5,7 @@
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>trooper-examples</artifactId>
-	<name>Trooper Examples</name>
+	<name>Trooper Seda Examples</name>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 
