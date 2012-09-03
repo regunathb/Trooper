@@ -113,13 +113,11 @@
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-integration</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>integration-rabbitmq</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<scope>test</scope>
 		</dependency>
 								
 	</dependencies>
