@@ -57,7 +57,6 @@
 	<!-- Configuring Common Batch Job Launcher.  -->
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
-		<!--<property name="taskExecutor" ref="asyncTasksExecutor"/>-->
 	</bean>
 	
 	<!-- The Job operator bean for launching adhoc jobs -->
@@ -68,9 +67,6 @@
 		<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
 
-	<!-- Async Task executor used in all jobs -->
-	<!--<bean id="asyncTasksExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />-->
-	
 	<!-- The incrementer to be used by all jobs -->
 	<bean id="incrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer" />	
 
