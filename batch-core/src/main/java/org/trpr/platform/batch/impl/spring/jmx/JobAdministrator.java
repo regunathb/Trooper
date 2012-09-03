@@ -201,8 +201,8 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 			statValues[3] = stat.getJobStatus();
 			statValues[4] = stat.getJobStepInError();
 			statValues[5] = stat.getJobMessage();
-			statValues[6] = stat.getJobStartTimeStamp().getTime();
-			statValues[7] = stat.getJobEndTimestamp().getTime();
+			statValues[6] = stat.getJobStartTimeStamp() == null ? null : stat.getJobStartTimeStamp().getTime();
+			statValues[7] = stat.getJobEndTimestamp() == null ? null : stat.getJobEndTimestamp().getTime();
 			CompositeData compositeData;
 			try {
 				compositeData = new CompositeDataSupport(compositeType, ATTRIBUTE_NAMES, statValues);

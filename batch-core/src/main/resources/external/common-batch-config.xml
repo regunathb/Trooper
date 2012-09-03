@@ -49,11 +49,6 @@
 	<!-- Configuring Common Batch Job Registry.  -->
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />	
 	
-	<!-- Bean for registering the jobs with the JobRegistry -->
-	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobRegistry"/>
-	</bean>		
-
 	<!-- Configuring Common Batch Job Launcher.  -->
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
