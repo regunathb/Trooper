@@ -43,7 +43,7 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	/** The partition index, if any*/
 	private int partitionIndex = -1;
 	
-	/** Indicator to signal read complete*/
+	/** Indicator to signal read complete - just a hack to stop execution at some point*/
 	private boolean isReadComplete;
 
 	/**
@@ -100,7 +100,6 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	public void update(ExecutionContext arg0) throws ItemStreamException {
 		// no op		
 	}
-
 
 	/** Getter/setter methods*/
 	public int getBatchSize() {

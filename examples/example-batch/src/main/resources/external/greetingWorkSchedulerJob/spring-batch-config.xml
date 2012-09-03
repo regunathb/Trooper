@@ -9,6 +9,11 @@
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
+	<!-- Bean for registering the jobs with the JobRegistry. Mandatory bean -->
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>		
+
 	<!--
 		Configuring the Greeting Job Scheduler Bean that will be executed when the trigger fires.
 	-->
@@ -31,7 +36,7 @@
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0/120 * * * ?" />
 	</bean>
 
 	<!--
