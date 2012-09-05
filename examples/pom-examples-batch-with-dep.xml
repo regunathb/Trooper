@@ -12,6 +12,7 @@
 	<modules>		
 		<module>../platform-core</module>
 		<module>../platform-model</module>
+		<module>../platform-task</module>
 		<module>../platform-integration</module>
 		<module>../runtime-core</module>
 		<module>../batch-model</module>
