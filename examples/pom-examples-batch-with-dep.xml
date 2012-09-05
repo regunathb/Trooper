@@ -14,6 +14,7 @@
 		<module>../platform-model</module>
 		<module>../platform-task</module>
 		<module>../platform-integration</module>
+		<module>./example-models</module>
 		<module>../runtime-core</module>
 		<module>../batch-model</module>
 		<module>../batch-core</module>
