@@ -10,6 +10,7 @@
 	<version>1.0-SNAPSHOT</version>
 
 	<modules>		
+	        <module>../mule-transport-rabbitmq</module>
 		<module>../platform-model</module>
 		<module>../platform-core</module>
 		<module>../platform-integration</module>
@@ -21,7 +22,6 @@
 		<module>example-models</module>
 		<module>example-services</module>
         <module>example-seda</module>
-        <module>../mule-transport-rabbitmq</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
