@@ -12,12 +12,14 @@
 	<modules>		
 		<module>../platform-core</module>
 		<module>../platform-model</module>
+		<module>../platform-task</module>
 		<module>../platform-integration</module>
 		<module>../runtime-core</module>
 		<module>../batch-model</module>
 		<module>../batch-core</module>
-        <module>example-batch</module>
-        <module>example-models</module>
+		<module>../service-model</module>
+	        <module>./example-batch</module>
+        	<module>./example-models</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
