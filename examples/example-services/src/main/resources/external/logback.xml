@@ -6,9 +6,11 @@
     	</encoder>
   	</appender>
   	
-   	<!-- Set Spring to log only at INFO level -->
+   	<!-- Set some of the 3rd party libraries to log only at INFO or higher levels -->
 	<logger name="org.springframework" level="info"/>
-
+	<logger name="net.sf.json" level="error"/>
+	<logger name="net.sf.ezmorph" level="error"/>
+	
 	<root level="info">
     	<appender-ref ref="STDOUT" />
  	</root>
