@@ -1,0 +1,46 @@
+{"greetingServiceRequest": {
+    "earthling":     {
+        "dateOfBirth":         {
+            "firstDayOfWeek": 1,
+            "gregorianChange":             {
+                "date": 15,
+                "day": 5,
+                "hours": 5,
+                "minutes": 30,
+                "month": 9,
+                "seconds": 0,
+                "time": -12219292800000,
+                "timezoneOffset": -330,
+                "year": -318
+            },
+            "lenient": true,
+            "minimalDaysInFirstWeek": 1,
+            "time":             {
+                "date": 18,
+                "day": 2,
+                "hours": 16,
+                "minutes": 14,
+                "month": 8,
+                "seconds": 18,
+                "time": 1347965058234,
+                "timezoneOffset": -330,
+                "year": 112
+            },
+            "timeInMillis": 1347965058234,
+            "timeZone":             {
+                "DSTSavings": 0,
+                "ID": "GMT+05:30",
+                "dirty": false,
+                "displayName": "GMT+05:30",
+                "lastRuleInstance": null,
+                "rawOffset": 19800000
+            }
+        },
+        "entityIdentifier": null,
+        "entityName": "",
+        "firstName": "Regunath",
+        "lastName": "B"
+    },
+    "id": "",
+    "version": "LATEST"
+}}
