@@ -23,6 +23,7 @@ import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.util.FileUtils;
+import org.trpr.platform.integration.impl.json.JSONTranscoderImpl;
 import org.trpr.platform.integration.impl.xml.XMLTranscoderImpl;
 import org.trpr.platform.runtime.impl.bootstrap.spring.Bootstrap;
 import org.trpr.platform.service.model.common.platformservicerequest.PlatformServiceRequest;
@@ -52,6 +53,7 @@ public class StandAloneServiceClient {
 	
 	/** service response file suffix */
 	private static final String SERVICE_RESPONSE_XML_FILE_SUFFIX = "Response.xml";
+	private static final String SERVICE_RESPONSE_JSON_FILE_SUFFIX = "Response.json";
 	
 	/**
 	 * Main method test the service in standalone nature. It expects three program arguments
@@ -88,10 +90,10 @@ public class StandAloneServiceClient {
 		bootstrap.init(bootstrapConfigPath);
 		
 		try { 
-			// Get the XML request in 
-			String requestXML = new FileUtils().readFromFile(serviceRequestFileName);
+			// Get the XML/JSON request in 
+			String requestContents = new FileUtils().readFromFile(serviceRequestFileName);
 			
-			// unmarshall XML String
+			// unmarshall XML/JSON String
 			Class requestClazz = Class.forName(serviceRequestClass);
 			
 			// get the request getter method
@@ -104,22 +106,23 @@ public class StandAloneServiceClient {
 				}
 			}
 			
-			Object requestXMLObject = new XMLTranscoderImpl().unmarshal(requestXML,requestClazz);
-			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)requestGetterMethod.invoke(requestXMLObject, new Object[0]);
+			Object requestContentsObject = serviceRequestFileName.endsWith(".xml") ? new XMLTranscoderImpl().unmarshal(requestContents,requestClazz) : 
+				new JSONTranscoderImpl().unmarshal(requestContents,requestClazz);
+			PlatformServiceRequest platformServiceRequest = (PlatformServiceRequest)requestGetterMethod.invoke(requestContentsObject, new Object[0]);
 	
 			// log service request information
 			LOGGER.debug("Service Name : " + serviceName);
 			LOGGER.debug("Service Version: " + platformServiceRequest.getVersion());
 			LOGGER.debug("Service Request Class: " + serviceRequestClass);
-			LOGGER.debug("Service Request: \n" + requestXML);
+			LOGGER.debug("Service Request: \n" + requestContents);
 			
 			// invoke Service
 			ServiceRequest<? extends PlatformServiceRequest> serviceRequest = new ServiceRequestImpl<PlatformServiceRequest>(platformServiceRequest, serviceName,platformServiceRequest.getVersion());
 			serviceResponse = new BrokerFactory().getBroker(new ServiceKeyImpl(serviceName, platformServiceRequest.getVersion())).invokeService(serviceRequest);
 			
 		
-			Object responseXMLObject = null;
-			responseXMLObject = Class.forName(serviceResponseClass).newInstance(); 
+			Object responseContentsObject = null;
+			responseContentsObject = Class.forName(serviceResponseClass).newInstance(); 
 			
 			// get the request getter method
 			Class responseClazz = Class.forName(serviceResponseClass);
@@ -132,14 +135,14 @@ public class StandAloneServiceClient {
 				}
 			}
 			// set the PlatformServiceResponse on the response XML object
-			responseSetterMethod.invoke(responseXMLObject, serviceResponse.getResponseData());
+			responseSetterMethod.invoke(responseContentsObject, serviceResponse.getResponseData());
 
 		    // Marshall java object
-			String responseXML = new XMLTranscoderImpl().marshal(responseXMLObject);
-			LOGGER.debug(serviceName + " Response: \n" + responseXML);
+			String responseContents = serviceRequestFileName.endsWith(".xml") ? new XMLTranscoderImpl().marshal(responseContentsObject) : new JSONTranscoderImpl().marshal(responseContentsObject);
+			LOGGER.debug(serviceName + " Response: \n" + responseContents);
 			
 			// write response in web browser
-			writeResponseinBrowser(serviceName, responseXML);
+			writeResponseinBrowser(serviceName, responseContents,serviceRequestFileName.endsWith(".xml"));
 			
 		} catch(Throwable e) {
 			LOGGER.error("Exception running the service", e);
@@ -160,9 +163,9 @@ public class StandAloneServiceClient {
 	 * @param responseXML service reponse in xml format
 	 * @throws PlatformException throw while writing service response in temp directory
 	 */
-	private static void writeResponseinBrowser(String serviceName, String responseXML) throws PlatformException {
+	private static void writeResponseinBrowser(String serviceName, String responseXML, boolean isXML) throws PlatformException {
 		String serviceResponseFilePath = System.getProperty("java.io.tmpdir") + serviceName 
-		                                 + SERVICE_RESPONSE_XML_FILE_SUFFIX;
+		                                 + (isXML ? SERVICE_RESPONSE_XML_FILE_SUFFIX : SERVICE_RESPONSE_JSON_FILE_SUFFIX);
 		try {
 			// write response XML into temp directory
 			FileWriter writer = new FileWriter(serviceResponseFilePath);
