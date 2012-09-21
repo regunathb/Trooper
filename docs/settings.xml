@@ -58,6 +58,11 @@
           </snapshots>
         </repository>
         <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Maven Snapshot Repository</name>
+            <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+        </repository>           
+        <repository>
           <id>maven-public-repository-group</id>
           <name>Public Maven Repository Group</name>
           <url>http://repo1.maven.org/maven/mule/dependencies/maven2/</url>
