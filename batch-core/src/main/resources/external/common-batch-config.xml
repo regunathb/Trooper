@@ -20,6 +20,7 @@
 		<property name="beans">
 			<map>
 				<entry key="bean:name=jobAdministrator" value-ref="jobAdministrator"/>
+				<entry key="bean:name=batchMetricsExporter" value-ref="batchMetricsExporter"/>
             </map>
         </property>
 	</bean>
@@ -28,7 +29,22 @@
 	<bean id="jobAdministrator" class="org.trpr.platform.batch.impl.spring.jmx.JobAdministrator">
 		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobOperator" ref="jobOperator"/>
+		<property name="jobService" ref="jobService"/>
 	</bean>
+
+	<!-- JMX interface bean for job metrics.-->
+	<bean id="batchMetricsExporter" class="org.trpr.platform.batch.impl.spring.jmx.BatchMetricsExporter">
+		<property name="server" ref="mbeanServer" />
+		<property name="jobAdministrator" ref="jobAdministrator"/>		
+	</bean>
+
+	<!-- The JobService for that does most of the JMX metrics collection work -->
+	<bean id="jobService" class="org.trpr.platform.batch.impl.spring.admin.SimpleJobService">
+		<constructor-arg index="0"><ref bean="jobRepository"/></constructor-arg>
+		<constructor-arg index="1"><ref bean="jobExplorer"/></constructor-arg>
+		<constructor-arg index="2"><ref bean="jobRegistry"/></constructor-arg>
+		<constructor-arg index="3"><ref bean="jobLauncher"/></constructor-arg>
+	</bean>	
 
 	<!--
 		Configuring Common Batch Job TransactionManager.
@@ -53,7 +69,7 @@
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	
+
 	<!-- The Job operator bean for launching adhoc jobs -->
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
 		<property name="jobLauncher" ref="jobLauncher"/>
@@ -63,6 +79,6 @@
 	</bean>
 
 	<!-- The incrementer to be used by all jobs -->
-	<bean id="incrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer" />	
+	<bean id="incrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
 
 </beans>

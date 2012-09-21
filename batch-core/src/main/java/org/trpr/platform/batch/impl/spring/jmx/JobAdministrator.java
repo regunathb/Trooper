@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
+import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -31,6 +32,7 @@ import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
+import org.springframework.batch.admin.service.JobService;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -57,7 +59,7 @@ import org.trpr.platform.core.spi.management.jmx.AppInstanceAwareMBean;
  * @author Regunath B
  * @version 1.0, 28 Aug 2012
  */
-@ManagedResource(objectName = "spring.application:type=Trooper,application=Batch-Statistics,name=JobAdministrator-", description = "Batch Job Administration Interface")
+@ManagedResource(objectName = "spring.application:type=Trooper,application=Batch-Management,name=JobAdministrator-", description = "Batch Job Administration Interface")
 public class JobAdministrator extends AppInstanceAwareMBean {
 	
 	/**
@@ -68,12 +70,25 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	/** String literal constant for unresolved host IP*/
 	private static final String UNKNOWN_HOST = "Unresolved Host IP";	
 	
+	/** The JMX type for holding step names*/
+	private static ArrayType STEP_JMX_TYPE;
+	
+	/** Static initialization for the step names JMX array type*/
+	static {
+		try {
+			STEP_JMX_TYPE = new ArrayType(1, SimpleType.STRING);
+		} catch (OpenDataException e) {
+			// do nothing as this should never happen
+		} 
+	}
+	
 	/** Data values used in constructing the JMX CompositeData and TabularData type instances*/
 	private static final String[] ATTRIBUTE_NAMES = {
 		"hostIP",
 		"hostStartTime",
 		"jobName", 
-		"jobStatus", 
+		"jobStatus",
+		"jobSteps",
 		"jobStepInError",
 		"jobMessage", 
 		"jobStartTime", 
@@ -83,7 +98,8 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 		"Host IP",
 		"Host Start Time",
 		"Job name", 
-		"Job last execution status", 
+		"Job last execution status",
+		"Job steps",
 		"Error step in job execution",
 		"Job last execution message", 
 		"Job last execution start", 
@@ -94,6 +110,7 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 		SimpleType.DATE, 
 		SimpleType.STRING, 
 		SimpleType.STRING, 
+		STEP_JMX_TYPE,
 		SimpleType.STRING, 
 		SimpleType.STRING, 
 		SimpleType.DATE, 
@@ -129,6 +146,9 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 
 	/** The JobExplorer instance for this job administrator*/
 	private JobExplorer jobExplorer;
+	
+	/** The JobService for accessing Job execution details*/
+	private JobService jobService;
 
 	/** Constructor for this class*/
 	public JobAdministrator() {
@@ -143,11 +163,19 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	}
 	
 	/**
+	 * Returns the JMX bean naming suffix for all batch related MBeans
+	 * @return the bean naming suffix
+	 */
+	public String getJMXBeanNameSuffix() {
+		return this.getMBeanNameSuffix(null,null); // pass nulls to get the static suffix
+	}
+	
+	/**
 	 * The JMX interface method for reading the managed attribute containing job invocation statistics.
 	 * @return TabularDataSupport JMX type containing a row each of {@link JobStatistics} wrapped as JMX type CompositeData
 	 */
 	@ManagedAttribute
-	public TabularDataSupport getJobInvocationStatistics() {
+	public TabularDataSupport getIndividualJobExecutionMetrics() {
 		this.populateJobStatistics();
 		return batchInvocationStatistics;
 	}
@@ -199,10 +227,11 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 			statValues[1] = stat.getHostStartTimeStamp().getTime();
 			statValues[2] = stat.getJobName();
 			statValues[3] = stat.getJobStatus();
-			statValues[4] = stat.getJobStepInError();
-			statValues[5] = stat.getJobMessage();
-			statValues[6] = stat.getJobStartTimeStamp() == null ? null : stat.getJobStartTimeStamp().getTime();
-			statValues[7] = stat.getJobEndTimestamp() == null ? null : stat.getJobEndTimestamp().getTime();
+			statValues[4] = stat.getJobSteps().toArray(new String[0]);
+			statValues[5] = stat.getJobStepInError();
+			statValues[6] = stat.getJobMessage();
+			statValues[7] = stat.getJobStartTimeStamp() == null ? null : stat.getJobStartTimeStamp().getTime();
+			statValues[8] = stat.getJobEndTimestamp() == null ? null : stat.getJobEndTimestamp().getTime();
 			CompositeData compositeData;
 			try {
 				compositeData = new CompositeDataSupport(compositeType, ATTRIBUTE_NAMES, statValues);
@@ -241,10 +270,10 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 					if (jobExecution.getStatus() == BatchStatus.FAILED) { // try to get the exit description from the contained steps that errored out
 						Collection<StepExecution> stepExecutions = jobExecution.getStepExecutions();
 						for (StepExecution step : stepExecutions) {	
+							jobStatistics[count].getJobSteps().add(step.getStepName());
 							if (step.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())) {
 								jobStatistics[count].setJobStepInError(step.getStepName());
 								jobStatistics[count].setJobMessage(step.getExitStatus().getExitDescription());
-								break;
 							}
 						}
 					} else {
@@ -285,6 +314,12 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	}	
 	public Calendar getHostStartTimeStamp() {
 		return this.hostStartTimeStamp;
+	}
+	public JobService getJobService() {
+		return this.jobService;
+	}
+	public void setJobService(JobService jobService) {
+		this.jobService = jobService;
 	}	
 	/** End Getter setter methods*/
 	

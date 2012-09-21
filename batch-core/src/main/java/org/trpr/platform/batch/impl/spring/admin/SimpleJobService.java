@@ -37,7 +37,6 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
@@ -64,9 +63,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 	/** Default shutdown timeout - 60 seconds */
 	private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
 	
-	/** Max executions limit - 10000*/
-	private static final int MAX_EXECUTIONS = 10000;
-	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobService.class);
 	
@@ -81,10 +77,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 
 	/** The JobRepository component*/
 	private JobRegistry jobRegistry;
-
-	/** The JobOperator component*/
-	private JobOperator jobOperator;	
-	
+ 
 	/** The JobLauncher component*/
 	private JobLauncher jobLauncher;
 
@@ -95,9 +88,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * Constructor for this class
 	 * @param jobRepository the JobRepository
 	 */
-	public SimpleJobService(JobRepository jobRepository, JobOperator jobOperator, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher) {
+	public SimpleJobService(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher) {
 		this.jobRepository = jobRepository;
-		this.jobOperator = jobOperator;
 		this.jobExplorer = jobExplorer;
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
@@ -179,8 +171,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public int countJobExecutions() {
 		int count = 0;
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) {
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) {
 				count += this.jobExplorer.getJobExecutions(jobInstance).size();
 			}
 			
@@ -194,9 +186,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public int countJobExecutionsForJob(String jobName) throws NoSuchJobException {
 		int count = 0;
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.equalsIgnoreCase(jobName)) {
-				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) {
+				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) {
 					count += this.jobExplorer.getJobExecutions(jobInstance).size();
 				}
 				break;
@@ -211,9 +203,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public int countJobInstances(String jobName) throws NoSuchJobException {
 		int count = 0;
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.equalsIgnoreCase(jobName)) {
-				count += this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS).size(); 
+				count += this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE).size(); 
 				break;
 			}
 		}		
@@ -225,7 +217,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#countJobs()
 	 */
 	public int countJobs() {
-		return  this.jobOperator.getJobNames().size();
+		return  this.jobRegistry.getJobNames().size();
 	}
 
 	/**
@@ -234,9 +226,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public int countStepExecutionsForStep(String jobName, String stepName) throws NoSuchStepException {
 		int count = 0;
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
-				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 					for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 						Collection<StepExecution> stepExecutions = jobExecution.getStepExecutions();
 						for (StepExecution step : stepExecutions) {	
@@ -256,8 +248,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getJobExecution(java.lang.Long)
 	 */
 	public JobExecution getJobExecution(Long jobExecutionId) throws NoSuchJobExecutionException {
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 					if (jobExecution.getId() == jobExecutionId) {
 						return jobExecution;
@@ -273,9 +265,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getJobExecutionsForJobInstance(java.lang.String, java.lang.Long)
 	 */
 	public Collection<JobExecution> getJobExecutionsForJobInstance(String jobName, Long jobInstanceId) throws NoSuchJobException {
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
-				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 					if (jobInstance.getId() == jobInstanceId) {
 						return this.jobExplorer.getJobExecutions(jobInstance);
 					}
@@ -290,8 +282,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getJobInstance(long)
 	 */
 	public JobInstance getJobInstance(long jobInstanceId) throws NoSuchJobInstanceException {
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				if (jobInstance.getId() == jobInstanceId) {
 					return jobInstance;
 				}
@@ -305,7 +297,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getLastJobParameters(java.lang.String)
 	 */
 	public JobParameters getLastJobParameters(String jobName) throws NoSuchJobException {
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
 				// get the last run JobInstance if any
 				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, 1)) {  // end is set as 1 to get a single element List
@@ -321,8 +313,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getStepExecution(java.lang.Long, java.lang.Long)
 	 */
 	public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) throws NoSuchStepExecutionException, NoSuchJobExecutionException {
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 					if (jobExecution.getId() == jobExecutionId) {
 						for (StepExecution step : jobExecution.getStepExecutions()) {	
@@ -342,8 +334,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getStepExecutions(java.lang.Long)
 	 */
 	public Collection<StepExecution> getStepExecutions(Long jobExecutionId) throws NoSuchJobExecutionException {
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 					if (jobExecution.getId() == jobExecutionId) {
 						return jobExecution.getStepExecutions();
@@ -421,13 +413,13 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public Collection<JobExecution> listJobExecutions(int start, int count) {
 		List<JobExecution> executionList = new LinkedList<JobExecution>();
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) {
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) {
 				executionList.addAll(this.jobExplorer.getJobExecutions(jobInstance));				
 			}
 		}
 		if (start >= executionList.size()) {
-			start = executionList.size();
+			return new LinkedList<JobExecution>(); // return empty list instead of a sub-list
 		}
 		if (start + count >= executionList.size()) {
 			count = executionList.size() - start;
@@ -440,12 +432,12 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#listJobExecutionsForJob(java.lang.String, int, int)
 	 */
 	public Collection<JobExecution> listJobExecutionsForJob(String jobName, int start, int count) throws NoSuchJobException {
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
-				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 					List<JobExecution> executionList = this.jobExplorer.getJobExecutions(jobInstance);
 					if (start >= executionList.size()) {
-						start = executionList.size();
+						return new LinkedList<JobExecution>(); // return empty list instead of a sub-list
 					}
 					if (start + count >= executionList.size()) {
 						count = executionList.size() - start;
@@ -462,11 +454,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#listJobInstances(java.lang.String, int, int)
 	 */
 	public Collection<JobInstance> listJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
-				List<JobInstance> instanceList = this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS);
+				List<JobInstance> instanceList = this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE);
 				if (start >= instanceList.size()) {
-					start = instanceList.size();
+					return new LinkedList<JobInstance>(); // return empty list instead of a sub-list
 				}
 				if (start + count >= instanceList.size()) {
 					count = instanceList.size() - start;
@@ -483,9 +475,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public Collection<String> listJobs(int start, int count) {
 		List<String> jobNames = new LinkedList<String>();
-		jobNames.addAll(this.jobOperator.getJobNames());
+		jobNames.addAll(this.jobRegistry.getJobNames());
 		if (start >= jobNames.size()) {
-			start = jobNames.size();
+			return new LinkedList<String>(); // return empty list instead of a sub-list
 		}
 		if (start + count >= jobNames.size()) {
 			count = jobNames.size() - start;
@@ -502,9 +494,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 			throw new NoSuchStepException("No step executions exist with this step name: " + stepName);
 		}
 		List<StepExecution> steps = new LinkedList<StepExecution>();
-		for (String name : this.jobOperator.getJobNames()) {
+		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
-				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 					for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 						Collection<StepExecution> stepExecutions = jobExecution.getStepExecutions();
 						for (StepExecution step : stepExecutions) {	
@@ -517,7 +509,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 			}
 		}						
 		if (start >= steps.size()) {
-			start = steps.size();
+			return new LinkedList<StepExecution>(); // return empty list instead of a sub-list
 		}
 		if (start + count >= steps.size()) {
 			count = steps.size() - start;
@@ -562,8 +554,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public int stopAll() {
 		List<JobExecution> allExecutions = new LinkedList<JobExecution>();
-		for (String jobName : this.jobOperator.getJobNames()) {
-			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, MAX_EXECUTIONS)) { 
+		for (String jobName : this.jobRegistry.getJobNames()) {
+			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
 					if (jobExecution.isRunning()) {
 						allExecutions.add(jobExecution);
