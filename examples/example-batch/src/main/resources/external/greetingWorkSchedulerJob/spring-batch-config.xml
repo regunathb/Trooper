@@ -74,7 +74,7 @@
 	<batch:job id="greetingJob" incrementer="incrementer">
 		<batch:step id="greetingJobStep">
 			<batch:partition step="step1" partitioner="partitioner">
-				<batch:handler grid-size="1" task-executor="taskExecutor" />
+				<batch:handler grid-size="2" task-executor="taskExecutor" />
 			</batch:partition>
 		</batch:step>
 	</batch:job>
