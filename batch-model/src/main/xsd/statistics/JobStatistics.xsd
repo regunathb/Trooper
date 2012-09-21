@@ -25,6 +25,7 @@
 			   <xs:element name="jobName" type="xs:string" minOccurs="0"/>
 			   <xs:element name="jobStatus" type="xs:string" minOccurs="0"/>
 			   <xs:element name="jobMessage" type="xs:string" minOccurs="0"/>
+			   <xs:element name="jobSteps" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 			   <xs:element name="jobStepInError" type="xs:string" minOccurs="0"/>
 			   <xs:element name="jobStartTimeStamp"  type="xs:dateTime" minOccurs="0"/>
 			   <xs:element name="jobEndTimestamp"  type="xs:dateTime" minOccurs="0"/>
