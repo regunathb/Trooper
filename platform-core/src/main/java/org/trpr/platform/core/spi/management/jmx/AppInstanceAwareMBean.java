@@ -32,7 +32,20 @@ public class AppInstanceAwareMBean implements InstanceAwareMBean {
 	 * @see InstanceAwareMBean#getMBeanNameSuffix(Object, String)
 	 */
 	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
-		return System.getProperty(PlatformConstants.TRPR_APP_NAME);
+		return escapeForObjectName(System.getProperty(PlatformConstants.TRPR_APP_NAME));
 	}
+	
+	/**
+	 * Helper method to escape chracters for JMX object naming
+	 */
+	private String escapeForObjectName(String value) {
+		value = value.replaceAll(" ", "_");
+		value = value.replaceAll(",", ";");
+		value = value.replaceAll("=", "~");
+		value = value.replaceAll(":", "@");
+		value = value.replaceAll(",", ";");
+		value = value.replaceAll("=", "~");
+		return value;
+	}	
 
 }
