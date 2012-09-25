@@ -52,11 +52,6 @@
 	</bean>
 	
 	<!--
-		The simple task executor for the partition execution
-	-->
-	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
-	
-	<!--
 		Shell Batch Job configuration
 	-->
 	<batch:job id="shellTaskletsJob" incrementer="incrementer">
