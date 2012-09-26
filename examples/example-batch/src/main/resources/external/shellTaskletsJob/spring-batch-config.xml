@@ -64,14 +64,14 @@
 	</batch:job>
 
 	<bean id="fileListingScriptBean1" class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
-		<property name="workingDirectory" value="/Users" />
+		<property name="workingDirectory" value="/etc" />
 		<property name="command" value="ls -al" />
 		<property name="timeout" value="10000" />
 		<property name="terminationCheckInterval" value="2000" />
 	</bean>
 
 	<bean id="fileListingScriptBean2" class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
-		<property name="workingDirectory" value="/Users/regunath.balasubramanian" />
+		<property name="workingDirectory" value="/etc" />
 		<property name="command" value="lsl -al" /> <!-- Intentional invalid command to induce step failure -->
 		<property name="timeout" value="10000" />
 		<property name="terminationCheckInterval" value="2000" />
