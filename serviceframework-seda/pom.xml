@@ -13,6 +13,15 @@
 		<org.mule.version>2.2.1</org.mule.version>		
 	</properties>
 
+
+	 <repositories>
+		<repository>
+		        <id>muleforge</id>
+		        <name>Muleforge Repository</name>
+		        <url>http://repository.muleforge.org/</url>
+		</repository>
+  	</repositories>
+
 	<dependencyManagement>
 	    <dependencies>
 			<dependency>
