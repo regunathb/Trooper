@@ -48,7 +48,7 @@ public class SedaClient {
 		publisher.closeConnections();
 		*/
 		Thread[] threads = new Thread[10];
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < threads.length; i++) {
 			final int count = i;
 			threads[i] = new Thread() {
 				public void run() {
@@ -65,11 +65,13 @@ public class SedaClient {
 				}
 			};
 			threads[i].start();	
+		}
+		for (Thread thread : threads) {
 			try {
-				threads[i].join();
+				thread.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}			
 		}
 		publisher.closeConnections();
 		
