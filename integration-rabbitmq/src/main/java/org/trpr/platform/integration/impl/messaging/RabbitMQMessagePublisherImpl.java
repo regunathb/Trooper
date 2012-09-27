@@ -117,15 +117,14 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 			int connectionIndex = (int)(totNoOfMessagesQueued % noOfQueues);
 			RabbitMQConfiguration rabbitMQConfiguration = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
 
-			RabbitConnectionHolder connectionHolder = this.rabbitConnectionHolders[connectionIndex];
-			if (connectionHolder == null || !connectionHolder.isValid()) { // don't synchronize here as all calls will require monitor acquisition
+			if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
 				try {
 					synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 						// check after monitor acquisition in order to ensure that multiple threads do not create
 						// a connection for the same configuration. 
-						if (connectionHolder == null || !connectionHolder.isValid()) { 
-							connectionHolder = new RabbitConnectionHolder(rabbitMQConfiguration);
-							connectionHolder.createConnection();
+						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
+							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
+							this.rabbitConnectionHolders[connectionIndex].createConnection();
 						}
 					}
 				} catch (Exception e) {
@@ -142,28 +141,34 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 				AMQP.BasicProperties msgProps = rabbitMQConfiguration.isDurable() ? 
 						(isMessageOfTypeString ? MessageProperties.PERSISTENT_TEXT_PLAIN : MessageProperties.PERSISTENT_BASIC) : 
 							(isMessageOfTypeString ? MessageProperties.TEXT_PLAIN : MessageProperties.BASIC); 
-				connectionHolder.getChannel().basicPublish(
-						rabbitMQConfiguration.getExchangeName(), 
-						rabbitMQConfiguration.getRoutingKey(), 
-						msgProps, 
-						body);
-				// Commit the message if it is durable and the commit count is reached. 
-				// The channel should and would be in txSelect mode when it was created using the RabbitMQConfiguration details
-				// increment totNoOfMessagesQueued by 1 and check as it is post incremented after publishing the message
-				if (rabbitMQConfiguration.isDurable() && ((totNoOfMessagesQueued + 1) % rabbitMQConfiguration.getDurableMessageCommitCount() == 0)) {
-					if (rabbitMQConfiguration.isDisableTX()) {
-						// error out, as explicitly disabling TX will not make the message durable
-						LOGGER.error("Configuration conflict. TX disabled for message publishing on durable queue. Message will not be published.");
-						return;
-					}					
-		        	// synchronized on the channel to avoid the below RabbitMQ client exception, caused in multi-threaded execution using the same channel:
-		        	// java.lang.IllegalStateException: cannot execute more than one synchronous AMQP command at a time
-		        	synchronized(connectionHolder.getChannel()) {
-		        		connectionHolder.getChannel().txCommit();
+				if (rabbitMQConfiguration.isDurable()) {
+		        	synchronized(this.rabbitConnectionHolders[connectionIndex].getChannel()) {
+			        	// synchronized on the channel to avoid the below RabbitMQ client exception, caused in multi-threaded execution using the same channel:
+			        	// java.lang.IllegalStateException: cannot execute more than one synchronous AMQP command at a time
+		        		this.rabbitConnectionHolders[connectionIndex].getChannel().basicPublish(
+								rabbitMQConfiguration.getExchangeName(), 
+								rabbitMQConfiguration.getRoutingKey(), 
+								msgProps, 
+								body);					
+						// Commit the message if it is durable and the commit count is reached. 
+						// The channel should and would be in txSelect mode when it was created using the RabbitMQConfiguration details
+						// increment totNoOfMessagesQueued by 1 and check as it is post incremented after publishing the message
+						if ((totNoOfMessagesQueued + 1) % rabbitMQConfiguration.getDurableMessageCommitCount() == 0) {
+							if (rabbitMQConfiguration.isDisableTX()) {
+								// error out, as explicitly disabling TX will not make the message durable
+								LOGGER.error("Configuration conflict. TX disabled for message publishing on durable queue. Message will not be published.");
+								return;
+							}					
+							this.rabbitConnectionHolders[connectionIndex].getChannel().txCommit();
+						}
 		        	}
+				} else {
+					this.rabbitConnectionHolders[connectionIndex].getChannel().basicPublish(
+							rabbitMQConfiguration.getExchangeName(), 
+							rabbitMQConfiguration.getRoutingKey(), 
+							msgProps, 
+							body);					
 				}
-				// the connection holder is working. set it to the array
-				this.rabbitConnectionHolders[connectionIndex] = connectionHolder;
 				return;
 			} catch (Exception e) {
 				this.rabbitConnectionHolders[connectionIndex] = null; // the connection holder is not working. Remove from array
@@ -215,20 +220,18 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 			int connectionIndex = (int)(totNoOfMessagesQueued % noOfQueues);
 			RabbitMQConfiguration RabbitMQConfiguration = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
 
-			RabbitConnectionHolder connectionHolder = this.rabbitConnectionHolders[connectionIndex];
 			try {
-				if (connectionHolder == null || !connectionHolder.isValid()) { // don't synchronize here as all calls will require monitor acquisition
+				if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
 					synchronized(RabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 						// check after monitor acquisition in order to ensure that multiple threads do not create
 						// a connection for the same configuration. 
-						if (connectionHolder == null || !connectionHolder.isValid()) { 
-							connectionHolder = new RabbitConnectionHolder(RabbitMQConfiguration);
-							connectionHolder.createConnection();
+						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
+							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(RabbitMQConfiguration);
+							this.rabbitConnectionHolders[connectionIndex].createConnection();
 						}
 					}
 				}
-				int count = connectionHolder.getMessageCount();
-				this.rabbitConnectionHolders[connectionIndex] = connectionHolder; // the connection holder is working. set it to the array
+				int count = this.rabbitConnectionHolders[connectionIndex].getMessageCount();
 				return count;
 			} catch (Exception e) {
 				LOGGER.error("Error while initializing Rabbit connection / getting message count. Will try others. Error is : " + e.getMessage(), e);
@@ -261,7 +264,7 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 					synchronized(this.rabbitMQConfigurations.get(i)) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 						// check after monitor acquisition in order to ensure that multiple threads do not create
 						// a connection for the same configuration. 
-						if (this.rabbitConnectionHolders[i] == null || !this.rabbitConnectionHolders[i].isValid()) { 
+						if (this.rabbitConnectionHolders[i] == null) { 
 							this.rabbitConnectionHolders[i] = new RabbitConnectionHolder(this.rabbitMQConfigurations.get(i));
 							this.rabbitConnectionHolders[i].createConnection();
 						}

@@ -145,20 +145,18 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 			int connectionIndex = (int)(totNoOfMessagesConsumed % noOfQueues);
 			RabbitMQConfiguration rabbitMQConfiguration = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
 
-			RabbitConnectionHolder connectionHolder = this.rabbitConnectionHolders[connectionIndex];
 			try {
-				if (connectionHolder == null || !connectionHolder.isValid()) { // don't synchronize here as all calls will require monitor acquisition
+				if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
 					synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 						// check after monitor acquisition in order to ensure that multiple threads do not create
 						// a connection for the same configuration. 
-						if (connectionHolder == null || !connectionHolder.isValid()) { 
-							connectionHolder = new RabbitConnectionHolder(rabbitMQConfiguration);
-							connectionHolder.createConnection();
+						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
+							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
+							this.rabbitConnectionHolders[connectionIndex].createConnectionAndConsumer();
 						}
 					}
 				}
-				int count = connectionHolder.getMessageCount();
-				this.rabbitConnectionHolders[connectionIndex] = connectionHolder; // the connection holder is working. set it to the array
+				int count = this.rabbitConnectionHolders[connectionIndex].getMessageCount();
 				return count;
 			} catch (Exception e) {
 				LOGGER.error("Error while initializing Rabbit connection / getting message count. Will try others. Error is : " + e.getMessage(), e);
@@ -196,15 +194,14 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 			int connectionIndex = (int)(totNoOfMessagesConsumed % noOfQueues);
 			RabbitMQConfiguration msgPubConfig = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
 
-			RabbitConnectionHolder connectionHolder = this.rabbitConnectionHolders[connectionIndex];
-			if (connectionHolder == null || !connectionHolder.isValid()) { // don't synchronize here as all calls will require monitor acquisition
+			if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
 				try {
 					synchronized(msgPubConfig) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 						// check after monitor acquisition in order to ensure that multiple threads do not create
 						// a connection for the same configuration. 
-						if (connectionHolder == null || !connectionHolder.isValid()) { 
-							connectionHolder = new RabbitConnectionHolder(msgPubConfig);
-							connectionHolder.createConnectionAndConsumer();
+						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
+							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(msgPubConfig);
+							this.rabbitConnectionHolders[connectionIndex].createConnectionAndConsumer();
 						}
 					}
 				} catch (Exception e) {
@@ -216,18 +213,19 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 				} 
 			}
 			try {				
-			    QueueingConsumer.Delivery delivery = getWaitTimeoutMillis() > 0 ? connectionHolder.getConsumer().nextDelivery(getWaitTimeoutMillis()) 
-			    		: connectionHolder.getConsumer().nextDelivery();
+			    QueueingConsumer.Delivery delivery = getWaitTimeoutMillis() > 0 ? this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery(getWaitTimeoutMillis()) 
+			    		: this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery();
 			    if (delivery != null) { // check for null - possible in case of a timeout
 				    message = isString ? new String(delivery.getBody(), ENCODING): PlatformUtils.toObject(delivery.getBody());
 				    if (!msgPubConfig.isNoAck()) { // Client is expected to ack explicitly, else donot as per AMQP spec
-				    	connectionHolder.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+				    	this.rabbitConnectionHolders[connectionIndex].getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(),false);
 				    }
-			    } 
+			    }
+			    
 				// Check if the connection holder is working and has returned a message. Set it to the array. This assignment does not happen
 		    	// if there are no messages in the queue and means that the connection is recreated the next time this method is called.
 		    	// Essentially we only keep connections when a message is successfully retrieved from the queue.
-				this.rabbitConnectionHolders[connectionIndex] = (message != null ? connectionHolder : null);
+				this.rabbitConnectionHolders[connectionIndex] = (message != null ? this.rabbitConnectionHolders[connectionIndex] : null);
 				if (message == null) { 
 					continue; // try other configurations
 				} else {

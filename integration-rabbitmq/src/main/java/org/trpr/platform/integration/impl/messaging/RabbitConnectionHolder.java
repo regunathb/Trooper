@@ -79,6 +79,15 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	 * @throws MessagingException in case of errors
 	 */
 	public void createConnection() throws MessagingException {
+		this.createConnection(false); //  do not use the disableTX override. Let durability settings drive TX behavior instead
+	}
+	
+	/**
+	 * Creates the connection objects using the RabbitMQConfiguration held by this class
+	 * @param disableTX when true, does not enable TX on the channel (usually the recommended case for Message consumers) even for durable queues
+	 * @throws MessagingException in case of errors
+	 */
+	public void createConnection(boolean disableTX) throws MessagingException {
 		
 		if (this.rabbitMQRpcConfiguration != null) {
 			this.createConnection(this.rabbitMQRpcConfiguration); // set up a RPC style connection
@@ -96,8 +105,9 @@ public class RabbitConnectionHolder implements ShutdownListener {
 					// The value "1" is set as default for the RabbitMQMessageConsumerImpl that uses this class. 
 					// So any application using the RabbitMQMessageConsumerImpl will have prefetch value set as "1".
 					this.channel.basicQos(1);
-					// enable TX mode on the channel if messages are durable and the disableTX override flag has not been set (typically for message consumers)
-					if (rabbitMQConfiguration.isDurable() && !rabbitMQConfiguration.isDisableTX()) {
+					// enable TX mode on the channel if messages are durable and the disableTX override flag has not been set (typically for message consumers) and
+					// if no TX disabling override has been specified
+					if (rabbitMQConfiguration.isDurable() && !rabbitMQConfiguration.isDisableTX() && !disableTX) {
 						this.channel.txSelect();
 					}
 					this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,null);	
@@ -112,14 +122,15 @@ public class RabbitConnectionHolder implements ShutdownListener {
 				}
 			}
 		}
-	}
+		LOGGER.info("Connection created for configuration : " + this.rabbitMQConfiguration.toString());
+	}	
 	
 	/**
 	 * Creates the connection objects, including a Consumer, using the RabbitMQConfiguration held by this class
 	 * @throws MessagingException in case of errors
 	 */
 	public void createConnectionAndConsumer() throws MessagingException {
-		this.createConnection();
+		this.createConnection(true); // set the disable TX override to true as this is clearly intended for use by a consumer
 		this.createConsumer();
 	}
 	
@@ -218,7 +229,7 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	 * @see com.rabbitmq.client.ShutdownListener#shutdownCompleted(com.rabbitmq.client.ShutdownSignalException)
 	 */
 	public void shutdownCompleted(ShutdownSignalException sse) {
-		LOGGER.warn("Connection terminated for configuration : " + this.rabbitMQConfiguration.toString());
+		LOGGER.info("Connection terminated for configuration : " + this.rabbitMQConfiguration.toString());
 		synchronized (this) { // all code blocks that mutate the connection and channel object references held by this class are synchronized
 			this.conn = null;
 			this.channel = null;
