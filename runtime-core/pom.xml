@@ -9,7 +9,7 @@
 	<description>Trooper Runtime Core project</description>
 
 	<properties>
-		<org.springframework.version>3.0.0.RELEASE</org.springframework.version>
+		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 	</properties>
 
 	<dependencyManagement>

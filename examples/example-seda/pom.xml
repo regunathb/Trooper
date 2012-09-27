@@ -9,7 +9,7 @@
 	<description>Trooper Example Orchestration</description>
 
 	<properties>
-		<org.springframework.version>3.0.0.RELEASE</org.springframework.version>
+		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<org.mule.version>2.2.1</org.mule.version>		
 	</properties>
 
