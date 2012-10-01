@@ -29,7 +29,7 @@ import java.io.Serializable;
  * @author Regunath B
  * @version 1.0, 01/06/2012
  */
-public interface Resource extends Serializable {
+public interface Resource<T> extends Serializable {
 
 	/**
 	 * Determine if this Resource actually exists in physical form. This method performs a definitive existence check, whereas the
@@ -42,7 +42,7 @@ public interface Resource extends Serializable {
 	 * Returns a form of this Resource - proxy or itself that may be sent over the network
 	 * @return this Resource or a handle/proxy that can be used to reconstruct this Resource
 	 */
-	public Resource getSerializedForm();
+	public T getSerializedForm();
 	
 	/**
 	 * Returns a name for this Resource. The name may be simple or represent a unique reference to this resource in the context that manages this
@@ -63,6 +63,6 @@ public interface Resource extends Serializable {
 	 * Determines if this Resource can be deemed equivalent to the specified Resource. Interpretations of equality are implementation specific
 	 * @return boolean true if the specified Resource may be considered equal, false otherwise 
 	 */
-	public boolean equals(Resource resource);
+	public boolean equals(Resource<T> resource);
 	
 }
