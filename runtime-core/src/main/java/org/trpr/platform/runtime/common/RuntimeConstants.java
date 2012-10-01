@@ -34,7 +34,7 @@ public abstract class RuntimeConstants {
 	/**
 	 * Constants for the conventions on config file names
 	 */
-	public static final String COMMON_SPRING_BEANS_CONFIG = "common-spring-beans.xml";	
+	public static final String COMMON_SPRING_BEANS_CONFIG = "packaged/common-spring-beans.xml";	// its a file picked up from classpath
 	public static final String BOOTSTRAP_EXTENSIONS_FILE = "bootstrap_extensions.xml";
 	public static final String LOGGING_FILE = "logback.xml";
 	
