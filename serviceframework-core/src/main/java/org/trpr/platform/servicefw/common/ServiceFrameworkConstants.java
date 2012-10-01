@@ -27,7 +27,7 @@ package org.trpr.platform.servicefw.common;
 public abstract class ServiceFrameworkConstants {
 	
 	/** File names for service configuration file names*/
-	public static final String COMMON_SPRING_SERVICES_CONFIG =  "common-spring-services-config.xml";
+	public static final String COMMON_SPRING_SERVICES_CONFIG =  "packaged/common-spring-services-config.xml"; //its a file picked up from classpath
 	public static final String SPRING_SERVICES_CONFIG = "spring-services-config.xml";
 
 	/**
