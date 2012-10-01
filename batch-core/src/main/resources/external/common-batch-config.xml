@@ -68,7 +68,11 @@
 	<!-- Configuring Common Batch Job Launcher.  -->
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="asyncJobExecutor"/>
 	</bean>
+
+	<!-- Async Task executor used in all jobs -->
+	<bean id="asyncJobExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 
 	<!-- The Job operator bean for launching adhoc jobs -->
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
