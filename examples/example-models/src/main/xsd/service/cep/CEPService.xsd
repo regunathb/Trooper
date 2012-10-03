@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://org/trpr/example/model/service/cepService"
+           xmlns="http://org/trpr/example/model/service/cepService"
+	   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   xmlns:request="http://org/trpr/platform/service/model/common/platformServiceRequest"
+	   xmlns:response="http://org/trpr/platform/service/model/common/platformServiceResponse"
+	   xmlns:earthling="http://org/trpr/example/model/entity/earthling"
+	   elementFormDefault="qualified">
+  
+	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceRequest.xsd"/>
+  	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceResponse.xsd"/>
+  	<xs:import namespace="http://org/trpr/example/model/entity/earthling" schemaLocation="../../entity/Earthling.xsd"/>
+	
+	<xs:element name="CEPServiceRequestXML">
+		<xs:complexType>
+    		<xs:sequence>  
+      			<xs:element name="cepServiceRequest" type="CEPServiceRequest" />  
+    		</xs:sequence>               
+	    </xs:complexType>		
+   	</xs:element>
+   	
+	<xs:complexType name="CEPServiceRequest">
+		<xs:complexContent>
+			<xs:extension base="request:PlatformServiceRequest">
+				<xs:sequence>
+					<xs:element name="earthling" type="earthling:Earthling"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="CEPServiceResponseXML">
+		<xs:complexType>
+    		<xs:sequence>  
+      			<xs:element name="cepServiceResponse" type="CEPServiceResponse" />  
+    		</xs:sequence>               
+	    </xs:complexType>		
+   	</xs:element>
+   				
+	<xs:complexType name="CEPServiceResponse">
+		<xs:complexContent>
+			<xs:extension base="response:PlatformServiceResponse">
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>
