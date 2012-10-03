@@ -36,7 +36,7 @@ import org.trpr.platform.spi.task.TaskContext;
 public class EchoService extends AbstractServiceImpl<EchoServiceRequest, EchoServiceResponse> {
 	
 	/**
-	 * String constant defining the Greeting Task ID
+	 * String constant defining the Echo Task ID
 	 */
 	private static final String ECHO_TASK_ID = "echotask";
 	
