@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/vm/2.2 classpath:packaged/xsd/mule-vm.xsd
 	   http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd">
 
-	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="CEPGreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoMatchInputEndpoint" address="amqp://myexchange:direct/?queue=echoMatchInput"/>
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoNonMatchInputEndpoint" address="amqp://myexchange:direct/?queue=echoNonMatchInput"/>
 	
@@ -25,7 +25,7 @@
 		</custom-exception-strategy>
 		<service name="CEPMuleService">
 			<inbound>
-				<inbound-endpoint ref="GreetingInputEndpoint" transformer-refs="EarthlingToCEPServiceRequest"/>
+				<inbound-endpoint ref="CEPGreetingInputEndpoint" transformer-refs="EarthlingToCEPServiceRequest"/>
 			</inbound>
 			<pooled-component>
 		        <method-entry-point-resolver>
