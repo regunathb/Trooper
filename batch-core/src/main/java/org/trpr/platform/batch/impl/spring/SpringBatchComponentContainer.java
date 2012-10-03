@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.core.PlatformException;
@@ -85,12 +86,9 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 */
 	public void init() throws PlatformException {
 		
-		// add the "file:" prefix to file name to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
-		// to relative path
 		// The common batch beans context is loaded first using the Platform common beans context as parent
-		String commonContextFile = FILE_PREFIX + FileLocator.findUniqueFile(BatchFrameworkConstants.COMMON_BATCH_CONFIG).getAbsolutePath();
-		this.commonBatchBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
-				ApplicationContextFactory.getCommonBeansContext());	
+		// load this from classpath as it is packaged with the binaries
+		this.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, ApplicationContextFactory.getCommonBeansContext());
 		// add the common batch beans to the contexts list
 		this.jobsContextList.add(this.commonBatchBeansContext);
 		
