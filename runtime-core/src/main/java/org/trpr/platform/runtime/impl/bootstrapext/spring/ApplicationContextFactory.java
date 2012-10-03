@@ -27,6 +27,7 @@ import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
@@ -113,11 +114,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 		// commonBeansContext is the base context for all application contexts, so load it if not loaded already.
 		AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)ApplicationContextFactory.appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
 		if (commonBeansContext == null) { 
-			File springBeansFile = FileLocator.findUniqueFile(RuntimeConstants.COMMON_SPRING_BEANS_CONFIG);
-			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
-			// to relative path
-			commonBeansContext = new FileSystemXmlApplicationContext(FILE_PREFIX + 
-					springBeansFile.getAbsolutePath());
+			commonBeansContext = new ClassPathXmlApplicationContext(RuntimeConstants.COMMON_SPRING_BEANS_CONFIG); // load this from classpath as it is packaged with the binaries
 			ApplicationContextFactory.appContextMap.put(COMMON_BEANS_CONTEXT_NAME.toLowerCase(), commonBeansContext);
 		}
 		return commonBeansContext;
