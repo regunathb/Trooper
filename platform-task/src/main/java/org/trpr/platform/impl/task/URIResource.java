@@ -57,11 +57,11 @@ public class URIResource<T> implements Resource<String> {
 	}
 
 	/**
-	 * Interface method implementation. Throws {@link UnsupportedOperationException}
+	 * Interface method implementation. Returns the name of the Resource that this one wraps
 	 * @see org.trpr.platform.spi.task.Resource#getName()
 	 */
 	public String getName() {
-		throw new UnsupportedOperationException("Method not supported on this serialized Resource. Consider constructing the resource using #getSerializedForm()");
+		return this.resource.getName();
 	}
 
 	/**
