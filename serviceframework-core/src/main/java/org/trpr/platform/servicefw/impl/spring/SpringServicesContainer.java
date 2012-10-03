@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 import org.trpr.platform.core.PlatformException;
@@ -115,8 +116,8 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void init() throws PlatformException {
 		// The common service beans context is loaded first using the Platform common beans context as parent
-		String commonContextFile = FILE_PREFIX + FileLocator.findUniqueFile(ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG).getAbsolutePath();		
-		this.commonServiceBeansContext = new FileSystemXmlApplicationContext(new String[]{commonContextFile},
+		// load this from classpath as it is packaged with the binaries
+		this.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG},
 				ApplicationContextFactory.getCommonBeansContext());	
 		
 		// load the service beans and set the commons bean context as the parent
