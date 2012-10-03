@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+
+	<!-- The CEP reference implementation services -->
+	<bean id="cepService_1.0" class="org.trpr.example.service.cep.CEPService">
+		<property name="taskManager" ref="taskManager" />
+		<property name="serviceContext" ref="serviceContext" />
+		<property name="cepEngineResource" ref="cepEngineResource" />
+	</bean>	
+
+	<bean id="echoService_1.0" class="org.trpr.example.service.echo.EchoService">
+		<property name="taskManager" ref="taskManager" />
+		<property name="serviceContext" ref="serviceContext" />
+	</bean>	
+	
+	<bean id="cepEngineResource" class="org.trpr.example.service.cep.CEPEngineResource"/>
+	
+	<bean id="cepEngine" class="org.trpr.example.service.cep.EPServiceProviderFactory">
+		<property name="itemListVar" value="itemsList" />
+		<property name="eplStatement" value="select * from org.trpr.example.model.entity.earthling.Earthling where lastName in (itemsList)" />
+		<property name="matchedEventSubscriber" ref="cepEventsDispatcher" />
+		<property name="unmatchedListener" ref="cepEventsDispatcher" />
+	</bean>
+	
+	<bean id="cepEventsDispatcher" class="org.trpr.example.service.cep.CEPEventsDispatcher"/>
+	
+</beans>

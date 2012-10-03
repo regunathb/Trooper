@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:rabbitmq="http://www.mulesource.org/schema/mule/rabbitmq/2.2"
+	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+	xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.2 classpath:packaged/xsd/mule.xsd
+       http://www.mulesource.org/schema/mule/rabbitmq/2.2 classpath:packaged/xsd/mule-rabbitmq.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 classpath:packaged/xsd/mule-vm.xsd
+	   http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd">
+
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoMatchInputEndpoint" address="amqp://myexchange:direct/?queue=echoMatchInput"/>
+	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoNonMatchInputEndpoint" address="amqp://myexchange:direct/?queue=echoNonMatchInput"/>
+	
+	<custom-transformer name="EarthlingToCEPServiceRequest" class="org.trpr.example.seda.cep.mule.transformer.EarthlingToCEPServiceRequestTransformer"/>	
+	<custom-transformer name="EarthlingToEchoServiceRequest" class="org.trpr.example.seda.cep.mule.transformer.EarthlingToEchoServiceRequestTransformer"/>
+	
+	<!-- Sample Mule model demonstrating chaining of Trooper services and CEP -->
+	<model name="cepModel">
+		<custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
+			<spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
+		</custom-exception-strategy>
+		<service name="CEPMuleService">
+			<inbound>
+				<inbound-endpoint ref="GreetingInputEndpoint" transformer-refs="EarthlingToCEPServiceRequest"/>
+			</inbound>
+			<pooled-component>
+		        <method-entry-point-resolver>
+		        	<include-entry-point method="processRequest" />
+		        </method-entry-point-resolver>
+				<!-- This bean is defined in spring-services-config.xml of this project -->
+				<spring-object bean="cepService_1.0" />
+			</pooled-component>
+		</service>
+		<service name="EchoMatchMuleService">
+			<inbound>
+				<inbound-endpoint ref="EchoMatchInputEndpoint" transformer-refs="EarthlingToEchoServiceRequest"/>
+			</inbound>
+			<pooled-component>
+		        <method-entry-point-resolver>
+		        	<include-entry-point method="processRequest" />
+		        </method-entry-point-resolver>
+				<!-- This bean is defined in spring-services-config.xml of this project -->
+				<spring-object bean="echoService_1.0" />
+			</pooled-component>
+		</service>
+		<service name="EchoNonMatchMuleService">
+			<inbound>
+				<inbound-endpoint ref="EchoNonMatchInputEndpoint" transformer-refs="EarthlingToEchoServiceRequest"/>
+			</inbound>
+			<pooled-component>
+		        <method-entry-point-resolver>
+		        	<include-entry-point method="processRequest" />
+		        </method-entry-point-resolver>
+				<!-- This bean is defined in spring-services-config.xml of this project -->
+				<spring-object bean="echoService_1.0" />
+			</pooled-component>
+		</service>
+	</model>
+
+    <rabbitmq:connector name="LocalhostRabbitMQConnector">
+        <spring:property name="host" value="localhost" />
+        <spring:property name="virtualHost" value="/" />
+        <spring:property name="port" value="5672" />
+        <spring:property name="username" value="guest" />
+        <spring:property name="password" value="guest" />
+        <spring:property name="retryPolicyTemplate">
+            <spring:bean
+                class="org.mule.modules.common.retry.policies.ExhaustingRetryPolicyTemplate">
+                <spring:property name="sleepTime" value="2000" />
+                <spring:property name="retryLimit" value="100" />
+            </spring:bean>
+        </spring:property>
+        <custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
+            <spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
+        </custom-exception-strategy>
+    </rabbitmq:connector>
+    
+</mule>
+
