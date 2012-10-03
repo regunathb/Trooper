@@ -47,12 +47,12 @@ public class SedaClient {
 		}
 		publisher.closeConnections();
 		*/
-		Thread[] threads = new Thread[10];
+		Thread[] threads = new Thread[1];
 		for (int i = 0; i < threads.length; i++) {
 			final int count = i;
 			threads[i] = new Thread() {
 				public void run() {
-					for (int j = 0; j < 1000; j++) {
+					for (int j = 0; j < 11; j++) {
 						Earthling e = new Earthling();
 						e.setFirstName("Mr");
 						e.setLastName("Trooper" + count + j);
