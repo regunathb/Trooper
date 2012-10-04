@@ -60,6 +60,7 @@ public class EchoService extends AbstractServiceImpl<EchoServiceRequest, EchoSer
 	    EchoServiceResponse echoServiceResponse = new EchoServiceResponse();				
 	    Earthling earthling = (Earthling)echoServiceRequest.getEarthling();
 
+	    // This service completely ignores what the EchoTask does or returns. This is because the task simply echoes the request data and nothing can go wrong there
 		String echo = "Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth().getTime();
 		echoServiceResponse.setEcho(echo);		
 		populateStatus(true, echoServiceResponse);

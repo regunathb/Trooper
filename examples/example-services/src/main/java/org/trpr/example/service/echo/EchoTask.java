@@ -21,6 +21,7 @@ import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.impl.task.AbstractTask;
 import org.trpr.platform.spi.task.Resource;
+import org.trpr.platform.spi.task.TaskResult.TaskResultCode;
 
 /**
  * The EchoTask defines the Task that will be executed by the EchoService
@@ -53,6 +54,7 @@ public class EchoTask extends AbstractTask {
 	protected void doExecute() {
 		Earthling earthling = (Earthling) this.getTaskData().getEntityByName(Earthling.class.getName())[0];
 		LOGGER.info("Echo " + earthling.getFirstName() + " " + earthling.getLastName() + " " + earthling.getDateOfBirth().getTime());
+		this.result.setResultCode(TaskResultCode.SUCCESS);
 	}
 	
 }

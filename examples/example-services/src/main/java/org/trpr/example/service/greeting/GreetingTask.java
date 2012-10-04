@@ -19,6 +19,8 @@ package org.trpr.example.service.greeting;
 import org.trpr.example.model.entity.earthling.Earthling;
 import org.trpr.platform.impl.task.AbstractTask;
 import org.trpr.platform.spi.task.Resource;
+import org.trpr.platform.spi.task.TaskResult.TaskResultCode;
+import org.trpr.platform.spi.validation.ValidationSummary;
 
 /**
  * The GreetingTask defines the Task to be executed by the GeetingService
@@ -49,6 +51,13 @@ public class GreetingTask extends AbstractTask {
 		Earthling earthling = (Earthling) this.getTaskData().getEntityByName(Earthling.class.getName())[0];
 		GreetingValidationStrategy greetingValidationStrategy = new GreetingValidationStrategy(earthling);
 		this.result.setExecutionSummary(greetingValidationStrategy.validate());	
+		
+	    ValidationSummary validationSummary = (ValidationSummary)this.result.getExecutionSummary();	    	    
+	    if (validationSummary.hasValidationErrors()) {
+	    	this.result.setResultCode(TaskResultCode.FAILURE);
+	    } else {
+	    	this.result.setResultCode(TaskResultCode.SUCCESS);
+	    }
 	}
 	
 }
