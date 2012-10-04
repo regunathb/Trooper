@@ -25,6 +25,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
 
 import org.springframework.batch.core.BatchStatus;
+import org.trpr.platform.batch.impl.spring.jmx.JMXJobUtils;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -48,14 +49,6 @@ public class StandAloneBatchClient {
 
 	/** The Log instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(StandAloneBatchClient.class);
-	
-	/** Array of Batch completion status strings that will cause Trooper to exit*/
-	private static final String[] BATCH_COMPLETION_STATUSES = {
-		BatchStatus.ABANDONED.name(),
-		BatchStatus.COMPLETED.name(),
-		BatchStatus.FAILED.name(),
-		BatchStatus.STOPPED.name(),
-	};
 	
 	/**
 	 * Main method test the service in standalone nature. It expects the following arguments
@@ -85,35 +78,11 @@ public class StandAloneBatchClient {
 		bootstrap.init(bootstrapConfigPath);
 		
 		try { 
-			MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-			Set<ObjectInstance> mbeans = mbeanServer.queryMBeans(null, null);
-			ObjectInstance jobAdministratorInstance = null;
-			for (ObjectInstance mbean : mbeans) {
-				if (mbean.getObjectName().toString().indexOf("JobAdministrator") > -1) {
-					jobAdministratorInstance = mbean;
-					break;
-				}
-			}
+			JMXJobUtils jmxJobUtils = new JMXJobUtils();
 			LOGGER.info("Invoking Trooper Job execution for : " + jobName);
-			mbeanServer.invoke(jobAdministratorInstance.getObjectName(), "runJob", new Object[] {jobName}, new String[] {String.class.getName()});
-			while(true) {
-				Thread.sleep(1000);
-				TabularDataSupport batchStats = (TabularDataSupport)mbeanServer.invoke(jobAdministratorInstance.getObjectName(), "getIndividualJobExecutionMetrics", null, null);
-				Set<Map.Entry<Object, Object>> stats = batchStats.entrySet();
-				for (Map.Entry entry : stats) {
-					CompositeData data = (CompositeData)entry.getValue();
-					if (data.get("jobName").equals(jobName) && data.get("jobStatus") != null) {
-						String status = data.get("jobStatus").toString(); 
-						for (String completedStatus : BATCH_COMPLETION_STATUSES) {
-							if (status.equalsIgnoreCase(completedStatus)) {
-								// job has completed execution exit.
-								LOGGER.info("Going to terminate Trooper as Job execution has completed with status : " + status);
-								return;								
-							}
-						}
-					}					
-				}
-			}
+			jmxJobUtils.runJob(jobName);
+			String status = jmxJobUtils.waitForJobExecution(jobName, 1000);
+			LOGGER.info("Going to terminate Trooper as Job execution has completed with status : " + status);
 		} catch(Throwable e) {
 			LOGGER.error("Exception running the job", e);
 			throw new PlatformException(e);
