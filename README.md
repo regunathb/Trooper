@@ -12,3 +12,5 @@ It is an umbrella project for a number of things:
 
 The Trooper "examples" project group demonstrates usage of various application profiles supported by Trooper.
 Documentation is continuously being added to the Wiki page of Trooper.
+
+- Shashi's forked version
