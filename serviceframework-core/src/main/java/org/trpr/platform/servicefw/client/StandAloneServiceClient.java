@@ -35,7 +35,7 @@ import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 
 /**
- * The <code> StandAloneServiceClient </code> may be used for testing services It expects three arguments:
+ * The <code> StandAloneServiceClient </code> may be used for testing services. It expects the following arguments:
  * <pre>
  * 1. Bootstrap config location  
  * 2. Service Name e.g. GreetingsService
@@ -56,7 +56,7 @@ public class StandAloneServiceClient {
 	private static final String SERVICE_RESPONSE_JSON_FILE_SUFFIX = "Response.json";
 	
 	/**
-	 * Main method test the service in standalone nature. It expects three program arguments
+	 * Main method to test the service in standalone nature. It expects the following arguments
      * 
 	 * @param args args[0] - Bootstrap configuration path 
 	 *             args[1] - Service Name
@@ -83,7 +83,7 @@ public class StandAloneServiceClient {
 		
 		ServiceResponse<? extends PlatformServiceResponse> serviceResponse = null;
 		
-		// boot the uid server application
+		// boot the Trooper runtime
 		Bootstrap bootstrap = new Bootstrap();
 		// we use System.out as the logging would not have been configured until the end of bootstrap
 		System.out.println(("Bootstrap Config Path: " + bootstrapConfigPath));
