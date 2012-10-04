@@ -279,13 +279,17 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 					} else {
 						jobStatistics[count].setJobMessage(jobExecution.getExitStatus().getExitDescription());
 					}
-					Calendar jobStartTimeStamp = Calendar.getInstance();
-					jobStartTimeStamp.setTime(jobExecution.getStartTime());
-					jobStatistics[count].setJobStartTimeStamp(jobStartTimeStamp);
+					if (jobExecution.getStartTime() != null) {
+						Calendar jobStartTimeStamp = Calendar.getInstance();
+						jobStartTimeStamp.setTime(jobExecution.getStartTime());
+						jobStatistics[count].setJobStartTimeStamp(jobStartTimeStamp);
+					}
 					
-					Calendar jobEndTimeStamp = Calendar.getInstance();
-					jobEndTimeStamp.setTime(jobExecution.getEndTime());
-					jobStatistics[count].setJobEndTimestamp(jobEndTimeStamp);
+					if (jobExecution.getEndTime() != null) {
+						Calendar jobEndTimeStamp = Calendar.getInstance();
+						jobEndTimeStamp.setTime(jobExecution.getEndTime());
+						jobStatistics[count].setJobEndTimestamp(jobEndTimeStamp);
+					}
 				}
 			}
 			count += 1;
