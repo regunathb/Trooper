@@ -22,6 +22,8 @@ import org.trpr.example.model.entity.earthling.Earthling;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.impl.task.AbstractTask;
+import org.trpr.platform.spi.task.TaskResult;
+import org.trpr.platform.spi.task.TaskResult.TaskResultCode;
 
 import com.espertech.esper.client.EPServiceProvider;
 
@@ -72,7 +74,9 @@ public class CEPTask<T> extends AbstractTask {
 				isVarSet = true;
 			}
 			epProvider.getEPRuntime().sendEvent(earthling);
+			this.result.setResultCode(TaskResultCode.SUCCESS);
 		} catch (Exception e) {
+			this.result.setResultCode(TaskResultCode.FAILURE);
 			LOGGER.error("Error accessing (or) invoking method on CEP engine :" + e.getMessage(), e);
 		}
 	}

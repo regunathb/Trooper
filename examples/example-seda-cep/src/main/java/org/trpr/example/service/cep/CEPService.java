@@ -26,6 +26,8 @@ import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 import org.trpr.platform.spi.task.Resource;
 import org.trpr.platform.spi.task.TaskContext;
+import org.trpr.platform.spi.task.TaskResult;
+import org.trpr.platform.spi.task.TaskResult.TaskResultCode;
 
 /**
  * The <code>CEPService</code> receives Earthling instances and sends it to the CEP engine for processing.
@@ -58,9 +60,12 @@ public class CEPService extends AbstractServiceImpl<CEPServiceRequest, CEPServic
 	protected ServiceResponse<CEPServiceResponse> prepareServiceResponse(
 			TaskContext taskContext,
 			ServiceRequest<CEPServiceRequest> serviceRequest) {
-	
-		// blindly sending a success response. Might make sense to check the CEPTask execution outcome from TaskContext
-		ServiceResponseImpl serviceResponse = new ServiceResponseImpl(String.valueOf(ServiceFrameworkConstants.SUCCESS_STATUS_CODE));
+		
+		TaskResult<Earthling> result = taskContext.getTaskResult(CEP_TASK_ID);		
+		ServiceResponseImpl serviceResponse = new ServiceResponseImpl(result.getResultCode().equals(TaskResultCode.SUCCESS) ? 
+				String.valueOf(ServiceFrameworkConstants.SUCCESS_STATUS_CODE):
+					String.valueOf(ServiceFrameworkConstants.FAILURE_STATUS_CODE));
+		
 		serviceResponse.setResponseData(new CEPServiceResponse());
 		return serviceResponse;		
 	}
