@@ -24,6 +24,7 @@ import javax.management.ObjectInstance;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
 
+import org.springframework.batch.core.BatchStatus;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -47,6 +48,14 @@ public class StandAloneBatchClient {
 
 	/** The Log instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(StandAloneBatchClient.class);
+	
+	/** Array of Batch completion status strings that will cause Trooper to exit*/
+	private static final String[] BATCH_COMPLETION_STATUSES = {
+		BatchStatus.ABANDONED.name(),
+		BatchStatus.COMPLETED.name(),
+		BatchStatus.FAILED.name(),
+		BatchStatus.STOPPED.name(),
+	};
 	
 	/**
 	 * Main method test the service in standalone nature. It expects the following arguments
@@ -87,19 +96,22 @@ public class StandAloneBatchClient {
 			}
 			LOGGER.info("Invoking Trooper Job execution for : " + jobName);
 			mbeanServer.invoke(jobAdministratorInstance.getObjectName(), "runJob", new Object[] {jobName}, new String[] {String.class.getName()});
-			boolean exitRuntime = false;
-			while(!exitRuntime) {
-				Thread.sleep(2000);
+			while(true) {
+				Thread.sleep(1000);
 				TabularDataSupport batchStats = (TabularDataSupport)mbeanServer.invoke(jobAdministratorInstance.getObjectName(), "getIndividualJobExecutionMetrics", null, null);
 				Set<Map.Entry<Object, Object>> stats = batchStats.entrySet();
 				for (Map.Entry entry : stats) {
 					CompositeData data = (CompositeData)entry.getValue();
 					if (data.get("jobName").equals(jobName) && data.get("jobStatus") != null) {
-						// job has completed execution exit.
-						LOGGER.info("Going to terminate Trooper as Job execution has completed!");
-						exitRuntime = true;
-						break;
-					}
+						String status = data.get("jobStatus").toString(); 
+						for (String completedStatus : BATCH_COMPLETION_STATUSES) {
+							if (status.equalsIgnoreCase(completedStatus)) {
+								// job has completed execution exit.
+								LOGGER.info("Going to terminate Trooper as Job execution has completed with status : " + status);
+								return;								
+							}
+						}
+					}					
 				}
 			}
 		} catch(Throwable e) {
