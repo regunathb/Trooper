@@ -47,7 +47,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
- * The <code>HibernateHandler</code> is an implementation of {@link PersistenceHandler} that uses Hibernate as the persistence framework.
+ * The <code>HibernateHandler</code> is a sub-type of {@link RDBMSHandler} that uses Hibernate as the persistence framework.
  * Hibernate is used via the Spring {@link HibernateTemplate}.
  * 
  * This class is also instrumented to log performance metrics using the platform-core {@link PerformanceMetricsLogger}
