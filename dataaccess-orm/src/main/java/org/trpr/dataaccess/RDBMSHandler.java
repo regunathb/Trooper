@@ -15,34 +15,21 @@
  */
 package org.trpr.dataaccess;
 
-import org.trpr.platform.core.spi.management.jmx.InstanceAwareMBean;
-import org.trpr.platform.core.spi.persistence.PersistenceHandler;
+import org.trpr.platform.core.impl.persistence.AbstractPersistenceHandler;
 
 /**
- * <code>RDBMSHandler<code> is an implementation of {@link PersistenceHandler} that caters to persisting data into an RDBMS.
+ * <code>RDBMSHandler<code> is a sub-tyep of {@link AbstractPersistenceHandler} caters to persisting data into an RDBMS.
  * This class is abstract and may be extended to create specific framework handlers - for example to persist using Hibernate or JPA or iBatis. 
 
  * @author Regunath B
  * @version 1.0, 23/05/2012
  */
 
-public abstract class RDBMSHandler implements PersistenceHandler, InstanceAwareMBean {
-
+public abstract class RDBMSHandler extends AbstractPersistenceHandler {
+	
 	/**
 	 * No arg constructor.
 	 */
 	public RDBMSHandler(){
 	}
-
-	/**
-	 * Interface method implementation. Returns the passed in bean identifier i.e. beanKey param appended with the Java hashCode of a newly
-	 * created Java Object.
-	 * @see InstanceAwareMBean#getMBeanNameSuffix(Object, String)
-	 */
-	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
-		// we could have used the hashCode of the managedBean object which apparently does not work when the object is instantiated using a Spring
-		// ApplicationContext. The reason is not known and hence choosing the safer option of creating a new Object and using its hashcode instead.
-		return "-" + beanKey + "[" + new Object().hashCode()+ "]";
-	}
-	
 }

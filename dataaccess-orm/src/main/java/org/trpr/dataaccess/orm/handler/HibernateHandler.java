@@ -55,7 +55,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  * @author Ashok Ayengar, Raja S, Regunath B
  * @version 1.0, 24/05/2012
  */
-@ManagedResource(objectName = "spring.application:application=Trooper-Perf-Metrics,type=PerformanceMetrics,name=HibernatePerfMetrics", description = "Hibernate Performance Metrics Logger")
+@ManagedResource(objectName = "spring.application:type=Trooper,application=Performance-Metrics,name=HibernateMetrics-", description = "Hibernate Performance Metrics Logger")
 public class HibernateHandler extends RDBMSHandler {
 
 	/**
