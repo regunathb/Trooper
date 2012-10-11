@@ -36,7 +36,7 @@ public class AppInstanceAwareMBean implements InstanceAwareMBean {
 	}
 	
 	/**
-	 * Helper method to escape chracters for JMX object naming
+	 * Helper method to escape characters for JMX object naming
 	 */
 	private String escapeForObjectName(String value) {
 		value = value.replaceAll(" ", "_");
