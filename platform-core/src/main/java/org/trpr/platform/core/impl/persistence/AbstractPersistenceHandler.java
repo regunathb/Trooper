@@ -13,26 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.core.spi.management.jmx;
+package org.trpr.platform.core.impl.persistence;
 
 import org.trpr.platform.core.PlatformConstants;
+import org.trpr.platform.core.spi.management.jmx.InstanceAwareMBean;
+import org.trpr.platform.core.spi.persistence.PersistenceHandler;
 
 /**
- * Class <code>AppInstanceAwareMBean</code> class is an implementation of {@link InstanceAwareMBean} interface that derives the MBean name from  
- * the JVM system property identified by PlatformConstants.TRPR_APP_NAME. 
- * 
+ * <code>AbstractPersistenceHandler<code> is a convenience implementation of {@link PersistenceHandler} that has behavior common to all persistence handlers such
+ * as JMX object naming behavior 
+ *
  * @author Regunath B
- * @version 1.0, 17/05/2012
+ * @version 1.0, 11/10/2012
  */
-public class AppInstanceAwareMBean implements InstanceAwareMBean {
+
+public abstract class AbstractPersistenceHandler implements PersistenceHandler, InstanceAwareMBean {
+	
+	/**
+	 * No arg constructor.
+	 */
+	public AbstractPersistenceHandler(){
+	}
 
 	/**
-	 * Interface method implementation. Returns null or the JVM system property identified by PlatformConstants.TRPR_APP_NAME.
-	 * Ignores the passed in managed bean instance and its identifier
+	 * Interface method implementation. Returns a bean name suffix that comprises of: <escaped Trooper app name>,"handler=<beanKey>"
 	 * @see InstanceAwareMBean#getMBeanNameSuffix(Object, String)
 	 */
 	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
-		return escapeForObjectName(System.getProperty(PlatformConstants.TRPR_APP_NAME));
+		return String.format(escapeForObjectName(System.getProperty(PlatformConstants.TRPR_APP_NAME)) + ",handler=%s", beanKey);
 	}
 	
 	/**
@@ -47,5 +55,6 @@ public class AppInstanceAwareMBean implements InstanceAwareMBean {
 		value = value.replaceAll("=", "~");
 		return value;
 	}	
+	
 
 }
