@@ -15,16 +15,6 @@
  */
 package org.trpr.platform.batch.client;
 
-import java.lang.management.ManagementFactory;
-import java.util.Map;
-import java.util.Set;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectInstance;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularDataSupport;
-
-import org.springframework.batch.core.BatchStatus;
 import org.trpr.platform.batch.impl.spring.jmx.JMXJobUtils;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
