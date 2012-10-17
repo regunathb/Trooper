@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<bean id="hbaseHandler"
+		class="org.trpr.dataaccess.hbase.persistence.HBaseHandler">
+		<!-- HBase configuration properties (org.apache.hadoop.conf.Configuration) --> 
+		<property name="hbaseConfigProps">
+			<props>
+				<prop key="hbase.rootdir">file:/tmp/hbase-root/hbase</prop>
+				<prop key="hbase.master.port">60000</prop>
+				<prop key="hbase.zookeeper.quorum">localhost</prop>
+				<prop key="hbase.client.write.buffer">2097152</prop>
+			</props>
+		</property>
+		
+		<!-- HBaseMappings information --> 
+		<property name="hbaseMappings">
+			<list>
+				<value>hbasesample/mytable.hbase.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="hbaseProvider"
+		class="org.trpr.dataaccess.hbase.persistence.HBaseProvider">
+		<property name="handler" ref="hbaseHandler" />
+	</bean>
+</beans>

@@ -35,6 +35,8 @@ public abstract class AbstractPersistentEntity implements PersistentEntity {
 	protected Criteria criteriaForLoad;
 	protected String entityName;
 	
+	public AbstractPersistentEntity(){}
+	
 	/** Constructors for this class*/
 	public AbstractPersistentEntity(String entityname, Identifier identifier) {
 		this(entityname, identifier, null);
