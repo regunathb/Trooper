@@ -14,7 +14,7 @@
 	</properties>
 
 	<dependencies>
-	
+
 		<!-- Third party dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -31,25 +31,30 @@
 			<artifactId>spring-beans</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
+		<!-- hadoop and hbase dependencies -->
 		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-hadoop</artifactId>
-			<version>${org.springframework.data.hadoop.version}</version>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>0.20.2-cdh3u5</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase</artifactId>
+			<version>0.90.6-cdh3u5</version>
+		</dependency>
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-				
+
 	</dependencies>
-	
+
 	<build>
 
 		<sourceDirectory>src/main/java</sourceDirectory>
-		
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -59,8 +64,34 @@
 				</includes>
 			</resource>
 		</resources>
-		
-		<plugins>		
+
+		<plugins>
+			<!-- generate code for mapping configs -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<mkdir dir="${basedir}/src/main/java" />
+								<exec executable="xjc">
+									<arg value="${basedir}/src/main/xsd" />
+									<arg value="-d" />
+									<arg value="${basedir}/src/main/java" />
+									<arg value="-b" />
+									<arg value="${basedir}/src/main/resources/packaged" />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -85,9 +116,9 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
-		
+
 	</build>
-	
+
 </project>
