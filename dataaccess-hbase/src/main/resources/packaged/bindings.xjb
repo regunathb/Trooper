@@ -1,0 +1,8 @@
+<jaxb:bindings 
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" version="1.0"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<jaxb:bindings schemaLocation="../../xsd/hbase/hbase-mapping.xsd"  node="/xs:schema">
+	</jaxb:bindings>
+	
+</jaxb:bindings>	

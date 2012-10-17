@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://org/trpr/dataaccess/hbase/model/config"
+	xmlns="http://org/trpr/dataaccess/hbase/model/config" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	
+	<xs:complexType name="columnDefinition">
+		<xs:attribute  name="columnFamily" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="columnQualifier" type="xs:string" ></xs:attribute>
+		<xs:attribute  name="columnQualifierAttribute" type="xs:string" ></xs:attribute>
+		<xs:attribute  name="valueAttribute" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="valueType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="processors" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Comma separated list of processors that should be used for encoding/decoding
+					the column's byte array value.
+					
+					A map of processors should be provided to HBaseHandler which maps the processor
+					name to its corresponding implementation of 
+					in.gov.uidai.platform.impl.persistence.hbase.util.ByteArrayProcessor.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="mapDefinition">
+		<xs:annotation>
+			<xs:documentation>
+				Map definition represents a set of columns in HBase table.  Each key in the map
+				will be used for a defining a new column with name "columnfamily:columnQualifierkey-value".  The
+				value of the cell will be derived from map.get(key).
+			</xs:documentation>
+		</xs:annotation>
+		
+		<xs:attribute  name="columnFamily" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="columnQualifier" type="xs:string" ></xs:attribute>
+		<xs:attribute  name="keyType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="valueType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="mapAttribute" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					Represents the map attribute in the entity class to which this definition applies to.
+					Should be of type java.util.Map.
+
+					A map of processors should be provided to HBaseHandler which maps the processor
+					name to its corresponding implementation of 
+					in.gov.uidai.platform.impl.persistence.hbase.util.ByteArrayProcessor.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute  name="processors" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Comma separated list of processors that should be used for encoding/decoding
+					the column's byte array value.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	
+	<xs:complexType name="rowKeyMember">
+		<xs:attribute  name="valueAttribute" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="valueType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute  name="valueLength" type="xs:int" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					Since composite row key members are concatenated to arrive at final row key,
+					it is very important that it is fixed length value.
+					
+					If you have variable length values, then, try to pad it with spaces so that
+					you still arrive at fixed length values.  You still need to cap the max length
+					of the values.  
+					
+					It is advised to use only small values as part of row key. 
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="compositeRowKey">
+		<xs:sequence>
+			<xs:element name="rowKeyMember" type="rowKeyMember" minOccurs="1" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="rowKeyDefinition">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>
+					Use element compositeRowKey if the row key is composed from multiple attributes
+					else you can use "valueAttribute" and "valueType" attributes of "rowKeyDefinition"
+				</xs:documentation>
+			</xs:annotation>
+			<xs:element name="compositeRowKey" type="compositeRowKey" minOccurs="0"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="valueAttribute" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="valueType" type="xs:string" use="optional"></xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="hbaseClass">
+		<xs:sequence>
+			<xs:element name="rowkey-definition" type="rowKeyDefinition" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="column-definition" type="columnDefinition" minOccurs="0" maxOccurs="unbounded"></xs:element>
+			<xs:element name="map-definition" type="mapDefinition" minOccurs="0" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
+		<xs:attribute name="table" type="xs:string"></xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="hbaseMapping">
+		<xs:sequence>
+			<xs:element name="hbase-class" type="hbaseClass"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="hbase-mapping">
+		<xs:annotation>
+			<xs:documentation>
+				This element tries to mirror Hibernate's hibernate-mapping element.
+				This element is used for describing a HBase Entity so that HBase ORM built as
+				part of UIDAI Persistence Manager can read and save values in HBase table.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

@@ -58,6 +58,12 @@ public class Criteria {
 	/** Max result set size*/
 	protected int maxResults = Criteria.NO_LIMIT;
 	
+	/**
+	 * Default const for any implementations that cannot define simple queries
+	 * or object types.
+	 */
+	public Criteria(){}
+	
 	/** Constructors for this class*/
 	public Criteria(Class<? extends PersistentEntity> managedClass, String query){
 		this(managedClass, query, Criteria.DEFAULT_QUERY);
