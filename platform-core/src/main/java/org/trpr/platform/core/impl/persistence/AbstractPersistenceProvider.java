@@ -41,6 +41,7 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#findEntities(Criteria)
 	 */
+	@Override
 	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
 		return getHandler().findEntities(criteria);
 	}
@@ -49,6 +50,7 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#findEntity(Criteria)
 	 */
+	@Override
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
 		return getHandler().findEntity(criteria);
 	}
@@ -57,6 +59,7 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#findEntity(PersistentEntity)
 	 */
+	@Override
 	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
 		return getHandler().findEntity(entity);
 	}
@@ -65,6 +68,7 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#makePersistent(PersistentEntity)
 	 */
+	@Override
 	public PersistentEntity makePersistent(PersistentEntity entity) throws PersistenceException {
 		return getHandler().makePersistent(entity);
 	}
@@ -73,6 +77,7 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#makeTransient(PersistentEntity)
 	 */
+	@Override
 	public void makeTransient(PersistentEntity entity) throws PersistenceException {
 		getHandler().makePersistent(entity);
 	}
@@ -81,9 +86,21 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 	 * Interface method implementation. Delegates the call to PersistenceHandler.
 	 * @see PersistenceProvider#update(Criteria)
 	 */
+	@Override
 	public int update(Criteria criteria) throws PersistenceException {
 		return getHandler().update(criteria);
 	}
+	
+	
+	/**
+	 * Interface method implementation. Delegates the call to PersistenceHandler.
+	 * @see PersistenceProvider#findObject(PersistentEntity)
+	 */
+	@Override
+	public Collection<PersistentEntity> findObject(PersistentEntity entity) throws PersistenceException {
+		return getHandler().findObject(entity);
+	}
+	
 
 	/** Getter/Setter methods*/
 	public PersistenceHandler getHandler() {
