@@ -18,8 +18,9 @@
 		<module>../batch-model</module>
 		<module>../batch-core</module>
 		<module>../service-model</module>
-	        <module>./example-batch</module>
-        	<module>./example-models</module>
+	    <module>./example-batch</module>
+        <module>./example-models</module>
+		<module>./example-hbase</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
