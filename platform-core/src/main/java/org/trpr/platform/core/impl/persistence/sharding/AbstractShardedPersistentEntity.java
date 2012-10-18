@@ -53,6 +53,12 @@ public abstract class AbstractShardedPersistentEntity extends AbstractPersistent
 	public AbstractShardedPersistentEntity(String entityName, Identifier identifier, Criteria criteriaForLoad) {
 		super(entityName, identifier, criteriaForLoad);
 	}
+	/**
+	 * Default constructor for implementations that do not use parameterized
+	 * constructors
+	 */
+	public AbstractShardedPersistentEntity() {
+	}
 	
 	/**
 	 * Interface method implementation. Returns the value stored in member variable. Sub-types may override this method to return different
