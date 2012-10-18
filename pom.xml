@@ -21,7 +21,8 @@
 		<module>service-model</module>
 	    <module>serviceframework-core</module>
         <module>serviceframework-seda</module>
-		<module>integration-rabbitmq</module>		
+		<module>integration-rabbitmq</module>	
+		<module>dataaccess-hbase</module>		
 	</modules>
 			
 </project>

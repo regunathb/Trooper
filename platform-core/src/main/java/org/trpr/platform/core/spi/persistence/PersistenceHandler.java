@@ -37,7 +37,7 @@ public interface PersistenceHandler {
 	 * @throws PersistenceException or one of its relevant sub-types in case of errors during persistence. See PersistenceException type hierarchy. 
 	 */
 	public PersistentEntity makePersistent(PersistentEntity entity) throws PersistenceException;
-	
+
 	/**
 	 * Deletes the specified PersistentEntity form the underyling data store. Returns quietly if the specified entity was not found (or) was already
 	 * deleted.
@@ -45,7 +45,7 @@ public interface PersistenceHandler {
 	 * @throws PersistenceException or one of its relevant sub-types in case of errors during persistence. See PersistenceException type hierarchy. 
 	 */
 	public void makeTransient(PersistentEntity entity) throws PersistenceException;
-	
+
 	/**
 	 * Loads and returns a PersistentEntity using the Criteria specified. Throws relevant PersistenceException if number of returned entities is not
 	 * exactly one.
@@ -54,7 +54,7 @@ public interface PersistenceHandler {
 	 * @throws PersistenceException or one of its relevant sub-types in case of errors during persistence. See PersistenceException type hierarchy. 
 	 */
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException;
-	
+
 	/**
 	 * Loads and returns a PersistentEntity using {@link PersistentEntity#getIdentifier()} if specified, or {@link PersistentEntity#getCriteriaForLoad()} using that 
 	 * order of preference. Throws relevant PersistenceException if number of returned entities is not exactly one.
@@ -63,7 +63,7 @@ public interface PersistenceHandler {
 	 * @throws PersistenceException or one of its relevant sub-types in case of errors during persistence. See PersistenceException type hierarchy. 
 	 */
 	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException;
-	
+
 	/**
 	 * Retrieves and returns a Collection of PersistentEntity instances from underlying data store using the specified Criteria.  
 	 * @param criteria the Criteria for loading entities from persistent store
@@ -71,7 +71,7 @@ public interface PersistenceHandler {
 	 * @throws PersistenceException or one of its relevant sub-types in case of errors during persistence. See PersistenceException type hierarchy.
 	 */
 	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException;
-	
+
 	/**
 	 * Updates the underlying data store using data in the specified Criteria. This method violates Object-Persistence mapping by providing access
 	 * to the data store using query constructs as supported by the data store. Use of this method is generally discouraged.
@@ -81,4 +81,17 @@ public interface PersistenceHandler {
 	 */
 	public int update(Criteria criteria) throws PersistenceException;
 	
+	/**
+	 * Method to fetch a collection of entities of type <code>PersistentEntity</code> from the underlying persistence mechanism.
+	 * 
+	 * @param entity - A entity instance of type <code>PersistentEntity</code>, similar to which the object has to be fetched.
+	 * @return Collection of entities of type <code>PersistentEntity</code> matching the entity which was provided.
+	 * @throws PersistenceException - In case of problems while accessing the persistence.
+	 */
+	public Collection<PersistentEntity> findObject(PersistentEntity entity) throws PersistenceException;
+	
+	
+	
+	
+
 }

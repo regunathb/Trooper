@@ -23,35 +23,32 @@ import org.trpr.platform.core.spi.persistence.PersistenceException;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
 
 /**
- * This class redefines those methods of {@link} AbstractPersistenceProvider that are 
- * not supported for HBase persistence by throwing {@link} UnsupportedOperationException.
+ * This class redefines those methods of {@link} AbstractPersistenceProvider
+ * that are not supported for HBase persistence by throwing {@link}
+ * UnsupportedOperationException.
+ * 
  * @shashikant soni
  */
 public class HBaseProvider extends AbstractPersistenceProvider {
-	
-	
+
 	@Override
 	public int update(Criteria criteria) throws PersistenceException {
 		throw new UnsupportedOperationException("Operation not supported!!!!!");
 	}
-	
+
 	@Override
-	public PersistentEntity findEntity(Criteria criteria)
-			throws PersistenceException {
+	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
 		throw new UnsupportedOperationException("Method not supported");
 	}
 
 	@Override
-	public PersistentEntity findEntity(PersistentEntity entity)
-			throws PersistenceException {
+	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
 		throw new UnsupportedOperationException("Method not supported");
 	}
 
 	@Override
-	public Collection<PersistentEntity> findEntities(Criteria criteria)
-			throws PersistenceException {
+	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
 		throw new UnsupportedOperationException("Method not supported");
 	}
-	
-	
+
 }

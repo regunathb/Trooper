@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+
+	<!-- Bean for registering the jobs with the JobRegistry. Mandatory bean -->
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>		
+
+	<!--
+		Configuring the Shell Job Scheduler Bean that will be executed when the trigger fires.
+	-->
+	<bean name="hbaseTestJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="org.trpr.platform.batch.impl.spring.job.BatchJob" />
+		<property name="group" value="hbase-test-batch" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="jobName" value-ref="hbaseTestTaskletJob" />
+				<entry key="jobLocator" value-ref="jobRepository" />
+				<entry key="jobLauncher" value-ref="jobLauncher" />
+			</map>
+		</property>
+	</bean>
+	
+	<!--
+		Associating the tasklet Job with a Quartz
+		Cron Trigger. Triggers define when a job is executed.
+		Executes every 1 minute
+	-->
+	<bean id="hbaseTestJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="hbaseTestJobDetailBean" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+	</bean>
+
+	<!--
+		Trigger to be scheduled and executed by Quartz for
+	-->
+	<bean
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="hbaseTestJobCronTrigger" />
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+		Shell Batch Job configuration
+	-->
+	<batch:job id="hbaseTestTaskletJob" incrementer="incrementer">
+		<batch:step id="hbaseTestOperations" >
+	       <batch:tasklet ref="hbaseTestOps"/>
+    	</batch:step>
+	</batch:job>
+
+	<bean id="hbaseTestWriter" class="org.trpr.example.batch.hbase.test.TestHBaseOps">
+		<property name="hbaseProvider" ref="hbaseProvider" />
+		<property name="delete" value="false" />
+	</bean>
+
+
+	<bean id="hbaseHandler" class="org.trpr.dataaccess.hbase.persistence.HBaseHandler">
+		<!-- HBase configuration properties (org.apache.hadoop.conf.Configuration) --> 
+		<property name="hbaseConfigProps">
+			<props>
+				<prop key="hbase.rootdir">file:/tmp/hbase-root/hbase</prop>
+				<prop key="hbase.master.port">60000</prop>
+				<prop key="hbase.zookeeper.quorum">localhost</prop>
+				<prop key="hbase.client.write.buffer">2097152</prop>
+			</props>
+		</property>
+		
+		<!-- HBaseMappings information --> 
+		<property name="hbaseMappings">
+			<list>
+				<value>hbasesample/mytable.hbase.xml</value>
+			</list>
+		</property>
+		<property name="useWAL" value="false" />
+		<property name="useAutoFlush" value="false" />
+	</bean>
+
+	<bean id="hbaseProvider"
+		class="org.trpr.dataaccess.hbase.persistence.HBaseProvider">
+		<property name="handler" ref="hbaseHandler" />
+	</bean>
+
+</beans>
