@@ -16,16 +16,18 @@
 package org.trpr.platform.impl.validation;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.mvel2.MVEL;
+import org.mvel2.ParserContext;
+import org.springframework.beans.PropertyAccessException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.spi.execution.ResultCode;
 import org.trpr.platform.spi.execution.Severity;
 import org.trpr.platform.spi.validation.ValidationResult;
 import org.trpr.platform.spi.validation.Validator;
-import org.mvel2.MVEL;
-import org.mvel2.ParserContext;
-import org.springframework.beans.PropertyAccessException;
 
 /**
  * The <code>ExpressionBasedValidator</code> in an implementation of the {@link Validator} interface. 
@@ -59,6 +61,9 @@ public class ExpressionBasedValidator implements Validator {
 	 * The Log instance for this class
 	 */
 	private static final Logger LOGGER = LogFactory.getLogger(ExpressionBasedValidator.class);
+	
+	/** Cache for compiled expressions */
+	private static Map<String, Serializable> compiledExpressionsCache = new HashMap<String, Serializable>();
 
 	/** String that maybe be used to identify the input field in UI, service request etc.*/
 	private String label;
@@ -127,7 +132,11 @@ public class ExpressionBasedValidator implements Validator {
 	public ValidationResult[] validate(String mvelExpression, ResultCode resultCode, Object inputObject) {
 		boolean mvelResult = false;
 		try {
-			Serializable compiled = MVEL.compileExpression(mvelExpression, CTX);
+			Serializable compiled = ExpressionBasedValidator.compiledExpressionsCache.get(mvelExpression);
+			if (compiled == null) { // no synchronization etc as race condition is not destructive and will only result in additional expression compiling cost
+				compiled = MVEL.compileExpression(mvelExpression, CTX);
+				ExpressionBasedValidator.compiledExpressionsCache.put(mvelExpression, compiled);
+			}
 			mvelResult = ((Boolean) MVEL.executeExpression(compiled,inputObject)).booleanValue();
 		} catch (PropertyAccessException pae) {
 			if (pae.getCause() instanceof NullPointerException) {
