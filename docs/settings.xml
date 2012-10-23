@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd" xmlns="http://maven.apache.org/SETTINGS/1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
   <profiles>
     <profile>
       <repositories>
@@ -44,6 +45,11 @@
       <id>dep-public-repositories</id>
       <repositories>
         <repository>
+            <id>Maven2-Repo</id>
+            <name>Maven2 Repository</name>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>   
+        <repository>
           <id>mule-maven-public-repository-group</id>
           <name>Mule Maven Repository Group</name>
           <url>http://repository.muleforge.org/</url>
@@ -61,7 +67,12 @@
             <id>spring-snapshots</id>
             <name>Spring Maven Snapshot Repository</name>
             <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
-        </repository>           
+        </repository>   
+        <repository>
+            <id>cloudera-hadoop</id>
+            <name>Cloudera Hadoop repo</name>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>                   
         <repository>
           <id>maven-public-repository-group</id>
           <name>Public Maven Repository Group</name>
