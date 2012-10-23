@@ -79,17 +79,33 @@
 		      	  <groupId>org.slf4j</groupId> 
 		          <artifactId>jcl104-over-slf4j</artifactId>
 		        </exclusion>
+		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
+            		<groupId>org.safehaus.jug</groupId>
+            		<artifactId>jug</artifactId>
+        		</exclusion>		        
 		    </exclusions>		    
 		</dependency>
 		<dependency>
 		    <groupId>org.mule.modules</groupId>
 		    <artifactId>mule-module-spring-config</artifactId>
 		    <version>${org.mule.version}</version>
+		    <exclusions>
+		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
+            		<groupId>org.safehaus.jug</groupId>
+            		<artifactId>jug</artifactId>
+        		</exclusion>
+		    </exclusions>				    
 		</dependency>
 		<dependency>
 		    <groupId>org.mule.modules</groupId>
 		    <artifactId>commonretrypolicies</artifactId>
 		    <version>${org.mule.version}</version>
+		    <exclusions>
+		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
+            		<groupId>org.safehaus.jug</groupId>
+            		<artifactId>jug</artifactId>
+        		</exclusion>
+		    </exclusions>				    
 		</dependency>		
 		<dependency>
 		    <groupId>org.mule.transports</groupId>
