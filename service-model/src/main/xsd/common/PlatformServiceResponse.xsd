@@ -14,9 +14,7 @@
 	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="PlatformServiceRequest.xsd" />
 	<xs:import namespace="http://org/trpr/platform/service/model/common/error" schemaLocation="Error.xsd" />
 	<xs:import namespace="http://org/trpr/platform/service/model/common/warning" schemaLocation="Warning.xsd" />	
-	<xs:import
-		namespace="http://org/trpr/platform/model/event"
-		schemaLocation="./../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
+	<xs:import namespace="http://org/trpr/platform/model/event"/> <!-- Do not specify schema location for XSDs from other projects. Will be handled via catalog files -->
 	
 	<xs:complexType name="PlatformServiceResponse" abstract="true">
 		<xs:sequence>

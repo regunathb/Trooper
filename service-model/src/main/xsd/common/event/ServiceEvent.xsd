@@ -3,8 +3,7 @@
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:platformEvent="http://org/trpr/platform/model/event"
 	elementFormDefault="qualified">
-	<xs:import namespace="http://org/trpr/platform/model/event"
-		schemaLocation="./../../../../../../platform-model/src/main/xsd/event/PlatformEvent.xsd" />
+	<xs:import namespace="http://org/trpr/platform/model/event"/> <!-- Do not specify schema location for XSDs from other projects. Will be handled via catalog files -->
 		
 	<xs:complexType name="ServiceEvent">
 		<xs:complexContent>

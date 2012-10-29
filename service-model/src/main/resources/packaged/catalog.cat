@@ -1,0 +1,5 @@
+-- add a reference to BusinessEntity file which is extracted from the platform-model Maven artifact --
+PUBLIC "http://org/trpr/platform/model/common" "../../../../target/xsd-includes/xsd/common/BusinessEntity.xsd"
+
+-- add a reference to PlatformEvent file which is extracted from the platform-model Maven artifact --
+PUBLIC "http://org/trpr/platform/model/event" "../../../../target/xsd-includes/xsd/event/PlatformEvent.xsd"
