@@ -3,7 +3,7 @@
 	xmlns="http://www.uidai.gov.in/server/persistence/hbase/configuration"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
-	<hbase-class name="in.gov.uidai.platform.hbase.sample.MyEntity" table="mytable">
+	<hbase-class name="org.trpr.example.batch.hbase.test.entity.HBaseEarthling" table="mytable">
 		<rowkey-definition valueAttribute="uid" valueType="java.lang.String" />
 		<column-definition columnFamily="demodata" columnQualifier="name" valueAttribute="name" valueType="java.lang.String" />
 		<column-definition columnFamily="demodata" columnQualifier="intValue" valueAttribute="intValue" valueType="java.lang.Integer" />

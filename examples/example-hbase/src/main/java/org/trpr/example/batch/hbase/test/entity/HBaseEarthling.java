@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.gov.uidai.platform.hbase.sample;
+package org.trpr.example.batch.hbase.test.entity;
 
 import java.util.Date;
 
@@ -26,7 +26,7 @@ import org.trpr.platform.core.spi.persistence.Criteria;
  * @author Shashikant Soni
  * 
  */
-public class MyEntity extends AbstractPersistentEntity {
+public class HBaseEarthling extends AbstractPersistentEntity {
 
 	private String uid;
 	private String name;
@@ -38,10 +38,10 @@ public class MyEntity extends AbstractPersistentEntity {
 	/*
 	 * No argument constructor
 	 */
-	public MyEntity() {
+	public HBaseEarthling() {
 	}
 	
-	public MyEntity(Criteria c){
+	public HBaseEarthling(Criteria c){
 		super(c);
 	}
 
@@ -99,7 +99,7 @@ public class MyEntity extends AbstractPersistentEntity {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer("MyEntity: ");
+		StringBuffer sb = new StringBuffer("HBaseEarthling: ");
 		sb.append(" UID='");
 		sb.append(this.getUid());
 		sb.append("', Name='");

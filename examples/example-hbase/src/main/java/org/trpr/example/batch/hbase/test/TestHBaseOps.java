@@ -16,18 +16,17 @@
 package org.trpr.example.batch.hbase.test;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.trpr.dataaccess.hbase.persistence.HBaseProvider;
-import org.trpr.example.batch.hbase.test.entity.MyEntity;
+import org.trpr.example.batch.hbase.test.entity.HBaseEarthling;
+import org.trpr.platform.core.spi.persistence.PersistenceManager;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
 
 /**
@@ -39,11 +38,11 @@ public class TestHBaseOps implements Tasklet {
 
 	private static final Log LOG = LogFactory.getLog(TestHBaseOps.class);
 
-	private HBaseProvider hbaseProvider;
+	private PersistenceManager persistenceManager;
 	
 	/**
 	 * if this flag is set true in the context. the sample record that
-	 * is created would be deleted at the end of run.
+	 * is created would be deleted at the end of test run.
 	 */
 	private boolean delete = false;
 	
@@ -51,12 +50,12 @@ public class TestHBaseOps implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution arg0, ChunkContext arg1) throws Exception {
 
-		MyEntity testEntity = new MyEntity();
+		HBaseEarthling testEntity = new HBaseEarthling();
 		testEntity.setName("Jone Doe");
 		String uid = UUID.randomUUID().toString();
 		testEntity.setUid(uid);
-		testEntity.setLongValue(new Long(1));
-		testEntity.setIntValue(1);
+		testEntity.setLongValue(new Random().nextLong());
+		testEntity.setIntValue(new Random().nextInt(10000));
 		testEntity.setDateValue(new Date());
 		testEntity.setByteArrayValue(uid.getBytes());
 
@@ -70,42 +69,40 @@ public class TestHBaseOps implements Tasklet {
 		return RepeatStatus.FINISHED;
 	}
 
-	private void write(MyEntity e) {
-		getHbaseProvider().makePersistent(e);
+	private void write(HBaseEarthling e) {
+		getPersistenceManager().makePersistent(e);
 		LOG.info("Persisted record in hbase with UID :: " + e.getUid());
 	}
 
-	private void read(MyEntity e) {
-		List<PersistentEntity> result = (List<PersistentEntity>) getHbaseProvider().findObject(e);
-		
-		if(CollectionUtils.isNotEmpty(result)) {
-		for (PersistentEntity persistentEntity : result) {
-			MyEntity aRec = (MyEntity) persistentEntity;
-			LOG.info("got record with uid from HBase :: " + aRec.toString());
-		}
+	@SuppressWarnings("unchecked")
+	private void read(HBaseEarthling e) {
+		PersistentEntity result =  getPersistenceManager().findEntity(e);
+		if(result != null) {
+			LOG.info("got record with uid from HBase :: " + result.toString());
 		} else {
-			LOG.info("NO FOUND record with uid from HBase :: " + e.toString());
+			LOG.info("NOT FOUND record with uid from HBase :: " + e.toString());
 		}
 		
 	}
 
-	private void update(MyEntity e) {
+	private void update(HBaseEarthling e) {
 		e.setName("Updated John Foo");
-		getHbaseProvider().makePersistent(e);
+		getPersistenceManager().makePersistent(e);
 		LOG.info("Updated record in hbase with UID :: " + e.getUid());
 	}
 	
-	private void delete(MyEntity e) {
-		getHbaseProvider().makeTransient(e);
+	private void delete(HBaseEarthling e) {
+		getPersistenceManager().makeTransient(e);
 		LOG.info("got record with uid from HBase :: " + e.getUid());
 	}
 
-	public HBaseProvider getHbaseProvider() {
-		return hbaseProvider;
+
+	public PersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 
-	public void setHbaseProvider(HBaseProvider hbaseProvider) {
-		this.hbaseProvider = hbaseProvider;
+	public void setPersistenceManager(PersistenceManager persistenceManager) {
+		this.persistenceManager = persistenceManager;
 	}
 
 	public boolean isDelete() {

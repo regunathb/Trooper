@@ -37,6 +37,11 @@ public abstract class AbstractShardedPersistentEntity extends AbstractPersistent
 	 * */
 	private String persistedShardHint = ShardedEntity.DEFAULT_SHARD;
 		
+	/**
+	 * Default constructor for classes that dont use params
+	 */
+	public AbstractShardedPersistentEntity(){}
+	
 	/** Constructors for this class*/
 	public AbstractShardedPersistentEntity(String entityname, Identifier identifier) {
 		this(entityname, identifier, null);

@@ -143,23 +143,6 @@ public class HBaseHandlerDelegate {
 	}
 
 	/**
-	 * Finds the entities using data in the specified entity using the specified
-	 * HTablePool
-	 * 
-	 * @param entity
-	 *            PersistentEntity data to use for search
-	 * @param hbaseTablePool
-	 *            the HTablePool to use for persistence
-	 * @return Collection of PersistentEntity instances from the search results
-	 * @throws PersistenceException
-	 *             in case of persistence errors
-	 */
-	public Collection<HBaseEntity> findObject(HBaseEntity entity, HTablePool hbaseTablePool) throws PersistenceException {
-		HbaseMapping metadata = hbaseMappingContainer.getMappingForClass(entity.getClass().getName());
-		return findEntities(hbaseTablePool, entity, metadata);
-	}
-
-	/**
 	 * Inserts a row in the HBase table. In case the row already exists, it
 	 * results in creation of a new version for all the columns.
 	 * 
@@ -227,6 +210,30 @@ public class HBaseHandlerDelegate {
 		}
 	}
 
+	public HBaseEntity findEntity(HTablePool hbaseTablePool, HBaseEntity entity, HbaseMapping metadata) throws PersistenceException {
+		HTable table = null;
+		try {
+			table = (HTable) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
+			byte[] rowKey = constructRowKey(entity, metadata.getHbaseClass().getRowkeyDefinition());
+			if (rowKey != null && rowKey.length > 0) {
+				// do a get operation
+				Get g = constructGetQuery(metadata, entity, rowKey);
+				Result result = table.get(g);
+				if (!result.isEmpty()) {
+					return constructEntityFromResultRow(metadata, result, entity);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred in searchData:", e);
+			throw new PersistenceException("Exception occcurred while performing search for table " + metadata.getHbaseClass().getTable(), e);
+		} finally {
+			if (table != null) {
+				hbaseTablePool.putTable(table);
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Looks up rows from HBase table and returns PersistentEntity instances
 	 * corresponding to them.
@@ -241,28 +248,17 @@ public class HBaseHandlerDelegate {
 	 * @throws PersistenceException
 	 *             in case anything goes wrong
 	 */
-	private List<HBaseEntity> findEntities(HTablePool hbaseTablePool, HBaseEntity entity, HbaseMapping metadata) throws PersistenceException {
-		List<HBaseEntity> searchResultList = null;
+	public Collection<PersistentEntity> findEntities(HTablePool hbaseTablePool, HBaseCriteria criteria, HbaseMapping metadata) throws PersistenceException {
+		List<PersistentEntity> searchResultList = new ArrayList<PersistentEntity>();
 		HTable table = null;
 		try {
 			table = (HTable) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
-			byte[] rowKey = constructRowKey(entity, metadata.getHbaseClass().getRowkeyDefinition());
-			searchResultList = new ArrayList<HBaseEntity>();
-			if (rowKey != null && rowKey.length > 0) {
-				// do a get operation
-				Get g = constructGetQuery(metadata, entity, rowKey);
-				Result result = table.get(g);
-				if (!result.isEmpty()) {
-					searchResultList.add(constructEntityFromResultRow(metadata, result, entity));
-				}
-			} else {
-				// do a scan operation
-				Scan s = constructScanQuery(metadata, (HBaseCriteria) entity.getCriteriaForLoad());
-				ResultScanner scanner = table.getScanner(s);
-				for (Result resultRow = scanner.next(); resultRow != null; resultRow = scanner.next()) {
-					if (!resultRow.isEmpty()) {
-						searchResultList.add(constructEntityFromResultRow(metadata, resultRow, entity));
-					}
+			// do a scan operation
+			Scan s = constructScanQuery(metadata, criteria);
+			ResultScanner scanner = table.getScanner(s);
+			for (Result resultRow = scanner.next(); resultRow != null; resultRow = scanner.next()) {
+				if (!resultRow.isEmpty()) {
+					searchResultList.add(constructEntityFromResultRow(metadata, resultRow, (HBaseEntity)criteria.getManagedClass().newInstance()));
 				}
 			}
 		} catch (Exception e) {
@@ -394,10 +390,8 @@ public class HBaseHandlerDelegate {
 	 *             attribute of the entity the value corresponds to. Workaround
 	 *             is to use raw HBase APIs for reading data in such cases.
 	 */
-	private HBaseEntity constructEntityFromResultRow(HbaseMapping metadata, Result resultRow, HBaseEntity entity) throws ConfigurationException {
-		HBaseEntity resEntity = null;
+	private HBaseEntity constructEntityFromResultRow(HbaseMapping metadata, Result resultRow, HBaseEntity resEntity) throws ConfigurationException {
 		try {
-			resEntity = entity.getClass().newInstance();
 			// Populate attribute from row key
 			byte[] rowKey = resultRow.getRow();
 
@@ -535,7 +529,7 @@ public class HBaseHandlerDelegate {
 	 *         of type as specified by <code>valueType</code>
 	 * @throws ConfigurationException
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "unchecked" })
 	private Object convertToObject(Class targetClass, byte[] bytes) throws ConfigurationException {
 		if (bytes != null) {
 			if (targetClass == byte[].class) {

@@ -38,7 +38,7 @@ import org.trpr.platform.core.spi.logging.TransactionDataLogger;
  * Also, ensure that "layout" property of appender is set to fully qualified name of this class.  Example below
  * <pre><code>
 		log4j.appender.txn_data_appender=org.apache.log4j.RollingFileAppender
-		log4j.appender.txn_data_appender.File=${LOG.FILE.PATH}/uid-<app-name>-monitor.csv
+		log4j.appender.txn_data_appender.File=${LOG.FILE.PATH}/trpr-<app-name>-monitor.csv
 		log4j.appender.txn_data_appender.layout=org.trpr.platform.core.impl.logging.LogBasedTransactionDataLogger
 		log4j.appender.txn_data_appender.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss:SSS},%t,%m%n
 		log4j.appender.txn_data_appender.MaxFileSize=10000KB
