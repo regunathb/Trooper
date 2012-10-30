@@ -45,7 +45,7 @@
 			    <artifactId>maven-dependency-plugin</artifactId>
 			    <executions>
 			          <execution>
-			              <id>unpack-xsd-files</id>
+			              <id>unpack-platform-xsd-files</id>
 			              <phase>initialize</phase>
 			                   <goals>
 			                       <goal>unpack</goal>
