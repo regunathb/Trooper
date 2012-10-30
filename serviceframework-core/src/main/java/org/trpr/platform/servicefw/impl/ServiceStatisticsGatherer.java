@@ -38,7 +38,7 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
 
 
 /**
- * The <code>ServiceStatisticsGatherer</code> class gathers service invocation statistics from the UID service framework classes.
+ * The <code>ServiceStatisticsGatherer</code> class gathers service invocation statistics from the Trooper service framework classes.
  * This class does not collect the statistics itself. It collates the statistics from the different framework classes, as required.
  * 
  * This class exposes the collected statistics via JMX interface and wraps the data as JMX supported types. 

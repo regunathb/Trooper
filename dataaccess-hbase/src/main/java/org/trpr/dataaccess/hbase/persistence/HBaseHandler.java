@@ -220,10 +220,19 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 		this.hbaseHandlerDelegate.makeTransient((HBaseEntity) entity, getHbaseTablePool((HBaseEntity) entity));
 	}
 
-	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public Collection findObject(PersistentEntity entity) throws PersistenceException {
-		return this.hbaseHandlerDelegate.findObject((HBaseEntity) entity, getHbaseTablePool((HBaseEntity) entity));
+	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
+		return this.hbaseHandlerDelegate.findEntity(getHbaseTablePool((HBaseEntity) entity), (HBaseEntity) entity, getMappingForClass(entity.getClass().getName()));
+	}
+
+	@Override
+	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
+		try {
+			return this.hbaseHandlerDelegate.findEntities(getHbaseTablePool((HBaseEntity)criteria.getManagedClass().newInstance()), (HBaseCriteria) criteria, getMappingForClass(criteria.getManagedClass().getName()));
+		} catch (Exception e) {
+			logger.error("Error while reading data :: ", e);
+			throw new PersistenceException("Error while reading data :: ", e);
+		} 
 	}
 
 	/** Getter/Setter methods */
@@ -270,16 +279,6 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 
 	@Override
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
-		throw new UnsupportedOperationException("Operation not supported!!!!!");
-	}
-
-	@Override
-	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
-		throw new UnsupportedOperationException("Operation not supported!!!!!");
-	}
-
-	@Override
-	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
 		throw new UnsupportedOperationException("Operation not supported!!!!!");
 	}
 

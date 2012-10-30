@@ -91,16 +91,6 @@ public abstract class AbstractPersistenceProvider implements PersistenceProvider
 		return getHandler().update(criteria);
 	}
 	
-	
-	/**
-	 * Interface method implementation. Delegates the call to PersistenceHandler.
-	 * @see PersistenceProvider#findObject(PersistentEntity)
-	 */
-	@Override
-	public Collection<PersistentEntity> findObject(PersistentEntity entity) throws PersistenceException {
-		return getHandler().findObject(entity);
-	}
-	
 
 	/** Getter/Setter methods*/
 	public PersistenceHandler getHandler() {

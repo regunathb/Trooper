@@ -5,7 +5,7 @@
 		Sample bootstrap configuration with no Component container
 	-->
 	<bean id="bootstrapInfo" class="org.trpr.platform.runtime.spi.bootstrap.BootstrapInfo">
-		<property name="projectsRoot" value="$RUNTIME_CONFIG_PATH/../../../../" />
+		<property name="projectsRoot" value="$RUNTIME_CONFIG_PATH/../../../../../../" />
 		<property name="applicationName" value="Hbase Test Runtime" />
 		<property name="runtimeNature" value="standalone" />
 		<property name="container" ref="containerImpl" />

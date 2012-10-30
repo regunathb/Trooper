@@ -81,17 +81,4 @@ public interface PersistenceHandler {
 	 */
 	public int update(Criteria criteria) throws PersistenceException;
 	
-	/**
-	 * Method to fetch a collection of entities of type <code>PersistentEntity</code> from the underlying persistence mechanism.
-	 * 
-	 * @param entity - A entity instance of type <code>PersistentEntity</code>, similar to which the object has to be fetched.
-	 * @return Collection of entities of type <code>PersistentEntity</code> matching the entity which was provided.
-	 * @throws PersistenceException - In case of problems while accessing the persistence.
-	 */
-	public Collection<PersistentEntity> findObject(PersistentEntity entity) throws PersistenceException;
-	
-	
-	
-	
-
 }

@@ -70,16 +70,6 @@ public interface PersistenceProvider {
 	 */
 	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException;
 	
-
-	/**
-	 * Retrieves a <code>java.util.Collection</code> of <code>PersistentEntity</code> from underlying data store using the specified 
-	 * entity as a parameter.
-	 * @param entity - the entity to use for searching
-	 * @return - <code>java.util.Collection</code> of <code>PersistentEntity</code>
-	 * @throws PersistenceException
-	 */
-	public Collection<PersistentEntity> findObject(PersistentEntity entity) throws PersistenceException;
-	
 	/**
 	 * Updates the underlying data store using data in the specified Criteria. This method violates Object-Persistence mapping by providing access
 	 * to the data store using query constructs as supported by the data store. Use of this method is generally discouraged.

@@ -15,8 +15,6 @@
  */
 package org.trpr.dataaccess.hbase.persistence;
 
-import java.util.Collection;
-
 import org.trpr.platform.core.impl.persistence.AbstractPersistenceProvider;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.PersistenceException;
@@ -38,16 +36,6 @@ public class HBaseProvider extends AbstractPersistenceProvider {
 
 	@Override
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
-		throw new UnsupportedOperationException("Method not supported");
-	}
-
-	@Override
-	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
-		throw new UnsupportedOperationException("Method not supported");
-	}
-
-	@Override
-	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
 		throw new UnsupportedOperationException("Method not supported");
 	}
 
