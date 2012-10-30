@@ -4,8 +4,7 @@
 	xmlns:common="http://org/trpr/platform/model/common"
 	elementFormDefault="qualified">
 
-	<xs:import namespace="http://org/trpr/platform/model/common"
-		schemaLocation="../../../../../../platform-model/src/main/xsd/common/BusinessEntity.xsd" />
+	<xs:import namespace="http://org/trpr/platform/model/common"/> <!-- Do not specify schema location for XSDs from other projects. Will be handled via catalog files -->
 
 	<xs:complexType name="Earthling">
 		<xs:complexContent>

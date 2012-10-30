@@ -7,8 +7,8 @@
 	   xmlns:earthling="http://org/trpr/example/model/entity/earthling"
 	   elementFormDefault="qualified">
   
-	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceRequest.xsd"/>
-  	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse" schemaLocation="../../../../../../../service-model/src/main/xsd/common/PlatformServiceResponse.xsd"/>
+	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceRequest"/> <!-- Do not specify schema location for XSDs from other projects. Will be handled via catalog files -->
+  	<xs:import namespace="http://org/trpr/platform/service/model/common/platformServiceResponse"/> <!-- Do not specify schema location for XSDs from other projects. Will be handled via catalog files -->
   	<xs:import namespace="http://org/trpr/example/model/entity/earthling" schemaLocation="../../entity/Earthling.xsd"/>
 	
 	<xs:element name="CEPServiceRequestXML">
