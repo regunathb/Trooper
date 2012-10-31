@@ -19,6 +19,7 @@ import java.net.InetAddress;
 
 import org.trpr.platform.servicefw.ServiceRegistry;
 import org.trpr.platform.servicefw.common.ServiceException;
+import org.trpr.platform.servicefw.common.ServiceFrameworkConstants;
 import org.trpr.platform.servicefw.spi.Broker;
 import org.trpr.platform.servicefw.spi.ServiceContainer;
 import org.trpr.platform.servicefw.spi.ServiceInfo;
@@ -39,10 +40,10 @@ public class BrokerFactory {
 	/** Exception message for calling a non-existent service */
 	private static final String SERVICE_DOESNOT_EXIST = "\nThe specified service is not available on this server (or) service configuration error";
 	private static final String YOU_INVOKED = "\nYou invoked : ";
-	private static final String SERVICES_AVAILABLE = "\n\nServices deployed on this server(Note case-sensitive) : \n";
+	private static final String SERVICES_AVAILABLE = "\n\nServices(case-sensitive) deployed on this server using '" + ServiceFrameworkConstants.SPRING_SERVICES_CONFIG + "' files are : \n";
 	private static final String SERVICE_NAME = "SERVICE NAME : ";
-	private static final String PROJECT = " [<PROJECT : ";
-	private static final String DOMAIN = " DOMAIN : ";
+	private static final String PROJECT = " [<Project : ";
+	private static final String DOMAIN = " Domain : ";
 	private static final String CLOSING_BRACES = ">]";
 	private static final String SECTION_DEMARCATION = "\n******************************************************";
 	
@@ -91,7 +92,7 @@ public class BrokerFactory {
 	 * Helper method to construct a ServiceException message for invocation of a
 	 * non-existent service
 	 */
-	private static String getMissingServiceMessage(ServiceKey serviceKey) {
+	public static String getMissingServiceMessage(ServiceKey serviceKey) {
 		StringBuffer buffer = new StringBuffer();
 		String hostName = null;
 		try {

@@ -194,6 +194,9 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 */
 	public ServiceCompartment<T,S> getCompartment(ServiceKey serviceKey) {
 		// always get the service key resolved from the service registry
+		if (this.serviceRegistry.getServiceInfo(serviceKey) == null) {
+			throw new ServiceException(BrokerFactory.getMissingServiceMessage(serviceKey));
+		}
 		return (ServiceCompartment<T,S>)serviceCompartments.get(this.serviceRegistry.getServiceInfo(serviceKey).getServiceKey());
 	}
 
@@ -214,7 +217,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	public ServiceResponse invokeService(ServiceInfo serviceInfo,
 			ServiceRequest request) throws ServiceException {
 		ServiceCompartment serviceCompartment = getCompartment(serviceInfo.getServiceKey());
-		AbstractServiceImpl service = (AbstractServiceImpl)this.servicesContext.getBean(serviceInfo.getServiceKey().toString());
+		Service service = (Service)this.servicesContext.getBean(serviceInfo.getServiceKey().toString());
 		return serviceCompartment.processRequest(service,request);
 	}
 

@@ -41,7 +41,8 @@ import org.trpr.platform.spi.task.TaskContext;
 import org.trpr.platform.spi.task.TaskManager;
 
 /**
- * <code>AbstractServiceImpl<code> is an implementation of the {@link Service} interface that provides common behavior for all services.
+ * <code>AbstractServiceImpl<code> is an implementation of the {@link Service} interface that provides common behavior for all services that implement service
+ * functionality in {@link Task}. Use the simpler {@link SimpleAbstractServiceImpl} for services that do not intend to distribute execution as tasks.
  * This implementation implements a template for service request processing. It uses a {@link TaskManager} implementation to process the service
  * request as a number of {@link Task} instances executed sequentially.
  * 
@@ -124,19 +125,18 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 		this.serviceContext = serviceContext;
 	}
 	/** End Getter/Setter methods*/
-	
+
 	/**
-	 * The method is called by clients to the service to get a response. This
-	 * helps prevent direct calls to the service without a security context from
-	 * any client. Publishes {@link ServiceInvocationEvent} for each service
-	 * invoked.
-	 *
-	 * @return ServiceResponse The response for the current request.
-	 *
+	 * Interface method implementation. 
+	 * @see Service#processRequest(ServiceRequest)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public ServiceResponse<S> processRequest(ServiceRequest<T> request) throws ServiceException {
+		
+		if (request == null) {
+			throw new ServiceException("The Service Request may not be null");
+		}
 		
 		// add the service request time-stamp as a header
 		Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};
@@ -152,6 +152,10 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 
 		// Prepare the service response from the task context and request.
         serviceResponse = prepareServiceResponse(taskContext, request);
+        
+		if (serviceResponse == null) {
+			throw new ServiceException("The Service Response may not be null");
+		}
 
 		// signal end of execution to the service context
 		this.serviceContext.notifyServiceExecutionEnd(request, serviceResponse, Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
