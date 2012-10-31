@@ -8,6 +8,11 @@
 		<property name="serviceContext" ref="serviceContext" />
 	</bean>	
 
+	<!-- The reference implementation services -->
+	<bean id="simpleGreetingService_1.0" class="org.trpr.example.service.greeting.SimpleGreetingService">
+		<property name="serviceContext" ref="serviceContext" />
+	</bean>	
+
 	<bean id="echoService_1.0" class="org.trpr.example.service.echo.EchoService">
 		<property name="taskManager" ref="taskManager" />
 		<property name="serviceContext" ref="serviceContext" />
