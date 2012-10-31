@@ -16,6 +16,7 @@
 package org.trpr.dataaccess.hbase.mappings.config;
 
 import java.beans.PropertyDescriptor;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
 import org.trpr.dataaccess.hbase.model.config.RowKeyDefinition;
 import org.trpr.dataaccess.hbase.model.config.RowKeyMember;
 import org.trpr.platform.integration.impl.xml.XMLTranscoderImpl;
+import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.config.ConfigurationException;
 
 /**
@@ -85,20 +87,16 @@ public class HBaseMappingContainer {
 	 */
 	private String readFileToString(String mappingFile) throws ConfigurationException {	
 		try {
-			InputStream stream = this.getClass().getClassLoader().getResourceAsStream(mappingFile);
-			if (stream != null) {
-				List<String> lines=IOUtils.readLines(stream);				
-				StringBuffer strBuf = new StringBuffer();				
-				for (String s : lines) {
-					strBuf.append(s);
-					strBuf.append("\n");
-				}		
-				return strBuf.toString();
-			} else {
-				throw new ConfigurationException("Mapping configuration file does not exist: " + mappingFile);
-			}
+			InputStream stream = new FileInputStream(FileLocator.findUniqueFile(mappingFile));
+			List<String> lines=IOUtils.readLines(stream);				
+			StringBuffer strBuf = new StringBuffer();				
+			for (String s : lines) {
+				strBuf.append(s);
+				strBuf.append("\n");
+			}		
+			return strBuf.toString();
 		} catch (Exception e) {
-			throw new ConfigurationException("Error while reading " + mappingFile, e);
+			throw new ConfigurationException("Error while reading Hbase mapping file : " + mappingFile, e);
 		}
 	}
 	

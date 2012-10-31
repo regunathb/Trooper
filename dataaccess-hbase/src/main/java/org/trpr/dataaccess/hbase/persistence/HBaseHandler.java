@@ -122,12 +122,15 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 		// initialize the HTablePool(s) for the HBase configurations
 		if (this.hbaseConfiguration != null) {
 			this.hbaseTablePool = new HTablePool(this.hbaseConfiguration, this.htablePoolSize);
+			this.targetHbaseTablePools.put(ShardedEntity.DEFAULT_SHARD,this.hbaseTablePool);
 		}
 		for (String shard : this.targetHbaseConfigurations.keySet()) {
 			this.targetHbaseTablePools.put(shard, new HTablePool(this.targetHbaseConfigurations.get(shard), this.htablePoolSize));
 		}
 		// initialize the delegate
 		this.hbaseHandlerDelegate = new HBaseHandlerDelegate(this.hbaseMappingContainer);
+		this.hbaseHandlerDelegate.setUseAutoFlush(useAutoFlush);
+		this.hbaseHandlerDelegate.setUseWAL(useWAL);
 
 	}
 
@@ -246,7 +249,6 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 
 	public void setUseWAL(Boolean useWAL) {
 		this.useWAL = useWAL;
-		this.hbaseHandlerDelegate.setUseWAL(useWAL);
 	}
 
 	public Boolean getUseWAL() {
@@ -255,7 +257,6 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 
 	public void setUseAutoFlush(Boolean useAutoFlush) {
 		this.useAutoFlush = useAutoFlush;
-		this.hbaseHandlerDelegate.setUseAutoFlush(useAutoFlush);
 	}
 
 	public Boolean getUseAutoFlush() {

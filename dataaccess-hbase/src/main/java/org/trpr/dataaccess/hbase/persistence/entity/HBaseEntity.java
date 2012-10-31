@@ -16,6 +16,7 @@
 package org.trpr.dataaccess.hbase.persistence.entity;
 
 import org.trpr.platform.core.impl.persistence.sharding.AbstractShardedPersistentEntity;
+import org.trpr.platform.core.spi.persistence.Criteria;
 
 /**
  * <p>
@@ -37,4 +38,16 @@ import org.trpr.platform.core.impl.persistence.sharding.AbstractShardedPersisten
  */
 public class HBaseEntity extends AbstractShardedPersistentEntity {
 
+	/**
+	 * No args constructor
+	 */
+	public HBaseEntity() {
+	}
+	/**
+	 * Constructor for this type
+	 * @param criteria the load criteria
+	 */
+	public HBaseEntity(Criteria criteria) {
+		super(criteria);
+	}
 }
