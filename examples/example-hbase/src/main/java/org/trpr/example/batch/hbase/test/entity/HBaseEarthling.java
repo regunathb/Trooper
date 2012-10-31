@@ -17,7 +17,7 @@ package org.trpr.example.batch.hbase.test.entity;
 
 import java.util.Date;
 
-import org.trpr.platform.core.impl.persistence.AbstractPersistentEntity;
+import org.trpr.dataaccess.hbase.persistence.entity.HBaseEntity;
 import org.trpr.platform.core.spi.persistence.Criteria;
 
 /**
@@ -26,7 +26,7 @@ import org.trpr.platform.core.spi.persistence.Criteria;
  * @author Shashikant Soni
  * 
  */
-public class HBaseEarthling extends AbstractPersistentEntity {
+public class HBaseEarthling extends HBaseEntity {
 
 	private String uid;
 	private String name;
@@ -35,7 +35,7 @@ public class HBaseEarthling extends AbstractPersistentEntity {
 	private byte[] byteArrayValue;
 	private Date dateValue;
 	
-	/*
+	/**
 	 * No argument constructor
 	 */
 	public HBaseEarthling() {

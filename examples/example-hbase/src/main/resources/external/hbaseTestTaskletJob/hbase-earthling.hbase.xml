@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hbase-mapping
-	xmlns="http://www.uidai.gov.in/server/persistence/hbase/configuration"
+	xmlns="http://org/trpr/dataaccess/hbase/model/config"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<hbase-class name="org.trpr.example.batch.hbase.test.entity.HBaseEarthling" table="mytable">

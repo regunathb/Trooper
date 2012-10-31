@@ -8,9 +8,9 @@
 		-->
 		<property name="hbaseConfigProps">
 			<props>
-				<prop key="hbase.rootdir">file:/tmp/hbase-root/hbase</prop>
+				<prop key="hbase.rootdir">hdfs://stage-pf4.nm.flipkart.com:8020/hbase</prop>
 				<prop key="hbase.master.port">60000</prop>
-				<prop key="hbase.zookeeper.quorum">localhost</prop>
+				<prop key="hbase.zookeeper.quorum">stage-pf4.nm.flipkart.com:2181</prop>
 				<prop key="hbase.client.write.buffer">2097152</prop>
 			</props>
 		</property>
@@ -18,7 +18,7 @@
 		<!-- HBaseMappings information -->
 		<property name="hbaseMappings">
 			<list>
-				<value>hbasesample/hbase-earthling.hbase.xml</value>
+				<value>hbase-earthling.hbase.xml</value>
 			</list>
 		</property>
 		<property name="useWAL" value="false" />

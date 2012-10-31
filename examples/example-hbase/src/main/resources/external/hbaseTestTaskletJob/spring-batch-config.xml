@@ -39,7 +39,7 @@
 	-->
 	<bean id="hbaseTestJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="hbaseTestJobDetailBean" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0/120 * * * ?" />
 	</bean>
 
 	<!--
