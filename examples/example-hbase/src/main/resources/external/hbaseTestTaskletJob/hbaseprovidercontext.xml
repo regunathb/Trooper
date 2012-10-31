@@ -14,15 +14,12 @@
 				<prop key="hbase.client.write.buffer">2097152</prop>
 			</props>
 		</property>
-
 		<!-- HBaseMappings information -->
 		<property name="hbaseMappings">
 			<list>
 				<value>hbase-earthling.hbase.xml</value>
 			</list>
 		</property>
-		<property name="useWAL" value="false" />
-		<property name="useAutoFlush" value="false" />
 	</bean>
 
 	<bean id="hbaseProvider" class="org.trpr.dataaccess.hbase.persistence.HBaseProvider">
