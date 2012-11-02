@@ -68,17 +68,7 @@ public class HBaseHandlerDelegate {
 	private static final Log logger = LogFactory.getLog(HBaseHandlerDelegate.class);
 
 	/** The serializer map */
-	private static Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
-
-	/** Static block to initialze the serializer map */
-	static {
-		// Default serializers. It can be overridden by setting new values in
-		// Spring bean definition of the HBaseHandler
-		classNameToSerializerMap.put("java.lang.String", new StringSerializer());
-		classNameToSerializerMap.put("java.lang.Long", new LongSerializer());
-		classNameToSerializerMap.put("java.lang.Integer", new IntegerSerializer());
-		classNameToSerializerMap.put("java.util.Date", new DateSerializer());
-	}
+	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
 
 	/** The HBase mapping container instance */
 	private HBaseMappingContainer hbaseMappingContainer;
@@ -95,6 +85,12 @@ public class HBaseHandlerDelegate {
 	 *            in persistence
 	 */
 	public HBaseHandlerDelegate(HBaseMappingContainer hbaseMappingContainer) {
+		// Default serializers. It can be overridden by setting new values in
+		// Spring bean definition of the HBaseHandler
+		classNameToSerializerMap.put("java.lang.String", new StringSerializer());
+		classNameToSerializerMap.put("java.lang.Long", new LongSerializer());
+		classNameToSerializerMap.put("java.lang.Integer", new IntegerSerializer());
+		classNameToSerializerMap.put("java.util.Date", new DateSerializer());		
 		this.hbaseMappingContainer = hbaseMappingContainer;
 	}
 
@@ -106,7 +102,7 @@ public class HBaseHandlerDelegate {
 	 */
 	public void setClassNameToSerializerMap(Map<String, Serializer> classNameToSerializerMap) {
 		// Do a putAll to avoid loosing the default serializer mappings
-		HBaseHandlerDelegate.classNameToSerializerMap.putAll(classNameToSerializerMap);
+		this.classNameToSerializerMap.putAll(classNameToSerializerMap);
 	}
 
 	/**
@@ -163,7 +159,6 @@ public class HBaseHandlerDelegate {
 		try {
 			table = (HTable) hbaseTablePool.getTable(classDefinition.getTable());
 			table.setAutoFlush(useAutoFlush);
-			// table.setWriteBufferSize(1024*1024*12);
 
 			Put put = new Put(constructRowKey(entity, classDefinition.getRowkeyDefinition()));
 			put.setWriteToWAL(useWAL);
@@ -309,17 +304,7 @@ public class HBaseHandlerDelegate {
 				}
 			}
 			for (ColumnDefinition column : metadata.getHbaseClass().getColumnDefinition()) {
-				/*
-				 * search by columnfamily:qualifier column family should contain
-				 * value but qualifier can be empty
-				 */
-				byte[] columnQualifier = getColumnQualifierInBytes(entity, column);
-
-				if (columnQualifier == null || columnQualifier.length == 0) {
-					getRequest.addColumn(getColumnFamilyInBytes(column), columnQualifier);
-				} else {
-					getRequest.addColumn(Bytes.add(getColumnFamilyInBytes(column), FAMILY_QUALIFIER_SEPARATOR.getBytes(), columnQualifier), columnQualifier);
-				}
+				getRequest.addColumn(getColumnFamilyInBytes(column), getColumnQualifierInBytes(entity, column));
 			}
 		} catch (IOException e) {
 			throw new ConfigurationException("Exception occurred while constructing get query for table " + metadata.getHbaseClass().getTable() + " using entity " + entity.toString(), e);
@@ -535,7 +520,7 @@ public class HBaseHandlerDelegate {
 			if (targetClass == byte[].class) {
 				return bytes;
 			} else {
-				Serializer serializer = HBaseHandlerDelegate.classNameToSerializerMap.get(targetClass.getName());
+				Serializer serializer = this.classNameToSerializerMap.get(targetClass.getName());
 				if (serializer != null) {
 					return serializer.toObject(bytes);
 				} else {
@@ -654,7 +639,7 @@ public class HBaseHandlerDelegate {
 			if (value instanceof byte[]) {
 				return (byte[]) value;
 			} else {
-				Serializer serializer = HBaseHandlerDelegate.classNameToSerializerMap.get(value.getClass().getName());
+				Serializer serializer = this.classNameToSerializerMap.get(value.getClass().getName());
 				if (serializer != null) {
 					return serializer.toBytes(value);
 				} else {
