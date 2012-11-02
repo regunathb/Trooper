@@ -122,17 +122,20 @@
 		</property>
 	</bean>	
 	
-	<bean id="greetingQueueConfiguration" class="org.trpr.platform.integration.impl.messaging.RabbitMQConfiguration">
+	<bean id="greetingQueueConfiguration" parent="commonQueueConfiguration">
+        <property name="hostName" value="localhost" />
+	</bean>
+	
+	<bean id="commonQueueConfiguration" class="org.trpr.platform.integration.impl.messaging.RabbitMQConfiguration">
         <property name="userName" value="guest" />
         <property name="password" value="guest" />
-        <property name="hostName" value="localhost" />
         <property name="virtualHost" value="/" />
         <property name="exchangeName" value="myexchange" />
 		<property name="queueName" value="greetingInput" />
 		<property name="exchangeType" value="direct" />
 		<property name="routingKey" value="greetingInput" />
         <property name="portNumber" value="5672" />
-	</bean>
+	</bean>	
 	<!-- End Rabbit configuration for publishing to queue -->	
 	
 </beans>
