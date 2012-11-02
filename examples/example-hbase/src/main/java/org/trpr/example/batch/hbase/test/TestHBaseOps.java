@@ -28,6 +28,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.trpr.example.batch.hbase.test.entity.HBaseEarthling;
 import org.trpr.platform.core.spi.persistence.PersistenceManager;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
+import org.trpr.platform.integration.impl.json.JSONTranscoderImpl;
 
 /**
  * Tets batch step which persists data into HBase using the HBaseProvider
@@ -60,7 +61,6 @@ public class TestHBaseOps implements Tasklet {
 		testEntity.setByteArrayValue(uid.getBytes());
 
 		write(testEntity);
-		read(testEntity);
 		update(testEntity);
 		read(testEntity);
 		if (delete)
@@ -78,9 +78,9 @@ public class TestHBaseOps implements Tasklet {
 	private void read(HBaseEarthling e) {
 		PersistentEntity result =  getPersistenceManager().findEntity(e);
 		if(result != null) {
-			LOG.info("got record with uid from HBase :: " + result.toString());
+			LOG.info("got record with uid from HBase :: " +  new JSONTranscoderImpl().marshal(result));
 		} else {
-			LOG.info("NOT FOUND record with uid from HBase :: " + e.toString());
+			LOG.info("NOT FOUND record with uid from HBase :: " + e.getUid());
 		}
 		
 	}
