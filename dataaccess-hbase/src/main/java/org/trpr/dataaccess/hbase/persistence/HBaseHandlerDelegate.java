@@ -37,6 +37,8 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.ColumnDefinition;
 import org.trpr.dataaccess.hbase.model.config.HbaseClass;
@@ -60,9 +62,7 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
  * 
  * @author Regunath B
  */
-public class HBaseHandlerDelegate {
-	/** The column family qualifier separator constant */
-	private static final String FAMILY_QUALIFIER_SEPARATOR = ":";
+public class HBaseHandlerDelegate implements InitializingBean {
 
 	/** Logger for this class */
 	private static final Log logger = LogFactory.getLog(HBaseHandlerDelegate.class);
@@ -76,9 +76,16 @@ public class HBaseHandlerDelegate {
 	/** Properties to control HBase data writes */
 	private Boolean useWAL = true;
 	private Boolean useAutoFlush = true;
+	
+	/**
+	 * No args constructor. Instance created using this default constructor is useful after #setClassNameToSerializerMap() and #setHBaseMappingContainer()
+	 * have been called subsequently.
+	 */
+	public HBaseHandlerDelegate() {
+	}
 
 	/**
-	 * Constructor for this delegate
+	 * Constructor for this delegate Initialized for use after 
 	 * 
 	 * @param hbaseMappingContainer
 	 *            the HBaseMappingContainer instance containing meta data used
@@ -104,7 +111,24 @@ public class HBaseHandlerDelegate {
 		// Do a putAll to avoid loosing the default serializer mappings
 		this.classNameToSerializerMap.putAll(classNameToSerializerMap);
 	}
-
+	
+	/**
+	 * Initializing bean method implementation. Checks to see if required properties are set
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(this.classNameToSerializerMap, "The 'classNameToSerializerMap' may not be null");
+	}
+	
+	/**
+	 * Sets the specified HBaseMappingContainer for use by this instance. Package level scope as we don't expect this to be set directly
+	 * @param hbaseMappingContainer the HBaseMappingContainer instance
+	 */
+	void setHBaseMappingContainer(HBaseMappingContainer hbaseMappingContainer) {
+		this.hbaseMappingContainer = hbaseMappingContainer;
+	}	
+	
 	/**
 	 * Persists the specified entity using the specified HTablePool
 	 * 

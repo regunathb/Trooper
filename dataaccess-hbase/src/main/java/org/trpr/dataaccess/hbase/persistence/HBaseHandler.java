@@ -127,8 +127,13 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 		for (String shard : this.targetHbaseConfigurations.keySet()) {
 			this.targetHbaseTablePools.put(shard, new HTablePool(this.targetHbaseConfigurations.get(shard), this.htablePoolSize));
 		}
-		// initialize the delegate
-		this.hbaseHandlerDelegate = new HBaseHandlerDelegate(this.hbaseMappingContainer);
+		// initialize the delegate with defaults, if not set already
+		if (this.hbaseHandlerDelegate == null) {
+			this.hbaseHandlerDelegate = new HBaseHandlerDelegate(this.hbaseMappingContainer);
+		} else {
+			// probably the serializers have been customized, so set only the mapping container
+			this.hbaseHandlerDelegate.setHBaseMappingContainer(this.hbaseMappingContainer);
+		}
 		this.hbaseHandlerDelegate.setUseAutoFlush(useAutoFlush);
 		this.hbaseHandlerDelegate.setUseWAL(useWAL);
 
