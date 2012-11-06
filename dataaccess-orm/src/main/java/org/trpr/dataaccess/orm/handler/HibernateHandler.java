@@ -23,21 +23,10 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.trpr.dataaccess.RDBMSHandler;
-import org.trpr.dataaccess.RDBMSIdentifier;
-import org.trpr.platform.core.impl.logging.NullMetricsLogger;
-import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
-import org.trpr.platform.core.spi.persistence.Criteria;
-import org.trpr.platform.core.spi.persistence.IncorrectResultSizePersistenceException;
-import org.trpr.platform.core.spi.persistence.PersistenceException;
-import org.trpr.platform.core.spi.persistence.PersistenceHandler;
-import org.trpr.platform.core.spi.persistence.PersistentEntity;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -45,6 +34,15 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.trpr.dataaccess.RDBMSHandler;
+import org.trpr.dataaccess.RDBMSIdentifier;
+import org.trpr.platform.core.impl.logging.LogBasedMetricsLogger;
+import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
+import org.trpr.platform.core.spi.persistence.Criteria;
+import org.trpr.platform.core.spi.persistence.IncorrectResultSizePersistenceException;
+import org.trpr.platform.core.spi.persistence.PersistenceException;
+import org.trpr.platform.core.spi.persistence.PersistenceHandler;
+import org.trpr.platform.core.spi.persistence.PersistentEntity;
 
 /**
  * The <code>HibernateHandler</code> is a sub-type of {@link RDBMSHandler} that uses Hibernate as the persistence framework.
@@ -59,10 +57,9 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 public class HibernateHandler extends RDBMSHandler {
 
 	/**
-	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. Initialized with the Null logger
-	 * The real logger may be injected using {@link #setPerformanceMetricsLogger(PerformanceMetricsLogger)}
+	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
 	 */
-	private PerformanceMetricsLogger performanceMetricsLogger = new NullMetricsLogger();
+	private PerformanceMetricsLogger performanceMetricsLogger =  new LogBasedMetricsLogger();
 	
 	/**
 	 * Hibernate Template to provide the hibernate API.
