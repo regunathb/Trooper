@@ -27,6 +27,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
@@ -35,12 +36,12 @@ import org.trpr.dataaccess.hbase.serializer.DateSerializer;
 import org.trpr.dataaccess.hbase.serializer.IntegerSerializer;
 import org.trpr.dataaccess.hbase.serializer.LongSerializer;
 import org.trpr.dataaccess.hbase.serializer.StringSerializer;
-import org.trpr.platform.core.impl.logging.NullMetricsLogger;
+import org.trpr.platform.core.impl.logging.LogBasedMetricsLogger;
+import org.trpr.platform.core.impl.persistence.AbstractPersistenceHandler;
 import org.trpr.platform.core.impl.persistence.sharding.ShardedEntityContextHolder;
 import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.PersistenceException;
-import org.trpr.platform.core.spi.persistence.PersistenceHandler;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
 import org.trpr.platform.core.spi.persistence.Serializer;
 import org.trpr.platform.core.spi.persistence.sharding.ShardedEntity;
@@ -60,7 +61,7 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
  * 
  */
 @ManagedResource(objectName = "spring.application:type=Trooper,application=Performance-Metrics,name=HBaseMetrics-", description = "HBase Performance Metrics Logger")
-public class HBaseHandler implements PersistenceHandler, InitializingBean {
+public class HBaseHandler extends AbstractPersistenceHandler implements InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(HBaseHandler.class);
 
@@ -95,10 +96,9 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
 
 	/**
-	 * The PerformanceMetricsLogger instance to use for capturing metrics of
-	 * code block execution
+	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
 	 */
-	protected PerformanceMetricsLogger performanceMetricsLogger = new NullMetricsLogger();
+	protected PerformanceMetricsLogger performanceMetricsLogger = new LogBasedMetricsLogger();
 
 	public HBaseHandler() {
 		// Default serializers. It can be overridden by setting new values in
@@ -106,7 +106,7 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 		classNameToSerializerMap.put("java.lang.String", new StringSerializer());
 		classNameToSerializerMap.put("java.lang.Long", new LongSerializer());
 		classNameToSerializerMap.put("java.lang.Integer", new IntegerSerializer());
-		classNameToSerializerMap.put("java.util.Date", new DateSerializer());
+		classNameToSerializerMap.put("java.util.Date", new DateSerializer());		
 	}
 
 	/**
@@ -139,6 +139,15 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 
 	}
 
+	/**
+	 * Enables performance metrics logging for this handler
+	 * @param performanceLoggingThreshold the elapsed time threshold for code block execution
+	 */
+	@ManagedOperation
+	public void startPerformanceMetricsLogging(long performanceLoggingThreshold) {
+		this.performanceMetricsLogger.setMetricsCaptureParams(true, performanceLoggingThreshold);
+	}
+	
 	public HbaseMapping getMappingForClass(String className) {
 		return hbaseMappingContainer.getMappingForClass(className);
 	}
@@ -201,81 +210,80 @@ public class HBaseHandler implements PersistenceHandler, InitializingBean {
 		return tablePool;
 	}
 
-	/**
-	 * Interface method implementation. Returns the passed in bean identifier
-	 * i.e. beanKey param appended with the Java hashCode of a newly created
-	 * Java Object.
-	 * 
-	 * @see org.trpr.platform.core.spi.management.jmx.InstanceAwareMBean#getMBeanNameSuffix(Object,
-	 *      String)
-	 */
-	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
-		// we could have used the hashCode of the managedBean object which
-		// apparently does not work when the object is instantiated using a
-		// Spring
-		// ApplicationContext. The reason is not known and hence choosing the
-		// safer option of creating a new Object and using its hashcode instead.
-		return "-" + beanKey + "[" + new Object().hashCode() + "]";
-	}
-
 	@Override
 	public PersistentEntity makePersistent(PersistentEntity entity) throws PersistenceException {
-		return this.hbaseHandlerDelegate.makePersistent((HBaseEntity) entity, getHbaseTablePool((HBaseEntity) entity));
+		// signal performance metrics capture. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.startPerformanceMetricsCapture();
+		PersistentEntity persistentEntity = this.hbaseHandlerDelegate.makePersistent((HBaseEntity) entity, getHbaseTablePool((HBaseEntity) entity));
+		// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.logPerformanceMetrics("HBaseHandler.makePersistent", entity.toString());		
+		return persistentEntity;
 	}
 
 	@Override
 	public void makeTransient(PersistentEntity entity) throws PersistenceException {
+		// signal performance metrics capture. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.startPerformanceMetricsCapture();
 		this.hbaseHandlerDelegate.makeTransient((HBaseEntity) entity, getHbaseTablePool((HBaseEntity) entity));
+		// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.logPerformanceMetrics("HBaseHandler.makeTransient", entity.toString());		
 	}
 
 	@Override
 	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
-		return this.hbaseHandlerDelegate.findEntity(getHbaseTablePool((HBaseEntity) entity), (HBaseEntity) entity, getMappingForClass(entity.getClass().getName()));
+		// signal performance metrics capture. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.startPerformanceMetricsCapture();
+		PersistentEntity persistentEntity = this.hbaseHandlerDelegate.findEntity(getHbaseTablePool((HBaseEntity) entity), (HBaseEntity) entity, getMappingForClass(entity.getClass().getName()));
+		// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.logPerformanceMetrics("HBaseHandler.findEntity", entity.toString());		
+		return persistentEntity;
 	}
 
 	@Override
 	public Collection<PersistentEntity> findEntities(Criteria criteria) throws PersistenceException {
+		// signal performance metrics capture. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+		this.performanceMetricsLogger.startPerformanceMetricsCapture();
 		try {
-			return this.hbaseHandlerDelegate.findEntities(getHbaseTablePool((HBaseEntity)criteria.getManagedClass().newInstance()), (HBaseCriteria) criteria, getMappingForClass(criteria.getManagedClass().getName()));
+			Collection<PersistentEntity> persistentEntities = this.hbaseHandlerDelegate.findEntities(getHbaseTablePool((HBaseEntity)criteria.getManagedClass().newInstance()), (HBaseCriteria) criteria, getMappingForClass(criteria.getManagedClass().getName()));
+			return persistentEntities;
 		} catch (Exception e) {
 			logger.error("Error while reading data :: ", e);
 			throw new PersistenceException("Error while reading data :: ", e);
-		} 
+		} finally {
+			// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
+			this.performanceMetricsLogger.logPerformanceMetrics("HBaseHandler.findEntities", criteria.toConciseString());		
+		}
 	}
 
 	/** Getter/Setter methods */
 	public Configuration getHbaseConfiguration() {
 		return this.hbaseConfiguration;
 	}
-
 	public void setHbaseConfiguration(HBaseConfiguration hbaseConfiguration) {
 		this.hbaseConfiguration = hbaseConfiguration;
 	}
-
 	public void setUseWAL(Boolean useWAL) {
 		this.useWAL = useWAL;
 	}
-
 	public Boolean getUseWAL() {
 		return useWAL;
 	}
-
 	public void setUseAutoFlush(Boolean useAutoFlush) {
 		this.useAutoFlush = useAutoFlush;
 	}
-
 	public Boolean getUseAutoFlush() {
 		return useAutoFlush;
 	}
-
 	public void setHtablePoolSize(int htablePoolSize) {
 		this.htablePoolSize = htablePoolSize;
 	}
-
 	public int getHtablePoolSize() {
 		return this.htablePoolSize;
 	}
-
+	public void setPerformanceMetricsLogger(PerformanceMetricsLogger performanceMetricsLogger) {
+		this.performanceMetricsLogger = performanceMetricsLogger;
+	}	
+	
 	// //////////// UNSUPPORTED operations ////////////////
 
 	@Override
