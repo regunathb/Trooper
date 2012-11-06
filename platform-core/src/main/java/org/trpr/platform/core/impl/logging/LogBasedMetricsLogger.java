@@ -42,6 +42,12 @@ public class LogBasedMetricsLogger implements PerformanceMetricsLogger {
 	protected long performanceLoggingThreshold;
 	
 	/**
+	 * No args constructor
+	 */
+	public LogBasedMetricsLogger() {		
+	}
+	
+	/**
 	 * Constructor for this class
 	 * @param capturePerfMetrics boolean to indicate capture of performance metrics. Default is false
 	 * @param performanceLoggingThreshold threshold in milliseconds for performanace metrics logging. Default is zero i.e. all elapsed times will be logged
