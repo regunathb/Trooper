@@ -2,6 +2,18 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 <beans>
 
+	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
+		 Needed to export the "hbaseHandler" as a JMX MBean.   
+	-->
+	
+	<bean id="hbaseHandlerMBeanExporter" parent="mbeansExporter">	
+		<property name="beans">
+			<map>
+				<entry key="TestHBaseOps-HbaseHandler" value-ref="hbaseHandler"/>
+            </map>
+        </property>
+	</bean>
+	
 	<bean id="hbaseHandler" class="org.trpr.dataaccess.hbase.persistence.HBaseHandler">
 		<!--
 			HBase configuration properties (org.apache.hadoop.conf.Configuration)
