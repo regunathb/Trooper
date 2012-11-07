@@ -27,7 +27,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
@@ -36,10 +35,8 @@ import org.trpr.dataaccess.hbase.serializer.DateSerializer;
 import org.trpr.dataaccess.hbase.serializer.IntegerSerializer;
 import org.trpr.dataaccess.hbase.serializer.LongSerializer;
 import org.trpr.dataaccess.hbase.serializer.StringSerializer;
-import org.trpr.platform.core.impl.logging.LogBasedMetricsLogger;
 import org.trpr.platform.core.impl.persistence.AbstractPersistenceHandler;
 import org.trpr.platform.core.impl.persistence.sharding.ShardedEntityContextHolder;
-import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.PersistenceException;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
@@ -93,13 +90,9 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	/** The HBase mapping container instance */
 	private HBaseMappingContainer hbaseMappingContainer;
 
+	/** Map for type to serializer mappings*/
 	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
-
-	/**
-	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
-	 */
-	protected PerformanceMetricsLogger performanceMetricsLogger = new LogBasedMetricsLogger();
-
+	
 	public HBaseHandler() {
 		// Default serializers. It can be overridden by setting new values in
 		// Spring bean definition
@@ -139,15 +132,6 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 
 	}
 
-	/**
-	 * Enables performance metrics logging for this handler
-	 * @param performanceLoggingThreshold the elapsed time threshold for code block execution
-	 */
-	@ManagedOperation
-	public void startPerformanceMetricsLogging(long performanceLoggingThreshold) {
-		this.performanceMetricsLogger.setMetricsCaptureParams(true, performanceLoggingThreshold);
-	}
-	
 	public HbaseMapping getMappingForClass(String className) {
 		return hbaseMappingContainer.getMappingForClass(className);
 	}
@@ -280,10 +264,6 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	public int getHtablePoolSize() {
 		return this.htablePoolSize;
 	}
-	public void setPerformanceMetricsLogger(PerformanceMetricsLogger performanceMetricsLogger) {
-		this.performanceMetricsLogger = performanceMetricsLogger;
-	}	
-	
 	// //////////// UNSUPPORTED operations ////////////////
 
 	@Override
