@@ -29,14 +29,12 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.trpr.dataaccess.RDBMSHandler;
 import org.trpr.dataaccess.RDBMSIdentifier;
-import org.trpr.platform.core.impl.logging.LogBasedMetricsLogger;
 import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.IncorrectResultSizePersistenceException;
@@ -56,11 +54,6 @@ import org.trpr.platform.core.spi.persistence.PersistentEntity;
 @ManagedResource(objectName = "spring.application:type=Trooper,application=Performance-Metrics,name=HibernateMetrics-", description = "Hibernate Performance Metrics Logger")
 public class HibernateHandler extends RDBMSHandler {
 
-	/**
-	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
-	 */
-	private PerformanceMetricsLogger performanceMetricsLogger =  new LogBasedMetricsLogger();
-	
 	/**
 	 * Hibernate Template to provide the hibernate API.
 	 */
@@ -232,15 +225,6 @@ public class HibernateHandler extends RDBMSHandler {
 	}
 	
 	/**
-	 * Enables performance metrics logging for this handler
-	 * @param performanceLoggingThreshold the elapsed time threshold for code block execution
-	 */
-	@ManagedOperation
-	public void startPerformanceMetricsLogging(long performanceLoggingThreshold) {
-		this.performanceMetricsLogger.setMetricsCaptureParams(true, performanceLoggingThreshold);
-	}
-
-	/**
 	 * Equals method implementation. Checks if the database URLs of the underlying session factory match
 	 * @param persistenceHandler the PersistenceHandler to check for equals
 	 * @return true if the specified PersistenceHandler equals this one
@@ -256,14 +240,6 @@ public class HibernateHandler extends RDBMSHandler {
 		} catch (SQLException e) {
 			throw new PersistenceException("Error evaluating PersistenceHandler#equals() : " + e.getMessage(), e);
 		}
-	}
-	
-	/**
-	 * Stops performance metrics logging, if any.
-	 */
-	@ManagedOperation
-	public void stopPerformanceMetricsLogging() {
-		this.performanceMetricsLogger.setMetricsCaptureParams(false, 0); // threshold is set as zero. Value does not matter as logging is getting turned off
 	}
 	
 	/** Start Spring DI style Setter/Getter methods */
