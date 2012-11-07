@@ -15,7 +15,11 @@
  */
 package org.trpr.platform.core.impl.persistence;
 
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.trpr.platform.core.PlatformConstants;
+import org.trpr.platform.core.impl.logging.LogBasedMetricsLogger;
+import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
 import org.trpr.platform.core.spi.management.jmx.InstanceAwareMBean;
 import org.trpr.platform.core.spi.persistence.PersistenceHandler;
 
@@ -28,6 +32,15 @@ import org.trpr.platform.core.spi.persistence.PersistenceHandler;
  */
 
 public abstract class AbstractPersistenceHandler implements PersistenceHandler, InstanceAwareMBean {
+	
+	/** Performance metrics logging control attributes*/
+	private boolean performanceMetricsEnabled = false;
+	private long performanceLoggingThreshold = 0;
+
+	/**
+	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
+	 */
+	protected PerformanceMetricsLogger performanceMetricsLogger = new LogBasedMetricsLogger();
 	
 	/**
 	 * No arg constructor.
@@ -42,6 +55,37 @@ public abstract class AbstractPersistenceHandler implements PersistenceHandler, 
 	public String getMBeanNameSuffix(Object managedBean, String beanKey) {
 		return String.format(escapeForObjectName(System.getProperty(PlatformConstants.TRPR_APP_NAME)) + ",handler=%s", beanKey);
 	}
+	
+	/**
+	 * Enables performance metrics logging for this handler
+	 * @param performanceLoggingThreshold the elapsed time threshold for code block execution
+	 */
+	@ManagedOperation
+	public void startPerformanceMetricsLogging(long performanceLoggingThreshold) {
+		this.performanceMetricsEnabled = true;
+		this.performanceLoggingThreshold = performanceLoggingThreshold;
+		this.performanceMetricsLogger.setMetricsCaptureParams(this.performanceMetricsEnabled, this.performanceLoggingThreshold);
+	}
+	
+	/**
+	 * Stops performance metrics logging, if any.
+	 */
+	@ManagedOperation
+	public void stopPerformanceMetricsLogging() {
+		this.performanceMetricsEnabled = false;
+		this.performanceLoggingThreshold = 0;
+		this.performanceMetricsLogger.setMetricsCaptureParams(false, 0); // threshold is set as zero. Value does not matter as logging is getting turned off
+	}
+	
+	/** Getter/Setter methods */
+	@ManagedAttribute
+	public boolean isPerformanceMetricsEnabled() {
+		return this.performanceMetricsEnabled;
+	}
+	@ManagedAttribute
+	public long getPerformanceLoggingThreshold() {
+		return this.performanceLoggingThreshold;
+	}	
 	
 	/**
 	 * Helper method to escape characters for JMX object naming
