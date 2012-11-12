@@ -11,4 +11,4 @@ It is an umbrella project for a number of things:
 * Provide data models suited for service interactions, event driven design and metrics collection
 
 The Trooper "examples" project group demonstrates usage of various application profiles supported by Trooper.
-Documentation is continuously being added to the Wiki page of Trooper.
+Documentation is continuously being added to the Wiki page of Trooper (https://github.com/regunathb/Trooper/wiki)
