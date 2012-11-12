@@ -15,6 +15,7 @@
  */
 package org.trpr.example.batch.hbase.test;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.trpr.dataaccess.hbase.persistence.HBaseCriteria;
 import org.trpr.example.batch.hbase.test.entity.HBaseEarthling;
 import org.trpr.platform.core.spi.persistence.PersistenceManager;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
@@ -60,11 +62,14 @@ public class TestHBaseOps implements Tasklet {
 		testEntity.setDateValue(new Date());
 		testEntity.setByteArrayValue(uid.getBytes());
 
+		
 		write(testEntity);
 		update(testEntity);
 		read(testEntity);
-		if (delete)
+		if (delete) {
 			delete(testEntity);
+		}
+		scan();
 
 		return RepeatStatus.FINISHED;
 	}
@@ -86,7 +91,7 @@ public class TestHBaseOps implements Tasklet {
 	}
 
 	private void update(HBaseEarthling e) {
-		e.setName("Updated John Foo");
+		e.setName("Updated John Foo 1");
 		getPersistenceManager().makePersistent(e);
 		LOG.info("Updated record in hbase with UID :: " + e.getUid());
 	}
@@ -96,6 +101,21 @@ public class TestHBaseOps implements Tasklet {
 		LOG.info("got record with uid from HBase :: " + e.getUid());
 	}
 
+	private void scan() {
+		HBaseCriteria criteria = new HBaseCriteria();
+		criteria.setManagedClass(HBaseEarthling.class);
+		Collection<PersistentEntity> entities = getPersistenceManager().findEntities(criteria);
+		LOG.info("******   Scan output for no. of entities : " + entities.size());
+		for (PersistentEntity entity : entities) {
+			try {
+				LOG.info(entity.toString());
+			} catch (Exception e) {
+				// to catch bad data related records and continue
+				LOG.warn("Unable to retrieve records with ID : " + ((HBaseEarthling)entity).getUid());
+			}
+		}
+		LOG.info("******   Scan complete for no. of entities : " + entities.size());
+	}
 
 	public PersistenceManager getPersistenceManager() {
 		return persistenceManager;
