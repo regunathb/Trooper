@@ -40,7 +40,7 @@ public abstract class AbstractPersistenceHandler implements PersistenceHandler, 
 	/**
 	 * The PerformanceMetricsLogger instance to use for capturing metrics of code block execution. 
 	 */
-	protected PerformanceMetricsLogger performanceMetricsLogger = new LogBasedMetricsLogger();
+	protected PerformanceMetricsLogger performanceMetricsLogger = new LogBasedMetricsLogger(this.performanceMetricsEnabled, this.performanceLoggingThreshold);
 	
 	/**
 	 * No arg constructor.
