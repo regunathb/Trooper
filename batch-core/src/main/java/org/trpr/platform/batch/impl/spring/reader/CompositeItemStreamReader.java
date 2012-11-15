@@ -41,8 +41,8 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	/** The delegate that does the actual data reading*/
 	private BatchItemStreamReader<T> delegate;
 	
-	/** The bounded queue containing data items*/
-	private Queue<T> boundedQueue = new LinkedList<T>();
+	/** The local queue containing data items*/
+	private Queue<T> localQueue = new LinkedList<T>();
 	
 	/** The Collection of ExecutionContext instances that determines data to be read */
 	private Queue<ExecutionContext> contextList = new LinkedList<ExecutionContext>();	
@@ -56,27 +56,27 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	}
 
 	/**
-	 * Interface method implementation. Returns data from the local bounded collection. Reads data from the delegate if the bounded collection is empty and
-	 * populates the local bounded collection.
+	 * Interface method implementation. Returns data from the collection. Reads data from the delegate if the bounded collection is empty and
+	 * populates the local collection.
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public T read() throws Exception, UnexpectedInputException, ParseException {
-		synchronized(this) {
-			if (!this.boundedQueue.isEmpty()) {
-				return this.boundedQueue.remove();
+		synchronized(this) { // synchronize access across readers to the local queue
+			if (!this.localQueue.isEmpty()) {
+				return this.localQueue.remove();
 			} 
 		}
-		// check to see if any of the ExecutionContexts exist for processing
+		// check to see if any of the ExecutionContext(s) exist for processing
 		ExecutionContext context = null;
 		synchronized(this) {
 			if (contextList.size() > 0) {
 				context = contextList.remove();
 			}
 			if (context != null) {
-				synchronized(context) {
+				synchronized(context) { // synchronizing on the context so that batch reads on the delegate can happen in parallel for different partitions say
 					T[] items = this.delegate.batchRead(context);
 					for (T item : items) {
-						this.boundedQueue.add(item);
+						this.localQueue.add(item);
 					}
 				}
 			}
