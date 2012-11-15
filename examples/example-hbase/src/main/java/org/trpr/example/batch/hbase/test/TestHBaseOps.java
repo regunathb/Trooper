@@ -104,6 +104,7 @@ public class TestHBaseOps implements Tasklet {
 	private void scan() {
 		HBaseCriteria criteria = new HBaseCriteria();
 		criteria.setManagedClass(HBaseEarthling.class);
+		criteria.setMaxResults(100);
 		Collection<PersistentEntity> entities = getPersistenceManager().findEntities(criteria);
 		LOG.info("******   Scan output for no. of entities : " + entities.size());
 		for (PersistentEntity entity : entities) {
