@@ -74,7 +74,7 @@
 	<batch:job id="greetingJob" incrementer="incrementer">
 		<batch:step id="greetingJobStep">
 			<batch:partition step="step1" partitioner="partitioner">
-				<batch:handler grid-size="2" task-executor="taskExecutor" />
+				<batch:handler grid-size="4" task-executor="taskExecutor" />
 			</batch:partition>
 		</batch:step>
 	</batch:job>
@@ -104,7 +104,7 @@
 	</bean>	
 	
 	<bean id="greetingDataReader" class="org.trpr.example.batch.greeting.reader.GreetingJobReader">
-		<property name="batchSize" value="100" />
+		<property name="batchSize" value="2" />
 	</bean>	
 	
 	<bean id="greetingDataProcessor" class="org.trpr.example.batch.greeting.processor.GreetingJobProcessor"/>
