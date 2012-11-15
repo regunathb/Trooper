@@ -16,8 +16,6 @@
 package org.trpr.example.batch.greeting.reader;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -42,12 +40,6 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	/** The read batch items size */
 	private int batchSize;
 	
-	/** The partition index, if any*/
-	private int partitionIndex = -1;
-	
-	/** Indicator to signal read complete for a partition - just a hack to stop execution at some point*/
-	private Map<String, Boolean> readStatusMap = new HashMap<String, Boolean>();
-
 	/**
 	 * Interface method implementation. Throws an exception suggesting to use the {@link #batchRead()} method instead via the {@link CompositeItemStreamReader} instead
 	 * @see org.springframework.batch.item.ItemReader#read()
@@ -57,24 +49,21 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	}
 
 	/**
-	 * Interface method implementation. Simply creates and returns an array of Earthling instances of total size defined by the READ_BATCH static variable value
+	 * Interface method implementation. Simply creates and returns an array of Earthling instances of total size defined by the batch size
 	 * @see org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader#batchRead()
 	 */
-	public Earthling[] batchRead() throws Exception, UnexpectedInputException, ParseException {
-		if (this.readStatusMap.get(String.valueOf(this.partitionIndex)) != null && this.readStatusMap.get(String.valueOf(this.partitionIndex))) { // no more data to read
-			this.readStatusMap.put(String.valueOf(this.partitionIndex),false); // set to false for next read when scheduled by the job trigger
-			return null;
-		}
+	public Earthling[] batchRead(ExecutionContext context) throws Exception, UnexpectedInputException, ParseException {
+		int partitionIndex = context.getInt(SimpleRangePartitioner.PARTITION_INDEX, -1); 
+		// we are not using the partition information here at all. May be used effectively to read ranges of data from underlying data stores for e.g
 		Earthling[] earthlings = new Earthling[this.getBatchSize()];
 		for (int i=0; i<this.getBatchSize();i++) {
 			earthlings[i] = new Earthling();
 			earthlings[i].setFirstName("Mr");
-			earthlings[i].setLastName("Trooper " + this.partitionIndex);
+			earthlings[i].setLastName("Trooper " + partitionIndex);
 			Calendar c  = Calendar.getInstance();
 			c.set(Calendar.YEAR, 2010);
 			earthlings[i].setDateOfBirth(c);	
 		}
-		this.readStatusMap.put(String.valueOf(this.partitionIndex),true); // signal that this reader does not have any more data
 		return earthlings;
 	}
 	
@@ -92,7 +81,6 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
-		this.partitionIndex = context.getInt(SimpleRangePartitioner.PARTITION_INDEX, -1);
 	}
 
 	/**
