@@ -61,25 +61,31 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public T read() throws Exception, UnexpectedInputException, ParseException {
-		synchronized(this) { // synchronize access across readers to the local queue
+		synchronized(this) { // synchronize access across readers that remove data from the local queue
 			if (!this.localQueue.isEmpty()) {
 				return this.localQueue.remove();
 			} 
 		}
 		// check to see if any of the ExecutionContext(s) exist for processing
-		ExecutionContext context = null;
-		synchronized(this) {
-			if (contextList.size() > 0) {
-				context = contextList.remove();
-			}
-			if (context != null) {
-				synchronized(context) { // synchronizing on the context so that batch reads on the delegate can happen in parallel for different partitions say
+		ExecutionContext context = contextList.peek();
+		if (context != null) {
+			synchronized(context) { // synchronizing on the context so that batch reads on the delegate can happen in parallel for different partitions say
+				if (contextList.contains(context)) { // double check to see if no other reader has processed and removed from the list
 					T[] items = this.delegate.batchRead(context);
-					for (T item : items) {
-						this.localQueue.add(item);
+					contextList.remove(context);
+					synchronized(this) { // synchronize access to add data to the local queue
+						for (T item : items) {
+							this.localQueue.add(item);
+						}
 					}
 				}
 			}
+		}
+		// check again to ensure that there is indeed no data and this Reader may signal read-complete i.e. return null
+		synchronized(this) { // synchronize access across readers that remove data from the local queue
+			if (!this.localQueue.isEmpty()) {
+				return this.localQueue.remove();
+			} 
 		}
 		return null; 
 	}
