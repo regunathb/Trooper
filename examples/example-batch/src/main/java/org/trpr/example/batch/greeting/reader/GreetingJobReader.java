@@ -16,6 +16,8 @@
 package org.trpr.example.batch.greeting.reader;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -43,8 +45,8 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	/** The partition index, if any*/
 	private int partitionIndex = -1;
 	
-	/** Indicator to signal read complete - just a hack to stop execution at some point*/
-	private boolean isReadComplete;
+	/** Indicator to signal read complete for a partition - just a hack to stop execution at some point*/
+	private Map<String, Boolean> readStatusMap = new HashMap<String, Boolean>();
 
 	/**
 	 * Interface method implementation. Throws an exception suggesting to use the {@link #batchRead()} method instead via the {@link CompositeItemStreamReader} instead
@@ -59,8 +61,8 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 	 * @see org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader#batchRead()
 	 */
 	public Earthling[] batchRead() throws Exception, UnexpectedInputException, ParseException {
-		if (this.isReadComplete) { // no more data to read
-			this.isReadComplete = false; // set to false for next read when scheduled by the job trigger
+		if (this.readStatusMap.get(String.valueOf(this.partitionIndex)) != null && this.readStatusMap.get(String.valueOf(this.partitionIndex))) { // no more data to read
+			this.readStatusMap.put(String.valueOf(this.partitionIndex),false); // set to false for next read when scheduled by the job trigger
 			return null;
 		}
 		Earthling[] earthlings = new Earthling[this.getBatchSize()];
@@ -72,7 +74,7 @@ public class GreetingJobReader<T extends Earthling> implements BatchItemStreamRe
 			c.set(Calendar.YEAR, 2010);
 			earthlings[i].setDateOfBirth(c);	
 		}
-		this.isReadComplete = true; // signal that this reader does not have any more data
+		this.readStatusMap.put(String.valueOf(this.partitionIndex),true); // signal that this reader does not have any more data
 		return earthlings;
 	}
 	
