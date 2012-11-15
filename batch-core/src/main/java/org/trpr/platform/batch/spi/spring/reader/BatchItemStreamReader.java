@@ -15,6 +15,7 @@
  */
 package org.trpr.platform.batch.spi.spring.reader;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -29,6 +30,7 @@ public interface BatchItemStreamReader<T> extends ItemStreamReader<T> {
 	
 	/**
 	 * Reads and returns an array of data items. The size of the returned array is implementation specific.
+	 * @param context the ExecutionContext containing information for data read, such as partition information
 	 * @return array of data items.
 	 * @throws ParseException if there is a problem parsing the current batch
 	 * (but the next one may still be valid)
@@ -37,5 +39,5 @@ public interface BatchItemStreamReader<T> extends ItemStreamReader<T> {
 	 * read might succeed.
 	 * @throws Exception if an there is a non-specific error.
 	 */
-	public T[] batchRead() throws Exception, UnexpectedInputException, ParseException;
+	public T[] batchRead(ExecutionContext context) throws Exception, UnexpectedInputException, ParseException;
 }

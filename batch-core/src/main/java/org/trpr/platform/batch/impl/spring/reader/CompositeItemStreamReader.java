@@ -44,6 +44,9 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	/** The bounded queue containing data items*/
 	private Queue<T> boundedQueue = new LinkedList<T>();
 	
+	/** The Collection of ExecutionContext instances that determines data to be read */
+	private Queue<ExecutionContext> contextList = new LinkedList<ExecutionContext>();	
+	
 	/**
 	 * Constructor for this class
 	 * @param delegate the ItemStreamReader delegate
@@ -57,25 +60,36 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * populates the local bounded collection.
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public synchronized T read() throws Exception, UnexpectedInputException, ParseException {
-		if (this.boundedQueue.isEmpty()) {
-			T[] items = this.delegate.batchRead();
-			if (items == null) { // no more data to read
-				return null;
+	public T read() throws Exception, UnexpectedInputException, ParseException {
+		synchronized(this) {
+			if (!this.boundedQueue.isEmpty()) {
+				return this.boundedQueue.remove();
+			} 
+		}
+		// check to see if any of the ExecutionContexts exist for processing
+		ExecutionContext context = null;
+		synchronized(this) {
+			if (contextList.size() > 0) {
+				context = contextList.remove();
 			}
-			for (T item : items) {
-				this.boundedQueue.add(item);
+			if (context != null) {
+				synchronized(context) {
+					T[] items = this.delegate.batchRead(context);
+					for (T item : items) {
+						this.boundedQueue.add(item);
+					}
+				}
 			}
 		}
-		return this.boundedQueue.remove();
+		return null; 
 	}
 
 	/**
-	 * Interface method implementation. Calls the namesake method on the delegate.
+	 * Interface method implementation. Throws {@link UnsupportedOperationException} as this composite reader's method should never be called.
 	 * @see BatchItemStreamReader#batchRead()
 	 */
-	public T[] batchRead() throws Exception, UnexpectedInputException, ParseException {
-		return this.delegate.batchRead();
+	public T[] batchRead(ExecutionContext context) throws Exception, UnexpectedInputException, ParseException {
+		throw new UnsupportedOperationException("Illegal invocation of batchRead(), call read() instead.");
 	}
 
 	
@@ -88,11 +102,12 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	}
 
 	/**
-	 * Interface method implementation. Calls the namesake method on the delegate
+	 * Interface method implementation. Stores the passed-in ExecutionContext in a ThreadLocal for use in {@link #batchRead()} method
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
-		this.delegate.open(context);
+		contextList.add(context);
+		// dont call open() on the delegate. We will pass on the ExecutionContext as part of batchRead() instead
 	}
 
 	/**
