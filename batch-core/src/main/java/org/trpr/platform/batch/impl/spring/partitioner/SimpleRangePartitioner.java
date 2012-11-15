@@ -42,6 +42,10 @@ public class SimpleRangePartitioner implements Partitioner {
 	public static final String TOTAL_PARTITIIONS = "totalPartitions";
 	public static final String PARTITION_INDEX = "partitionIndex";
 
+	/**
+	 * Interface method implementation. Creates and returns a map of ExecutionContext instances keyed by the partition key
+	 * @see org.springframework.batch.core.partition.support.Partitioner#partition(int)
+	 */
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> map = new HashMap<String, ExecutionContext>(gridSize);
 		for (int i = 0; i < gridSize; i++) {
