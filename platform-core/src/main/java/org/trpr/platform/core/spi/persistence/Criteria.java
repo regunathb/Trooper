@@ -97,6 +97,15 @@ public class Criteria {
 	}
 	
 	/**
+	 * Returns the parameter value identified by the specified name
+	 * @param param the parameter name
+	 * @return null or the value that was set using {@link #addParameter(String, Object)}
+	 */
+	public Object getParameter(String param) {
+		return  this.paramsMap.get(param);
+	}
+	
+	/**
 	 * Overriden super class method. Does a verbose print of all information contained in this Criteria
 	 * @see java.lang.Object#toString()
 	 */
