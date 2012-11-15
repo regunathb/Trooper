@@ -275,9 +275,17 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			// do a scan operation
 			Scan s = constructScanQuery(metadata, criteria);
 			ResultScanner scanner = table.getScanner(s);
+			// check to see if start and end indices have been specified, for pagination say
+			int startIndex = criteria.getFirstResult();
+			int maxResults = criteria.getMaxResults();
+			int count = 0;
 			for (Result resultRow = scanner.next(); resultRow != null; resultRow = scanner.next()) {
-				if (!resultRow.isEmpty()) {
+				if (!resultRow.isEmpty() && count >= startIndex) {
 					searchResultList.add(constructEntityFromResultRow(metadata, resultRow, (HBaseEntity)criteria.getManagedClass().newInstance()));
+				}
+				count += 1;
+				if (count >= maxResults) {
+					break;
 				}
 			}
 		} catch (Exception e) {
@@ -312,19 +320,22 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			HBaseCriteria queryCriteria = (HBaseCriteria) entity.getCriteriaForLoad();
 			if (queryCriteria != null) {
 				/* add the maximum versions to fetch */
-				if (queryCriteria.getNumVersionsToFetch() > 1) {
-					getRequest.setMaxVersions(queryCriteria.getNumVersionsToFetch());
+				int versions = queryCriteria.getParameter(HBaseCriteria.VERSIONS) == null ? 1 : Integer.valueOf((String)queryCriteria.getParameter(HBaseCriteria.VERSIONS));
+				if (versions > 1) {
+					getRequest.setMaxVersions(versions);
 				}
 				/* add the time range for fetching records */
-				if (queryCriteria.getStartTimestamp() != 0) {
+				long startTimestamp = queryCriteria.getParameter(HBaseCriteria.START_TIMESTAMP) == null ? 0 : Long.valueOf((String)queryCriteria.getParameter(HBaseCriteria.START_TIMESTAMP));
+				if (startTimestamp != 0) {
 					/*
 					 * Verify the end timestamp value if it is empty we will use
 					 * the current system time
 					 */
-					if (queryCriteria.getEndTimestamp() == 0) {
-						queryCriteria.setEndTimestamp(System.currentTimeMillis());
+					long endTimestamp = queryCriteria.getParameter(HBaseCriteria.END_TIMESTAMP) == null ? 0 : Long.valueOf((String)queryCriteria.getParameter(HBaseCriteria.END_TIMESTAMP));
+					if (endTimestamp == 0) {
+						queryCriteria.addParameter(HBaseCriteria.END_TIMESTAMP,System.currentTimeMillis());
 					}
-					getRequest.setTimeRange(queryCriteria.getStartTimestamp(), queryCriteria.getEndTimestamp());
+					getRequest.setTimeRange(startTimestamp, endTimestamp);
 				}
 			}
 			for (ColumnDefinition column : metadata.getHbaseClass().getColumnDefinition()) {
@@ -353,23 +364,35 @@ public class HBaseHandlerDelegate implements InitializingBean {
 		try {
 			if (queryCriteria != null) {
 				if (queryCriteria.getScan() != null) {
-					scanRequest = queryCriteria.getScan();
+					scanRequest = queryCriteria.getScan(); // use the Scan object passed in through the HBaseCriteria
 				} else {
 					scanRequest = new Scan();
 					/* add the maximum versions to fetch */
-					if (queryCriteria.getNumVersionsToFetch() > 1) {
-						scanRequest.setMaxVersions(queryCriteria.getNumVersionsToFetch());
+					int versions = queryCriteria.getParameter(HBaseCriteria.VERSIONS) == null ? 1 : Integer.valueOf((String)queryCriteria.getParameter(HBaseCriteria.VERSIONS));
+					if (versions > 1) {
+						scanRequest.setMaxVersions(versions);
 					}
 					/* add the time range for fetching records */
-					if (queryCriteria.getStartTimestamp() != 0) {
+					long startTimestamp = queryCriteria.getParameter(HBaseCriteria.START_TIMESTAMP) == null ? 0 : Long.valueOf((String)queryCriteria.getParameter(HBaseCriteria.START_TIMESTAMP));
+					if (startTimestamp != 0) {
 						/**
 						 * Verify the end timestamp value if it is empty we will
 						 * use the current system time
 						 */
-						if (queryCriteria.getEndTimestamp() == 0) {
-							queryCriteria.setEndTimestamp(System.currentTimeMillis());
+						long endTimestamp = queryCriteria.getParameter(HBaseCriteria.END_TIMESTAMP) == null ? 0 : Long.valueOf((String)queryCriteria.getParameter(HBaseCriteria.END_TIMESTAMP));
+						if (endTimestamp == 0) {
+							queryCriteria.addParameter(HBaseCriteria.END_TIMESTAMP,System.currentTimeMillis());
 						}
-						scanRequest.setTimeRange(queryCriteria.getStartTimestamp(), queryCriteria.getEndTimestamp());
+						scanRequest.setTimeRange(startTimestamp, endTimestamp);
+					}
+					/* add start and end row keys if specified*/
+					byte[] startKey = (byte[])queryCriteria.getParameter(HBaseCriteria.START_KEY);
+					byte[] endKey = (byte[])queryCriteria.getParameter(HBaseCriteria.END_KEY);
+					if (startKey != null) {
+						scanRequest.setStartRow(startKey);
+					}
+					if (endKey != null) {
+						scanRequest.setStopRow(endKey);
 					}
 				}
 			} else {
