@@ -16,9 +16,8 @@
 
 package org.trpr.platform.batch.impl.spring.reader;
 
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -45,10 +44,10 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	private BatchItemStreamReader<T> delegate;
 	
 	/** The local list containing data items*/
-	private List<T> localQueue = Collections.synchronizedList(new LinkedList<T>()); // synchronized collections for multi-threaded access
+	private Queue<T> localQueue = new LinkedList<T>(); 
 	
 	/** The Collection of ExecutionContext instances that determines data to be read */
-	private List<ExecutionContext> contextList = Collections.synchronizedList(new LinkedList<ExecutionContext>());	// synchronized collections for multi-threaded access
+	private Queue<ExecutionContext> contextList = new LinkedList<ExecutionContext>();	
 	
 	/** The CountDownLatch to keep track of ExecutionContext instances that are processed*/
 	private CountDownLatch countDownLatch;
@@ -66,30 +65,41 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * populates the local collection.
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public T read() throws Exception, UnexpectedInputException, ParseException {
-		
+	public T read() throws Exception, UnexpectedInputException, ParseException {		
 		// return data from local queue if available already
-		if (!this.localQueue.isEmpty()) {
-			return this.localQueue.remove(0);
-		}			
+		synchronized(this) {
+			if (!this.localQueue.isEmpty()) {
+				return this.localQueue.remove();
+			}			
+		}
 		
+		ExecutionContext context = null;
 		// else, check to see if any of the ExecutionContext(s) exist for processing
-		if (!this.contextList.isEmpty()) {
-			ExecutionContext context = this.contextList.remove(0);
-			T[] items = this.delegate.batchRead(context);
-			for (T item : items) {
-				this.localQueue.add(item);
+		synchronized(this) {
+			if (!this.contextList.isEmpty()) {
+				context = this.contextList.remove();
 			}
-			this.countDownLatch.countDown(); // count down on the latch
-			return this.localQueue.remove(0); // return an item for processing after populating the local collection
+		}
+		
+		if (context != null) {
+			T[] items = this.delegate.batchRead(context);
+			synchronized(this) {			
+				for (T item : items) {
+					this.localQueue.add(item);
+				}
+				this.countDownLatch.countDown(); // count down on the latch
+				return this.localQueue.remove(); // return an item for processing after populating the local collection
+			}
 		}
 		
 		this.countDownLatch.await(); // wait for any batch reads on the delegate to complete
 		
 		// Check again to see if any new items have been added, exit otherwise
-		if (!this.localQueue.isEmpty()) {
-			return this.localQueue.remove(0);
-		}			
+		synchronized(this) {
+			if (!this.localQueue.isEmpty()) {
+				return this.localQueue.remove();
+			}	
+		}
 		return null;
 	}
 
