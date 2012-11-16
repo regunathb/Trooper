@@ -36,7 +36,7 @@
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0/20 * * * ?" />
 	</bean>
 
 	<!--
@@ -52,9 +52,9 @@
 	</bean>
 	
 	<!--
-		The simple task executor for the partition execution
+		The simple async task executor for the partition execution
 	-->
-	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 	
 	<!-- The range based partitioner bean -->
 	<bean id="partitioner" class="org.trpr.platform.batch.impl.spring.partitioner.SimpleRangePartitioner"/>
@@ -104,7 +104,7 @@
 	</bean>	
 	
 	<bean id="greetingDataReader" class="org.trpr.example.batch.greeting.reader.GreetingJobReader">
-		<property name="batchSize" value="10000" />
+		<property name="batchSize" value="1000" />
 	</bean>	
 	
 	<bean id="greetingDataProcessor" class="org.trpr.example.batch.greeting.processor.GreetingJobProcessor"/>
