@@ -16,8 +16,10 @@
 
 package org.trpr.platform.batch.impl.spring.reader;
 
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -42,8 +44,14 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	/** The delegate that does the actual data reading*/
 	private BatchItemStreamReader<T> delegate;
 	
-	/** The local queue containing data items*/
-	private Queue<T> localQueue = new LinkedList<T>();
+	/** The local list containing data items*/
+	private List<T> localQueue = Collections.synchronizedList(new LinkedList<T>()); // synchronized collections for multi-threaded access
+	
+	/** The Collection of ExecutionContext instances that determines data to be read */
+	private List<ExecutionContext> contextList = Collections.synchronizedList(new LinkedList<ExecutionContext>());	// synchronized collections for multi-threaded access
+	
+	/** The CountDownLatch to keep track of ExecutionContext instances that are processed*/
+	private CountDownLatch countDownLatch;
 	
 	/**
 	 * Constructor for this class
@@ -54,13 +62,34 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	}
 
 	/**
-	 * Interface method implementation. Returns data from the collection populated in {@link #open(ExecutionContext)}
+	 * Interface method implementation. Returns data from the collection. Reads data from the delegate if the bounded collection is empty and
+	 * populates the local collection.
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public synchronized T read() throws Exception, UnexpectedInputException, ParseException {
+	public T read() throws Exception, UnexpectedInputException, ParseException {
+		
+		// return data from local queue if available already
 		if (!this.localQueue.isEmpty()) {
-			return this.localQueue.remove();
+			return this.localQueue.remove(0);
+		}			
+		
+		// else, check to see if any of the ExecutionContext(s) exist for processing
+		if (!this.contextList.isEmpty()) {
+			ExecutionContext context = this.contextList.remove(0);
+			T[] items = this.delegate.batchRead(context);
+			for (T item : items) {
+				this.localQueue.add(item);
+			}
+			this.countDownLatch.countDown(); // count down on the latch
+			return this.localQueue.remove(0); // return an item for processing after populating the local collection
 		}
+		
+		this.countDownLatch.await(); // wait for any batch reads on the delegate to complete
+		
+		// Check again to see if any new items have been added, exit otherwise
+		if (!this.localQueue.isEmpty()) {
+			return this.localQueue.remove(0);
+		}			
 		return null;
 	}
 
@@ -82,21 +111,15 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	}
 
 	/**
-	 * Interface method implementation. Processes each passed-in ExecutionContext by calling {@link #batchRead(ExecutionContext)} on the delegate.
-	 * Stores the returned batch read values in the local cache
+	 * Interface method implementation. Stores the passed-in ExecutionContext in a ThreadLocal for use in {@link #batchRead()} method
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
-		try {
-			T[] items = this.delegate.batchRead(context);
-			synchronized(this) { // synchronize access to add data to the local queue
-				for (T item : items) {
-					this.localQueue.add(item);
-				}
-			}
-		} catch (Exception e) {
-			throw new ItemStreamException("Exception performing batch read on Delegate : " + this.delegate.getClass().getName(),e);
+		contextList.add(context);
+		if (this.countDownLatch == null) {
+			this.countDownLatch = new CountDownLatch(context.getInt(SimpleRangePartitioner.TOTAL_PARTITIIONS, 1)); // initialize the CountDownLatch to the partition size
 		}
+		// dont call open() on the delegate. We will pass on the ExecutionContext as part of batchRead() instead
 	}
 
 	/**
