@@ -67,7 +67,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 */
 	public T read() throws Exception, UnexpectedInputException, ParseException {		
 		// return data from local queue if available already
-		synchronized(this) {
+		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.localQueue.isEmpty()) {
 				return this.localQueue.remove();
 			}			
@@ -75,15 +75,15 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		
 		ExecutionContext context = null;
 		// else, check to see if any of the ExecutionContext(s) exist for processing
-		synchronized(this) {
+		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.contextList.isEmpty()) {
 				context = this.contextList.remove();
 			}
 		}
 		
 		if (context != null) {
-			T[] items = this.delegate.batchRead(context);
-			synchronized(this) {			
+			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
+			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
 					this.localQueue.add(item);
 				}
@@ -96,7 +96,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		
 		// Check again to see if any new items have been added, exit otherwise
 		synchronized(this) {
-			if (!this.localQueue.isEmpty()) {
+			if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
 				return this.localQueue.remove();
 			}	
 		}
