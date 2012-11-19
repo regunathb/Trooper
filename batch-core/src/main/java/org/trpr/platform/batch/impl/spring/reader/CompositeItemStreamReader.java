@@ -125,8 +125,8 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
-		contextList.add(context);
-		if (this.countDownLatch == null) {
+		this.contextList.add(context);
+		if (this.countDownLatch == null || this.countDownLatch.getCount() == 0) { // create a CountDownLatch if variable instance is null or the previous one has counted down to zero
 			this.countDownLatch = new CountDownLatch(context.getInt(SimpleRangePartitioner.TOTAL_PARTITIIONS, 1)); // initialize the CountDownLatch to the partition size
 		}
 		// dont call open() on the delegate. We will pass on the ExecutionContext as part of batchRead() instead
