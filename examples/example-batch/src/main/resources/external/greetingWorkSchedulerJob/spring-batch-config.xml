@@ -32,11 +32,10 @@
 	<!--
 		Associating the Greeting Job with a Quartz
 		Cron Trigger. Triggers define when a job is executed.
-		Executes every 1 minute
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0 0/20 * * * ?" />
+		<property name="cronExpression" value="0 0/240 * * * ?" />
 	</bean>
 
 	<!--
@@ -63,9 +62,9 @@
 		Greeting Job Task Executor Multi-Threaded-Pool Configuration.
 	-->
 	<bean id="greetingJobTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-		<property name="corePoolSize" value="5" />
-		<property name="maxPoolSize" value="10" />
-		<property name="queueCapacity" value="50" />
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="queueCapacity" value="500" />
 	</bean>	
 	
 	<!--
@@ -74,7 +73,7 @@
 	<batch:job id="greetingJob" incrementer="incrementer">
 		<batch:step id="greetingJobStep">
 			<batch:partition step="step1" partitioner="partitioner">
-				<batch:handler grid-size="4" task-executor="taskExecutor" />
+				<batch:handler grid-size="5" task-executor="taskExecutor" />
 			</batch:partition>
 		</batch:step>
 	</batch:job>

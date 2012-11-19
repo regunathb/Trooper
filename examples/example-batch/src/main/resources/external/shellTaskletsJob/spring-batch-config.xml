@@ -32,11 +32,10 @@
 	<!--
 		Associating the Shell tasklets Job with a Quartz
 		Cron Trigger. Triggers define when a job is executed.
-		Executes every 1 minute
 	-->
 	<bean id="shellJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="shellJobDetailBean" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0/120 * * * ?" />
 	</bean>
 
 	<!--
