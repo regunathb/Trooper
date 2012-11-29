@@ -27,6 +27,8 @@ import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
+import org.trpr.platform.runtime.common.RuntimeConstants;
+import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
@@ -54,7 +56,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	private static final String DEFAULT_EVENT_PRODUCER = "platformEventProducer";
 	
     /** The common batch beans context*/
-    private AbstractApplicationContext commonBatchBeansContext;    
+    private static AbstractApplicationContext commonBatchBeansContext;    
     
 	/**
 	 * The list of Spring application contexts that would hold all job instances loaded by this container
@@ -64,6 +66,15 @@ public class SpringBatchComponentContainer implements ComponentContainer {
     /** Local reference for all BootstrapExtensionS loaded by the Container and set on this ComponentContainer*/
     private BootstrapExtension[] loadedBootstrapExtensions;
     
+	/**
+	 * Returns the common Batch Spring beans application context that is intended as parent of all batch application contexts 
+	 * WARN : this method can retun null if this ComponentContainer is not suitably initialized via a call to {@link #init()}
+	 * @return null or the common batch AbstractApplicationContext
+	 */
+	public static AbstractApplicationContext getCommonBatchBeansContext() {
+		return SpringBatchComponentContainer.commonBatchBeansContext;
+	}
+	
     /**
      * Interface method implementation. Returns the fully qualified class name of this class
      * @see org.trpr.platform.runtime.spi.component.ComponentContainer#getName()
@@ -88,9 +99,13 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		
 		// The common batch beans context is loaded first using the Platform common beans context as parent
 		// load this from classpath as it is packaged with the binaries
-		this.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, ApplicationContextFactory.getCommonBeansContext());
+		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, ApplicationContextFactory.getCommonBeansContext());
 		// add the common batch beans to the contexts list
-		this.jobsContextList.add(this.commonBatchBeansContext);
+		this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
+
+		// Load additional if runtime nature is "server". This context is the new common beans context
+		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG},
+				SpringBatchComponentContainer.commonBatchBeansContext);
 		
 		// locate and load the individual job bean XML files using the common batch beans context as parent
 		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
@@ -98,7 +113,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
 			// to relative path
 			this.jobsContextList.add(new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobBeansFile.getAbsolutePath()},
-					this.commonBatchBeansContext));
+					SpringBatchComponentContainer.commonBatchBeansContext));
 		}
 		
 	}
@@ -120,7 +135,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 * Note that typically no consumers are registered when running this container
 	 */ 
 	public void publishEvent(PlatformEvent event) {
-		PlatformEventProducer publisher= (PlatformEventProducer)this.commonBatchBeansContext.getBean(DEFAULT_EVENT_PRODUCER);
+		PlatformEventProducer publisher= (PlatformEventProducer)SpringBatchComponentContainer.commonBatchBeansContext.getBean(DEFAULT_EVENT_PRODUCER);
 		publisher.publishEvent(event);
 	}
 	    

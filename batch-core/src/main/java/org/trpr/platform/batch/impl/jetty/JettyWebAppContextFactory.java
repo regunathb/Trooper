@@ -1,0 +1,99 @@
+/*
+ * Copyright 2012-2015, the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.trpr.platform.batch.impl.jetty;
+
+import java.io.File;
+
+import org.mortbay.jetty.webapp.WebAppContext;
+import org.springframework.beans.factory.FactoryBean;
+import org.trpr.platform.runtime.impl.config.FileLocator;
+
+/**
+ * The Spring factory bean for creating the Jetty WebAppContext using resources found on the classpath
+ * 
+ * @author Regunath B
+ * @version 1.0, 28/11/2012
+ * 
+ */
+public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
+	
+	/** The name of the web app context */
+	private String contextName;
+	
+	/** The web app context path i.e. where WEB-INF is located*/
+	private String contextPath;
+
+	/**
+	 * Interface method implementation. Returns the Jetty WebAppContext type
+	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+	 */
+	public Class<WebAppContext> getObjectType() {
+		return WebAppContext.class;
+	}
+
+	/**
+	 * Interface method implementation. Returns true
+	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
+	 */
+	public boolean isSingleton() {
+		return true;
+	}
+
+	/**
+	 * Interface method implementation. Creates and returns a WebAppContext instance
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
+	public WebAppContext getObject() throws Exception {
+		String path = null;
+		File[] files = FileLocator.findDirectories(this.getContextPath(), null);
+		for (File file : files) {
+			// we need only WEB-INF from batch-core project and none else even by mistake
+			String fileToString = file.toString();
+			if (fileToString.contains("batch-core")) {
+				path = fileToString;
+				break;
+			}
+		}
+		if (path.contains(".jar!") && path.startsWith("file:/")) {
+			path = path.replace("file:/","jar:file:/");
+		}
+		// trim off the "WEB-INF" part as the WebAppContext path should refer to the parent directory
+		if (path.endsWith("WEB-INF")) {
+			path = path.replace("WEB-INF", "");
+		}
+		return new WebAppContext(path, this.getContextName());
+	}
+
+	/** Getter/Setter methods */
+	public String getContextName() {
+		return this.contextName;
+	}
+
+	public void setContextName(String contextName) {
+		this.contextName = contextName;
+	}
+
+	public String getContextPath() {
+		return this.contextPath;
+	}
+
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}	
+	/** End Getter/Setter methods */	
+
+}

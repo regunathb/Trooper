@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+
+	<!-- The Jetty server beans  -->
+    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start" destroy-method="stop">
+        <property name="connectors">
+            <list>
+                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector">
+                    <property name="port" value="8182"/>
+                </bean>
+            </list>
+        </property>
+       <property name="handler">
+            <bean id="handlers"
+                  class="org.mortbay.jetty.handler.HandlerCollection">
+                <property name="handlers">
+                    <list>
+                        <bean id="contexts"
+                              class="org.mortbay.jetty.handler.ContextHandlerCollection">
+                            <property name="handlers">
+                                <list>
+                                    <bean class="org.trpr.platform.batch.impl.jetty.JettyWebAppContextFactory">
+										<property name="contextName" value="/"/>
+										<property name="contextPath" value="WEB-INF"/>	                                    	
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+     
+</beans>

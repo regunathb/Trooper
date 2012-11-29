@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:integration="http://www.springframework.org/schema/integration" xmlns:http="http://www.springframework.org/schema/integration/http"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                                 http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-2.0.xsd
+                                 http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+
+	<integration:channel id="job-configuration-multipart" />
+
+	<integration:transformer id="multipartToJobConfigurationRequest" input-channel="job-configuration-multipart"
+		output-channel="job-configuration-requests">
+		<bean class="org.springframework.batch.admin.integration.MultipartToJobConfigurationRequestTransformer" />
+	</integration:transformer>
+
+	<http:inbound-channel-adapter name="/job-configuration" channel="job-configuration-multipart"
+		request-payload-type="org.springframework.batch.admin.integration.MultipartJobConfigurationRequest" view-name="redirect:jobs"
+		supported-methods="POST" message-converters="multipartJobConfigurationRequestHttpMessageConverter" />
+
+	<http:inbound-gateway name="/job-configuration.json" request-channel="job-configurations"
+		reply-key="jobs" reply-channel="job-registrations" request-payload-type="org.springframework.core.io.Resource"
+		view-name="jobs" supported-methods="POST" message-converters="resourceHttpMessageConverter" />
+
+	<bean name="redirect:jobs" class="org.springframework.web.servlet.view.RedirectView">
+		<property name="url" value="#{resourceService.servletPath}/jobs" />
+		<property name="contextRelative" value="true" />
+	</bean>
+
+	<bean id="resourceHttpMessageConverter" class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+
+	<bean id="multipartJobConfigurationRequestHttpMessageConverter" class="org.springframework.batch.admin.web.BindingHttpMessageConverter">
+		<property name="targetType" value="org.springframework.batch.admin.integration.MultipartJobConfigurationRequest" />
+	</bean>
+
+</beans>

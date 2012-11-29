@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<import resource="classpath*:WEB-INF/servlet/manager/controller-context.xml" />
+ 	<import resource="classpath*:WEB-INF/servlet/manager/integration-context.xml" />
+ 	<import resource="classpath*:WEB-INF/servlet/manager/manager-context.xml" />
+ 	<import resource="classpath*:WEB-INF/servlet/resources/resources-context.xml" />
+ 	
+</beans>

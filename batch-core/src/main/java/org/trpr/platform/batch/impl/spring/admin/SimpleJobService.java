@@ -251,7 +251,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		for (String jobName : this.jobRegistry.getJobNames()) {
 			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
-					if (jobExecution.getId() == jobExecutionId) {
+					if (jobExecution.getId().longValue() == jobExecutionId.longValue()) {
 						return jobExecution;
 					}
 				}
@@ -268,7 +268,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
 				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
-					if (jobInstance.getId() == jobInstanceId) {
+					if (jobInstance.getId().longValue() == jobInstanceId.longValue()) {
 						return this.jobExplorer.getJobExecutions(jobInstance);
 					}
 				}
@@ -284,7 +284,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	public JobInstance getJobInstance(long jobInstanceId) throws NoSuchJobInstanceException {
 		for (String jobName : this.jobRegistry.getJobNames()) {
 			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
-				if (jobInstance.getId() == jobInstanceId) {
+				if (jobInstance.getId().longValue() == jobInstanceId) {
 					return jobInstance;
 				}
 			}
@@ -316,9 +316,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 		for (String jobName : this.jobRegistry.getJobNames()) {
 			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
-					if (jobExecution.getId() == jobExecutionId) {
+					if (jobExecution.getId().longValue() == jobExecutionId.longValue()) {
 						for (StepExecution step : jobExecution.getStepExecutions()) {	
-							if (step.getId() == stepExecutionId) {
+							if (step.getId().longValue() == stepExecutionId.longValue()) {
 								return step;
 							}
 						}
@@ -337,7 +337,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		for (String jobName : this.jobRegistry.getJobNames()) {
 			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) { 
 				for (JobExecution jobExecution : this.jobExplorer.getJobExecutions(jobInstance)) {
-					if (jobExecution.getId() == jobExecutionId) {
+					if (jobExecution.getId().longValue() == jobExecutionId.longValue()) {
 						return jobExecution.getStepExecutions();
 					}
 				}
@@ -421,10 +421,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 		if (start >= executionList.size()) {
 			return new LinkedList<JobExecution>(); // return empty list instead of a sub-list
 		}
-		if (start + count >= executionList.size()) {
-			count = executionList.size() - start;
+		int end = start + count;
+		if (end >= executionList.size()) {
+			end = executionList.size();
 		}			
-		return executionList.subList(start, count);
+		return executionList.subList(start, end);
 	}
 
 	/**
@@ -439,10 +440,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 					if (start >= executionList.size()) {
 						return new LinkedList<JobExecution>(); // return empty list instead of a sub-list
 					}
-					if (start + count >= executionList.size()) {
-						count = executionList.size() - start;
+					int end = start + count;
+					if (end >= executionList.size()) {
+						end = executionList.size();
 					}								
-					return executionList.subList(start, count);
+					return executionList.subList(start, end);
 				}
 			}
 		}				
@@ -460,10 +462,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 				if (start >= instanceList.size()) {
 					return new LinkedList<JobInstance>(); // return empty list instead of a sub-list
 				}
-				if (start + count >= instanceList.size()) {
-					count = instanceList.size() - start;
+				int end = start + count;
+				if (end >= instanceList.size()) {
+					end = instanceList.size();
 				}								
-				return instanceList.subList(start, count);
+				return instanceList.subList(start, end);
 			}
 		}				
 		return null;
@@ -479,10 +482,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 		if (start >= jobNames.size()) {
 			return new LinkedList<String>(); // return empty list instead of a sub-list
 		}
-		if (start + count >= jobNames.size()) {
-			count = jobNames.size() - start;
+		int end = start + count;
+		if (end >= jobNames.size()) {
+			end = jobNames.size();
 		}		
-		return jobNames.subList(start, count);
+		return jobNames.subList(start, end);
 	}
 
 	/**
@@ -511,10 +515,11 @@ public class SimpleJobService implements JobService, DisposableBean {
 		if (start >= steps.size()) {
 			return new LinkedList<StepExecution>(); // return empty list instead of a sub-list
 		}
-		if (start + count >= steps.size()) {
-			count = steps.size() - start;
+		int end = start + count;
+		if (end >= steps.size()) {
+			end = steps.size();
 		}		
-		return steps.subList(start, count);
+		return steps.subList(start, end);
 	}
 
 	/**
