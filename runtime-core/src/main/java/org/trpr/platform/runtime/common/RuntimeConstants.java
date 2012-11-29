@@ -42,6 +42,7 @@ public abstract class RuntimeConstants {
 	 * Constant values for runtime nature
 	 */
 	public static final String STANDALONE = "STANDALONE";
+	public static final String SERVER = "SERVER";
 	public static final String TEST = "TEST";
 	
 	/** The Application name identifier JVM system property*/

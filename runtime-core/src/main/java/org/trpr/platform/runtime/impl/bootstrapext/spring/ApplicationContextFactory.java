@@ -108,7 +108,6 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	/**
 	 * Returns the common Spring beans application context that is intended as parent of all application contexts created by the runtime
 	 * @return the AbstractApplicationContext for the XML identified by {@link RuntimeConstants#COMMON_SPRING_BEANS_CONFIG}
-	 * TODO : Need a better way than to expose this than as a static method.
 	 */
 	public static AbstractApplicationContext getCommonBeansContext() {
 		// commonBeansContext is the base context for all application contexts, so load it if not loaded already.
