@@ -135,7 +135,6 @@
 					<includes>
 						<include>packaged/**/*</include>
 						<include>WEB-INF/**/*</include>
-						<include>META-INF/**/*</include>
 						<include>org/**/*</include>
 					</includes>
 				</configuration>
