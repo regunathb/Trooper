@@ -9,8 +9,9 @@
 
 	<context:annotation-config />
 
-	<mvc:resources location="/,classpath:/META-INF/" mapping="resources/**" />
-
+	<mvc:resources location="/WEB-INF/web/resources/" mapping="resources/**" />
+	<mvc:resources mapping="/favicon.ico" location="/WEB-INF/web/resources/images/favicon.ico" />
+	
 	<mvc:annotation-driven />
 
 	<mvc:interceptors>
@@ -78,7 +79,7 @@
 		<property name="attributes">
 			<props merge="true">
 				<prop key="titleCode">home.title</prop>
-				<prop key="titleText">Spring Batch Admin</prop>
+				<prop key="titleText">Trooper Batch Admin</prop>
 			</props>
 		</property>
 	</bean>

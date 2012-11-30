@@ -6,17 +6,19 @@
                                  http://www.springframework.org/schema/context
                                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
                                  
+	<!-- 
 	<bean class="org.springframework.batch.admin.web.HomeMenu" parent="baseMenu"/>
+	<bean class="org.springframework.batch.admin.web.FilesMenu" parent="baseMenu"/>
+	-->
 	<bean class="org.springframework.batch.admin.web.JobsMenu" parent="baseMenu"/>
 	<bean class="org.springframework.batch.admin.web.ExecutionsMenu" parent="baseMenu"/>
-	<bean class="org.springframework.batch.admin.web.FilesMenu" parent="baseMenu"/>
 	
 	<bean name="jobs" parent="standard">
 		<property name="attributes">
 			<props merge="true">
 				<prop key="body">/manager/jobs/html/jobs.ftl</prop>
 				<prop key="titleCode">jobs.title</prop>
-				<prop key="titleText">Spring Batch Admin: Jobs</prop>
+				<prop key="titleText">Trooper Batch Admin: Jobs</prop>
 			</props>
 		</property>
 	</bean>
@@ -34,7 +36,7 @@
 			<props merge="true">
 				<prop key="body">/manager/jobs/html/job.ftl</prop>
 				<prop key="titleCode">job.title</prop>
-				<prop key="titleText">Spring Batch Admin: Job Summary</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Summary</prop>
 			</props>
 		</property>
 	</bean>
@@ -53,7 +55,7 @@
 				<prop key="body">/manager/jobs/html/executions.ftl</prop>
 				<prop key="feedPath">/jobs/executions.rss</prop>
 				<prop key="titleCode">job.executions.title</prop>
-				<prop key="titleText">Spring Batch Admin: Job Executions</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Executions</prop>
 			</props>
 		</property>
 	</bean>
@@ -79,7 +81,7 @@
 			<props merge="true">
 				<prop key="body">/manager/jobs/html/execution.ftl</prop>
 				<prop key="titleCode">job.execution.title</prop>
-				<prop key="titleText">Spring Batch Admin: Job Execution</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Execution</prop>
 			</props>
 		</property>
 	</bean>
@@ -89,7 +91,7 @@
 			<props merge="true">
 				<prop key="body">/manager/jobs/json/execution.ftl</prop>
 				<prop key="titleCode">job.execution.title</prop>
-				<prop key="titleText">Spring Batch Admin: Job Execution</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Execution</prop>
 			</props>
 		</property>
 	</bean>
@@ -99,7 +101,7 @@
 			<props merge="true">
 				<prop key="body">/manager/steps/html/executions.ftl</prop>
 				<prop key="titleCode">step.executions.title</prop>
-				<prop key="titleText">Spring Batch Admin: Step Executions</prop>
+				<prop key="titleText">Trooper Batch Admin: Step Executions</prop>
 			</props>
 		</property>
 	</bean>
@@ -109,7 +111,7 @@
 			<props merge="true">
 				<prop key="body">/manager/steps/html/execution.ftl</prop>
 				<prop key="titleCode">step.execution.title</prop>
-				<prop key="titleText">Spring Batch Admin: Step Execution Summary</prop>
+				<prop key="titleText">Trooper Batch Admin: Step Execution Summary</prop>
 			</props>
 		</property>
 	</bean>
@@ -119,7 +121,7 @@
 			<props merge="true">
 				<prop key="body">/manager/steps/json/execution.ftl</prop>
 				<prop key="titleCode">step.execution.title</prop>
-				<prop key="titleText">Spring Batch Admin: Step Execution</prop>
+				<prop key="titleText">Trooper Batch Admin: Step Execution</prop>
 			</props>
 		</property>
 	</bean>
@@ -129,7 +131,7 @@
 			<props merge="true">
 				<prop key="body">/manager/steps/html/history.ftl</prop>
 				<prop key="titleCode">step.history.title</prop>
-				<prop key="titleText">Spring Batch Admin: Step Execution History</prop>
+				<prop key="titleText">Trooper Batch Admin: Step Execution History</prop>
 			</props>
 		</property>
 	</bean>
@@ -141,7 +143,7 @@
 				<prop key="history">/manager/steps/html/history.ftl</prop>
 				<prop key="execution">/manager/steps/html/execution.ftl</prop>
 				<prop key="titleCode">step.progress.title</prop>
-				<prop key="titleText">Spring Batch Admin: Step Execution Progress</prop>
+				<prop key="titleText">Trooper Batch Admin: Step Execution Progress</prop>
 			</props>
 		</property>
 	</bean>
@@ -157,7 +159,7 @@
 				<prop key="body">/manager/files/html/files.ftl</prop>
 				<prop key="side">/manager/files/html/side.ftl</prop>
 				<prop key="titleCode">files.title</prop>
-				<prop key="titleText">Spring Batch Admin: Input File Uploads</prop>
+				<prop key="titleText">Trooper Batch Admin: Input File Uploads</prop>
 			</props>
 		</property>
 	</bean>
@@ -176,7 +178,7 @@
 				<prop key="body">/manager/files/html/configuration.ftl</prop>
 				<prop key="side">/manager/files/html/side.ftl</prop>
 				<prop key="titleCode">configuration.title</prop>
-				<prop key="titleText">Spring Batch Admin: Job Configuration Upload</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Configuration Upload</prop>
 			</props>
 		</property>
 	</bean>
