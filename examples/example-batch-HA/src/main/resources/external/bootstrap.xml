@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 <beans>
-	<!--
-		Sample bootstrap configuration with no Component container
-	-->
 	<bean id="bootstrapInfo" class="org.trpr.platform.runtime.spi.bootstrap.BootstrapInfo">
 		<property name="projectsRoot" value="$RUNTIME_CONFIG_PATH/../../../../" />
 		<property name="applicationName" value="Test Runtime" />
