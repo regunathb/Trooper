@@ -27,8 +27,6 @@ import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
-import org.trpr.platform.runtime.common.RuntimeConstants;
-import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
