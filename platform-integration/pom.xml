@@ -57,7 +57,17 @@
 			<classifier>jdk15</classifier>
 			<version>2.4</version>
 		</dependency>
-								
+ 		<dependency>
+      		<groupId>javax.mail</groupId>
+      		<artifactId>javax.mail-api</artifactId>
+      		<version>1.4.4</version>
+    	</dependency>
+ 		<dependency>
+      		<groupId>javax.mail</groupId>
+      		<artifactId>mail</artifactId>
+      		<version>1.4.4</version>
+    	</dependency>
+    									
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
