@@ -57,8 +57,11 @@
 		<batch:step id="shellStep1" next="shellStep2">
 	       <batch:tasklet ref="fileListingScriptBean1"/>
     	</batch:step>
-		<batch:step id="shellStep2">
+		<batch:step id="shellStep2"  next="emailStep3">
 	       <batch:tasklet ref="fileListingScriptBean2"/>
+    	</batch:step>
+		<batch:step id="emailStep3">
+	       <batch:tasklet ref="emailTasklet"/>
     	</batch:step>
 	</batch:job>
 
@@ -71,9 +74,27 @@
 
 	<bean id="fileListingScriptBean2" class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
 		<property name="workingDirectory" value="/etc" />
-		<property name="command" value="lsl -al" /> <!-- Intentional invalid command to induce step failure -->
+		<property name="command" value="ls -al" /> <!-- Intentional invalid command to induce step failure -->
 		<property name="timeout" value="10000" />
 		<property name="terminationCheckInterval" value="2000" />
 	</bean>
+	
+	<bean id="emailTasklet" class="org.trpr.example.batch.email.EmailTasklet">
+		<property name="mailSender" ref="mailSender" />
+	</bean>
+
+	<bean id="mailSender" class="org.trpr.platform.integration.impl.email.SpringMailSender">
+		<property name="mailSender" ref="javaMailSender" />
+	</bean>	
+	
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    	<property name="host" value="localhost"/>
+    	<property name="port" value="25"/>
+    	<property name="javaMailProperties">
+        	<props>
+        		<prop key="mail.debug">true</prop>
+        	</props>
+    	</property>
+	</bean>	
 
 </beans>
