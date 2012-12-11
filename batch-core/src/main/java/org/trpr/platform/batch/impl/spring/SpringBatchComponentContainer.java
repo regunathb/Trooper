@@ -27,6 +27,8 @@ import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
+import org.trpr.platform.runtime.common.RuntimeConstants;
+import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
@@ -102,8 +104,10 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
 
 		// Load additional if runtime nature is "server". This context is the new common beans context
-		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG},
-				SpringBatchComponentContainer.commonBatchBeansContext);
+		if (RuntimeVariables.getRuntimeNature().equalsIgnoreCase(RuntimeConstants.SERVER)) {
+			SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG},
+					SpringBatchComponentContainer.commonBatchBeansContext);
+		}
 		
 		// locate and load the individual job bean XML files using the common batch beans context as parent
 		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
