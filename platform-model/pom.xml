@@ -17,12 +17,13 @@
     	</license>
   	</licenses>
  
-  	<repositories>
+	<distributionManagement>
     	<repository>
       		<id>clojars</id>
-      		<url>http://clojars.org/repo/</url>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
     	</repository>
-  	</repositories> 	
+  	</distributionManagement> 
   	
   	<scm>
     	<url>https://github.com/regunathb/Troope</url>
@@ -34,6 +35,16 @@
       		<id>regunathb</id>
       		<name>Regunath B</name>
       		<email>regunathb@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>shashiks</id>
+      		<name>Shashikant S</name>
+      		<email>soni.shashikant@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>srikanthps</id>
+      		<name>Srikanth PS</name>
+      		<email>srikanthps@yahoo.com</email>
     	</developer>
   	</developers>
    		

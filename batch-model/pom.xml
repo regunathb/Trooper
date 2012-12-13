@@ -1,27 +1,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-model</artifactId>
 	<name>Batch Model</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<description>Trooper Batch Model</description>
+
+	<licenses>
+    	<license>
+      		<name>The Apache Software License, Version 2.0</name>
+      		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      		<distribution>repo</distribution>
+    	</license>
+  	</licenses>
+ 
+	<distributionManagement>
+    	<repository>
+      		<id>clojars</id>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
+    	</repository>
+  	</distributionManagement> 
+  	
+  	<scm>
+    	<url>https://github.com/regunathb/Troope</url>
+    	<connection>https://github.com/regunathb/Trooper.git</connection>
+  	</scm>
+  
+    <developers>
+   		<developer>
+      		<id>regunathb</id>
+      		<name>Regunath B</name>
+      		<email>regunathb@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>shashiks</id>
+      		<name>Shashikant S</name>
+      		<email>soni.shashikant@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>srikanthps</id>
+      		<name>Srikanth PS</name>
+      		<email>srikanthps@yahoo.com</email>
+    	</developer>
+  	</developers>
 
 	<dependencies>
         <!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
 	</dependencies>	
 	
-	<build>
-	
+	<build>	
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -36,10 +74,8 @@
 				<includes>
 					<include>**/*.xsd</include>
 				</includes>
-			</resource>						
-			
-		</resources>
-		
+			</resource>									
+		</resources>		
 		<plugins>
 			<!-- Extract the XSDs from dependency jars i.e. models -->
 			<plugin>

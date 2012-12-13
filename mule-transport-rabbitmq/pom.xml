@@ -1,13 +1,53 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 
+	<modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.transports</groupId>
     <artifactId>mule-transport-rabbitmq</artifactId>
     <packaging>jar</packaging>
     <version>2.2.1</version>
     <name>RabbitMQ Mule Transport</name>
     <description>A RabbitMQ transport for Mule</description>
+
+	<licenses>
+    	<license>
+      		<name>The Apache Software License, Version 2.0</name>
+      		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      		<distribution>repo</distribution>
+    	</license>
+  	</licenses>
+ 
+	<distributionManagement>
+    	<repository>
+      		<id>clojars</id>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
+    	</repository>
+  	</distributionManagement> 
+  	
+  	<scm>
+    	<url>https://github.com/regunathb/Troope</url>
+    	<connection>https://github.com/regunathb/Trooper.git</connection>
+  	</scm>
+  
+    <developers>
+   		<developer>
+      		<id>regunathb</id>
+      		<name>Regunath B</name>
+      		<email>regunathb@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>shashiks</id>
+      		<name>Shashikant S</name>
+      		<email>soni.shashikant@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>srikanthps</id>
+      		<name>Srikanth PS</name>
+      		<email>srikanthps@yahoo.com</email>
+    	</developer>
+  	</developers>
     
     <properties>
  		<org.mule.version>2.2.1</org.mule.version>		
@@ -128,9 +168,7 @@
     </dependencies>
 
 	<build>
-
-		<sourceDirectory>src/main/java</sourceDirectory>
-		
+		<sourceDirectory>src/main/java</sourceDirectory>		
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -139,8 +177,7 @@
 					<include>**/*.*</include>
 				</includes>
 			</resource>
-		</resources>
-		
+		</resources>		
 		<plugins>		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -152,7 +189,6 @@
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
-
 					<includes>
 						<include>org/**/*</include>
 						<include>META-INF/**/*</include>
@@ -167,8 +203,6 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>			
-		</plugins>
-		
+		</plugins>		
 	</build>
-
 </project>

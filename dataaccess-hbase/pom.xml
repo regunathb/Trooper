@@ -1,20 +1,58 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>org.trpr</groupId>
 	<artifactId>dataaccess-hbase</artifactId>
 	<name>Data Access HBase</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<description>Trooper Data Access HBase project</description>
+
+	<licenses>
+    	<license>
+      		<name>The Apache Software License, Version 2.0</name>
+      		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      		<distribution>repo</distribution>
+    	</license>
+  	</licenses>
+ 
+	<distributionManagement>
+    	<repository>
+      		<id>clojars</id>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
+    	</repository>
+  	</distributionManagement> 
+  	
+  	<scm>
+    	<url>https://github.com/regunathb/Troope</url>
+    	<connection>https://github.com/regunathb/Trooper.git</connection>
+  	</scm>
+  
+    <developers>
+   		<developer>
+      		<id>regunathb</id>
+      		<name>Regunath B</name>
+      		<email>regunathb@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>shashiks</id>
+      		<name>Shashikant S</name>
+      		<email>soni.shashikant@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>srikanthps</id>
+      		<name>Srikanth PS</name>
+      		<email>srikanthps@yahoo.com</email>
+    	</developer>
+  	</developers>
 
 	<properties>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-		<org.springframework.data.hadoop.version>1.0.0.RC1</org.springframework.data.hadoop.version>
 	</properties>
 
 	<dependencies>
-
 		<!-- Third party dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -51,24 +89,22 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-integration</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-
 		<sourceDirectory>src/main/java</sourceDirectory>
-
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -78,7 +114,6 @@
 				</includes>
 			</resource>
 		</resources>
-
 		<plugins>
 			<!-- generate code for mapping configs -->
 			<plugin>
@@ -116,7 +151,6 @@
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
-
 					<includes>
 						<include>packaged/**/*</include>
 						<include>org/**/*</include>
@@ -132,7 +166,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
 	</build>
-
 </project>
