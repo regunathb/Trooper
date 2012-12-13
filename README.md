@@ -1,5 +1,4 @@
 # Trooper
-=======
 
 Trooper is a Java module like framework that provides various runtime profiles for building applications. Batch, Service and Orchestration runtime profiles are currently supported.
 It is an umbrella project for a number of things:
@@ -9,6 +8,12 @@ It is an umbrella project for a number of things:
 * Implement a number of patterns suited for scalability and deployment on commodity hardware. E.g. sharding, statelessness, data locality, fail-fast, checkpointing and recovery.
 * Sub-projects that may be used totally independent of Trooper. E.g. the "mule-transport-rabbitmq" is a Maven project providing a RabbitMQ transport for Mule.
 * Provide data models suited for service interactions, event driven design and metrics collection
+
+## Releases
+
+| Release | Date | Description |
+|:------------|:----------------|:------------|
+| Version 1.0.0    | December 2012   |     First stable release      
 
 ## Documentation and Examples
 
