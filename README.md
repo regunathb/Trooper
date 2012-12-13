@@ -1,7 +1,7 @@
 Trooper
 =======
 
-Trooper is a Java Framework for building applications using cell based architecture patterns.
+Trooper is a Java module like framework that provides various runtime profiles for building applications. Batch, Service and Orchestration runtime profiles are currently supported.
 It is an umbrella project for a number of things:
 
 * Build Service Oriented applications that can be distributed and scaled.
@@ -10,5 +10,24 @@ It is an umbrella project for a number of things:
 * Sub-projects that may be used totally independent of Trooper. E.g. the "mule-transport-rabbitmq" is a Maven project providing a RabbitMQ transport for Mule.
 * Provide data models suited for service interactions, event driven design and metrics collection
 
+## Documentation and Examples
+
 The Trooper "examples" project group demonstrates usage of various application profiles supported by Trooper.
 Documentation is continuously being added to the Wiki page of Trooper (https://github.com/regunathb/Trooper/wiki)
+
+## Getting help
+
+Write directly to the project committers (listed below) until the time dev and user mailing lists are setup.
+
+## License
+
+Trooper is licensed under : The Apache Software License, Version 2.0. Here is a copy of the license (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+## Project lead
+
+* Regunath B ([@regunathb](http://twitter.com/RegunathB))
+
+## Core contributors
+
+* Shashikant Soni ([@shashiks](https://github.com/shashiks))
+* Srikanth PS ([@srikanthps](http://twitter.com/srikanthps))
