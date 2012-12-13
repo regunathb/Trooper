@@ -1,4 +1,4 @@
-Trooper
+# Trooper
 =======
 
 Trooper is a Java module like framework that provides various runtime profiles for building applications. Batch, Service and Orchestration runtime profiles are currently supported.
