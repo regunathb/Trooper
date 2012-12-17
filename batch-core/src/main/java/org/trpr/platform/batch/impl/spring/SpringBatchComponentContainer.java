@@ -99,7 +99,17 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		
 		// The common batch beans context is loaded first using the Platform common beans context as parent
 		// load this from classpath as it is packaged with the binaries
-		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, ApplicationContextFactory.getCommonBeansContext());
+		ApplicationContextFactory defaultCtxFactory = null;
+		for (BootstrapExtension be : this.loadedBootstrapExtensions) {
+			if (ApplicationContextFactory.class.isAssignableFrom(be.getClass())) {
+				defaultCtxFactory = (ApplicationContextFactory)be;
+				break;
+			}
+		}
+
+		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, 
+				defaultCtxFactory.getCommonBeansContext());
+		
 		// add the common batch beans to the contexts list
 		this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
 
@@ -107,6 +117,8 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		if (RuntimeVariables.getRuntimeNature().equalsIgnoreCase(RuntimeConstants.SERVER)) {
 			SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG},
 					SpringBatchComponentContainer.commonBatchBeansContext);
+			// now add the common server nature batch beans to the contexts list
+			this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
 		}
 		
 		// locate and load the individual job bean XML files using the common batch beans context as parent
