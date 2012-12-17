@@ -43,7 +43,6 @@ import org.trpr.platform.servicefw.ServiceContext;
 import org.trpr.platform.servicefw.ServiceRegistry;
 import org.trpr.platform.servicefw.common.ServiceException;
 import org.trpr.platform.servicefw.common.ServiceFrameworkConstants;
-import org.trpr.platform.servicefw.impl.AbstractServiceImpl;
 import org.trpr.platform.servicefw.impl.BrokerFactory;
 import org.trpr.platform.servicefw.impl.ServiceCompartmentImpl;
 import org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer;
@@ -117,8 +116,16 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	public void init() throws PlatformException {
 		// The common service beans context is loaded first using the Platform common beans context as parent
 		// load this from classpath as it is packaged with the binaries
+		ApplicationContextFactory defaultCtxFactory = null;
+		for (BootstrapExtension be : this.loadedBootstrapExtensions) {
+			if (ApplicationContextFactory.class.isAssignableFrom(be.getClass())) {
+				defaultCtxFactory = (ApplicationContextFactory)be;
+				break;
+			}
+		}
+		
 		this.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG},
-				ApplicationContextFactory.getCommonBeansContext());	
+				defaultCtxFactory.getCommonBeansContext());	
 		
 		// load the service beans and set the commons bean context as the parent
 		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);	
