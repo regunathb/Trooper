@@ -10,10 +10,10 @@
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
 	<!-- The Jetty server beans  -->
-    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start" destroy-method="stop">
+    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
         <property name="connectors">
             <list>
-                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector">
+                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
                     <property name="port" value="8182"/>
                 </bean>
             </list>
