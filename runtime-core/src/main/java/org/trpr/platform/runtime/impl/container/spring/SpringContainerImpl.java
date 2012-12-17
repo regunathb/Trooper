@@ -29,6 +29,7 @@ import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.BootstrapExtensionInfo;
+import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
@@ -81,8 +82,9 @@ public class SpringContainerImpl implements Container {
 	 * @see Container#init()
 	 */
 	public void init() throws PlatformException {
+		
 		// Initialize the bootstrap extensions. This is done before the component container is loaded as components may depend on bootstrap
-		// extensions like ApplicationContextFactory
+		// extensions like ApplicationContextFactory		
 		initializeBootstrapExtensions();
 
 		// instantiate the ComponentContainer if it has been configured in bootstrap config
@@ -132,6 +134,10 @@ public class SpringContainerImpl implements Container {
 		File[] bootstrapExtensionFiles = FileLocator.findFiles(RuntimeConstants.BOOTSTRAP_EXTENSIONS_FILE);
 		// Create the Bootstrap Extension dependency manager that will load all bootstrap extensions
 		BootstrapExtensionDependencyManager beManager = new BootstrapExtensionDependencyManager(this);
+		
+		// add the ApplicationContextFactory as a default BE
+		beManager.addBootstrapExtensionInfo(new BootstrapExtensionInfo(ApplicationContextFactory.COMMON_BEANS_CONTEXT_NAME, ApplicationContextFactory.class.getName(), true));
+		
 		for (File beFile : bootstrapExtensionFiles) {
 			try {
 				// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 

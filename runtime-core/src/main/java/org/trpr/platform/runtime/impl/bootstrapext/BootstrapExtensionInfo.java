@@ -45,9 +45,21 @@ public class BootstrapExtensionInfo implements Comparable<BootstrapExtensionInfo
 	private Map<String, String> beProperties = new HashMap<String, String>();
 	
 	/**
-	 * Constructor for this class
+	 * No args Constructor for this class
 	 */
 	public BootstrapExtensionInfo() {			
+	}
+	
+	/**
+	 * Constructor for this class
+	 * @param beName the name of the BootstrapExtension
+	 * @param beClassName the BootstrapExtension class name
+	 * @param enabled boolean flag denoting if BootstrapExtension is enabled
+	 */
+	public BootstrapExtensionInfo(String beName, String beClassName,  boolean enabled) {
+		this.beName = beName;
+		this.beClassName = beClassName;
+		this.enabled = enabled;
 	}
 	
 	/**

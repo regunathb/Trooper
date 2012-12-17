@@ -46,7 +46,7 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	 * The pre-defined name for the Commons bean application context. String should be unique and not the same as any name defined by users for
 	 * application contexts loaded via this BootstrapExtension
 	 */
-	private static final String COMMON_BEANS_CONTEXT_NAME = "~~~TrprPlatformCommonBeansContext~~~";
+	public static final String COMMON_BEANS_CONTEXT_NAME = "~~~TrprPlatformCommonBeansContext~~~";
 	
 	/** The Logger instance for this class  */
 	private static final Logger LOGGER = LogFactory.getLogger(ApplicationContextFactory.class);
@@ -109,14 +109,16 @@ public class ApplicationContextFactory extends AbstractBootstrapExtension {
 	 * Returns the common Spring beans application context that is intended as parent of all application contexts created by the runtime
 	 * @return the AbstractApplicationContext for the XML identified by {@link RuntimeConstants#COMMON_SPRING_BEANS_CONFIG}
 	 */
-	public static AbstractApplicationContext getCommonBeansContext() {
+	public AbstractApplicationContext getCommonBeansContext() {
 		// commonBeansContext is the base context for all application contexts, so load it if not loaded already.
-		AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)ApplicationContextFactory.appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
-		if (commonBeansContext == null) { 
-			commonBeansContext = new ClassPathXmlApplicationContext(RuntimeConstants.COMMON_SPRING_BEANS_CONFIG); // load this from classpath as it is packaged with the binaries
-			ApplicationContextFactory.appContextMap.put(COMMON_BEANS_CONTEXT_NAME.toLowerCase(), commonBeansContext);
+		synchronized(AbstractApplicationContext.class) { // synchronize on the class to prevent race condition, if any (very unlikely as bootstrapping is a single threaded operation)
+			AbstractApplicationContext commonBeansContext = (AbstractApplicationContext)ApplicationContextFactory.appContextMap.get((COMMON_BEANS_CONTEXT_NAME).toLowerCase());
+			if (commonBeansContext == null) { 
+				commonBeansContext = new ClassPathXmlApplicationContext(RuntimeConstants.COMMON_SPRING_BEANS_CONFIG); // load this from classpath as it is packaged with the binaries
+				ApplicationContextFactory.appContextMap.put(COMMON_BEANS_CONTEXT_NAME.toLowerCase(), commonBeansContext);
+			}
+			return commonBeansContext;
 		}
-		return commonBeansContext;
 	}
 	
 }
