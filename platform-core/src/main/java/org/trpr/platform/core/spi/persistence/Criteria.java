@@ -31,6 +31,9 @@ import org.apache.commons.lang.StringUtils;
  */
 
 public class Criteria {
+	
+	/** The optional Identifier that may be used in loading a PersistentEntity from the underlying data store*/
+	private Identifier identifier;
 
 	/** Type classifiers for the type of query strings*/
 	public static final int DEFAULT_QUERY=0;
@@ -190,5 +193,11 @@ public class Criteria {
 	public Map<String, Object> getParamsMap() {
 		return this.paramsMap;
 	}
+	public Identifier getIdentifier() {
+		return this.identifier;
+	}
+	public void setIdentifier(Identifier identifier) {
+		this.identifier = identifier;
+	}	
 	/** === End getter/setter methods == */
 }
