@@ -12,5 +12,81 @@
 		<property name="taskManager" ref="taskManager" />
 		<property name="serviceContext" ref="serviceContext" />
 	</bean>	
+
+	<!--  Commented (to minimize dependency when running samples) set of example beans for check-pointing using AOP and RDBMS persistence provider -->
+	
+	<!-- AOP proxying of the service beans. Used for checkpointing stage execution status in the RDBMS -->
+	<!-- 
+	<bean id="serviceCheckpointingInterceptor" class="org.trpr.platform.seda.aop.SedaStageCheckpointingInterceptor">
+		<property name="stageExecutionEvaluator" ref="greetingStageExecutionEvaluator" />
+		<property name="persistenceManager" ref="greetingPersistenceManager" />
+	</bean>
+	<bean id="greetingStageExecutionEvaluator" class="org.trpr.example.seda.greeting.checkpointing.GreetingStageExecutionEvaluator"/>
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<value>greetingService_1.0</value>	
+			</list>	
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>serviceCheckpointingInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	-->
+		
+	<!--  The Persistence framework beans for storing check-pointing data into RDBMS -->	
+	<!-- 
+	<bean id="greetingCheckpointDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/trooper" />
+		<property name="user" value="test" />
+		<property name="password" value="test" />
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="25" />
+		<property name="acquireIncrement" value="3" />
+		<property name="maxIdleTime" value="60" />
+		<property name="maxStatements" value="200" /> 
+		<property name="idleConnectionTestPeriod" value="300" />
+		<property name="testConnectionOnCheckin" value="true" />
+		<property name="preferredTestQuery" value="select 1 from dual" />
+	</bean>
+	<bean id="greetingHibernateSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="greetingCheckpointDataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>packaged/hibernate/greeting/earthling.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
+				hibernate.show_sql = false
+			</value>
+		</property>
+	</bean>	
+	<bean id="greetingHibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="greetingHibernateSessionFactory"></property>
+	</bean>	
+	<bean id="greetingHibernateHandler" class="org.trpr.dataaccess.orm.handler.HibernateHandler">
+		<property name="template" ref="greetingHibernateTemplate" />
+	</bean>
+	<bean id="greetingRdbmsProviderForHibernate" class="org.trpr.dataaccess.RDBMSProvider"
+		<property name="handler" ref="greetingHibernateHandler" />
+	</bean>
+	<bean id = "persistenceDelegate" class="org.trpr.platform.core.impl.persistence.PersistenceDelegate">
+	</bean>	
+	<bean id = "greetingPersistenceManager" class="org.trpr.platform.core.impl.persistence.PersistenceManagerProvider">
+		<property name="providersForEntity">
+			<map>
+				<entry key="org.trpr.example.seda.greeting.persistence.PersistentEarthling" value-ref="greetingRdbmsProviderForHibernate"/>
+			</map>
+		</property>
+		<property name="persistenceDelegate" ref="persistenceDelegate"/>
+	</bean>
+	-->
 	
 </beans>
