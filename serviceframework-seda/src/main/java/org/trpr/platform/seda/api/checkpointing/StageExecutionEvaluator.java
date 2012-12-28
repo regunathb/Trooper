@@ -31,19 +31,11 @@ public interface StageExecutionEvaluator<T,S> {
 	
 	/**
 	 * Evaluates the specified ServiceRequest and ServiceResponse and returns an array of {@link PersistentEntity} instances that contain check-pointing data. 
-	 * May return null if the specified service message objects cannot be evaluated by this StageExecutionEvaluator.
+	 * May return null if the specified service message objects cannot be evaluated by this StageExecutionEvaluator or if there is nothing to check-point.
 	 * @param ServiceRequest the ServiceRequest for stage execution
 	 * @param serviceResponse the ServiceResponse from stage execution
 	 * @return null or array of PersistentEntity instances containing check-pointing data for service execution
 	 */
 	public PersistentEntity[] evaluateStageExecutionResponse(ServiceRequest<T> serviceRequest, ServiceResponse<S> serviceResponse);
 
-	/**
-	 * Evaluates the specified ServiceRequest and ServiceResponse on whether the stage should be executed based on pre-conditions, which needs to be implemented by the implementation class.
-	 * returns a boolean value based on which the decision can be made.
-	 * @param ServiceRequest the ServiceRequest for stage execution
-	 * @param serviceResponse the ServiceResponse from stage execution
-	 * @return boolean boolean value indicating whether to proceed or not.
-	 */
-	public boolean canProceed(ServiceRequest<T> serviceRequest);
 }

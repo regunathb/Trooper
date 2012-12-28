@@ -57,24 +57,16 @@ public class SedaStageCheckpointingInterceptor<T,S,P extends PlatformServiceRequ
 	 */
 	@SuppressWarnings("unchecked")
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		boolean canProceed = true;
 		Object returnValue = null;
 		
+		returnValue = invocation.proceed();
+		// check-point only if the currently active ServiceContainer requires it
 		if (this.serviceContext.doesContainerSupportCheckpointing()) {
 			Object arguments[] = invocation.getArguments();
-			canProceed = this.stageExecutionEvaluator.canProceed((ServiceRequest<T>) arguments[0]);
-		}
-		
-		if (canProceed) {
-			returnValue = invocation.proceed();
-			// check-point only if the currently active ServiceContainer requires it
-			if (this.serviceContext.doesContainerSupportCheckpointing()) {
-				Object arguments[] = invocation.getArguments();
-				PersistentEntity[] entities = this.stageExecutionEvaluator.evaluateStageExecutionResponse(
-						(ServiceRequest<T>) arguments[0], (ServiceResponse<S>) returnValue);
-				if (null != entities) {
-					this.persistenceManager.makePersistent(entities);
-				}
+			PersistentEntity[] entities = this.stageExecutionEvaluator.evaluateStageExecutionResponse(
+					(ServiceRequest<T>) arguments[0], (ServiceResponse<S>) returnValue);
+			if (null != entities) {
+				this.persistenceManager.makePersistent(entities);
 			}
 		}
 		return returnValue;
