@@ -18,8 +18,9 @@
 	<!-- AOP proxying of the service beans. Used for checkpointing stage execution status in the RDBMS -->
 	<!-- 
 	<bean id="serviceCheckpointingInterceptor" class="org.trpr.platform.seda.aop.SedaStageCheckpointingInterceptor">
+		<property name="serviceContext" ref="serviceContext" />
 		<property name="stageExecutionEvaluator" ref="greetingStageExecutionEvaluator" />
-		<property name="persistenceManager" ref="greetingPersistenceManager" />
+		<property name="persistenceManager" ref="greetingPersistenceManager" /> 
 	</bean>
 	<bean id="greetingStageExecutionEvaluator" class="org.trpr.example.seda.greeting.checkpointing.GreetingStageExecutionEvaluator"/>
 	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
@@ -34,13 +35,10 @@
 			</list>
 		</property>
 	</bean>
-	-->
-		
+	-->	
 	<!--  The Persistence framework beans for storing check-pointing data into RDBMS -->	
 	<!-- 
-	<bean id="greetingCheckpointDataSource"
-		class="com.mchange.v2.c3p0.ComboPooledDataSource"
-		destroy-method="close">
+	<bean id="greetingCheckpointDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
 		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/trooper" />
 		<property name="user" value="test" />
@@ -74,11 +72,10 @@
 	<bean id="greetingHibernateHandler" class="org.trpr.dataaccess.orm.handler.HibernateHandler">
 		<property name="template" ref="greetingHibernateTemplate" />
 	</bean>
-	<bean id="greetingRdbmsProviderForHibernate" class="org.trpr.dataaccess.RDBMSProvider"
+	<bean id="greetingRdbmsProviderForHibernate" class="org.trpr.dataaccess.RDBMSProvider">
 		<property name="handler" ref="greetingHibernateHandler" />
 	</bean>
-	<bean id = "persistenceDelegate" class="org.trpr.platform.core.impl.persistence.PersistenceDelegate">
-	</bean>	
+	<bean id = "persistenceDelegate" class="org.trpr.platform.core.impl.persistence.PersistenceDelegate"/>
 	<bean id = "greetingPersistenceManager" class="org.trpr.platform.core.impl.persistence.PersistenceManagerProvider">
 		<property name="providersForEntity">
 			<map>
@@ -88,5 +85,4 @@
 		<property name="persistenceDelegate" ref="persistenceDelegate"/>
 	</bean>
 	-->
-	
 </beans>
