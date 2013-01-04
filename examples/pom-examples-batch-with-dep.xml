@@ -21,6 +21,7 @@
 	    <module>./example-batch</module>
         <module>./example-models</module>
 		<module>./example-hbase</module>
+        <module>../dataaccess-hbase</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
