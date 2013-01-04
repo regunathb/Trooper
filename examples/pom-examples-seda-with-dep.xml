@@ -21,7 +21,7 @@
 		<module>../serviceframework-seda</module>
 		<module>example-models</module>
 		<module>example-services</module>
-        <module>example-seda</module>
+                <module>example-seda</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
