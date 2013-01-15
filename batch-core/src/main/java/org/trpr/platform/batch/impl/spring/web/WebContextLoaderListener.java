@@ -20,8 +20,6 @@ import javax.servlet.ServletContext;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
 
 /**
@@ -37,12 +35,7 @@ public class WebContextLoaderListener extends ContextLoaderListener {
 	 * Overriden template method. Uses the {@link SpringBatchComponentContainer#getCommonBatchBeansContext()} as the parent application context
 	 * @see org.springframework.web.context.ContextLoader#loadParentContext(javax.servlet.ServletContext)
 	 */
-	
 	protected ApplicationContext loadParentContext(ServletContext servletContext) {
-		
 		return SpringBatchComponentContainer.getCommonBatchBeansContext();
 	}
-	
-	
-	
 }

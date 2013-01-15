@@ -39,6 +39,8 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	 */
 	public JobInfo(String name, int executionCount, Long jobInstanceId,
 			boolean launchable, boolean incrementable, String cronExpression, Date nextFireTime) {
+		
+		//Calling super constructor to initialise the remaining attributes
 		super(name, executionCount, jobInstanceId, launchable, incrementable);
 		
 		this.cronExpression = cronExpression;
