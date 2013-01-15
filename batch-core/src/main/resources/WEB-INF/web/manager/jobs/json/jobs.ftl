@@ -3,8 +3,8 @@
 "jobs" : { 
     "resource" : "${baseUrl}${url}",
     "registrations" : {
-<#if jobs?? && jobs?size!=0>
-    <#list jobs as job>
+<#if newjobs?? && newjobs?size!=0>
+    <#list newjobs as job>
         "${job.name}" : {
             <#assign job_url><@spring.url relativeUrl="${servletPath}/jobs/${job.name}.json"/></#assign>
             "name" : "${job.name}",
@@ -12,8 +12,10 @@
             "description" : "<@spring.messageText code="${job.name}.description" text="No description"/>",
             "executionCount" : ${job.executionCount?c},
             "launchable" : <#if job.launchable??>${job.launchable?string}<#else>false</#if>,
-            "incrementable" : <#if job.incrementable??>${job.incrementable?string}<#else>false</#if>
-        }<#if job_index != jobs?size-1>,</#if>
+            "incrementable" : <#if job.incrementable??>${job.incrementable?string}<#else>false</#if>,
+            "CronExpression" : ${job.cronExpression},
+            "NextFireDate" ${job.nextFireTime}:
+        }<#if job_index != newjobs?size-1>,</#if>
     </#list>
 </#if>
      }
