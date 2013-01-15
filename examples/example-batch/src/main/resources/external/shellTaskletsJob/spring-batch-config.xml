@@ -42,7 +42,7 @@
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->
 	<bean
-		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		class="org.trpr.platform.batch.impl.spring.web.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<ref bean="shellJobCronTrigger" />
