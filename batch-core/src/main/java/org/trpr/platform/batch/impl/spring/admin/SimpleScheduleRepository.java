@@ -33,33 +33,33 @@ import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
  */
 
 public class SimpleScheduleRepository implements ScheduleRepository {
+	
 	/**
 	 * A Map holding the Trigger information related to the job. The key is the jobName and the value is org.quartz.Trigger
 	 */
 	private Map<String, Trigger> jobTrigger;
 	
 	/**
-	 * Default constructor. Initialises jobTrigger Map as a new HashMap
+	 * Default constructor. Initializes jobTrigger Map as a new HashMap
 	 */
-	public SimpleScheduleRepository() {
-		
+	public SimpleScheduleRepository() {		
 		this.jobTrigger = new HashMap<String, Trigger> ();
 	}
 
-	@Override
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#addTrigger
 	 */
+	@Override
 	public void addTrigger(String jobName, Trigger trigger) {
 		this.jobTrigger.put(jobName, trigger);		
 	}
 
-	@Override
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#getCronExpression
 	 */
+	@Override
 	public String getCronExpression(String jobName) {
 		String cronExpr = null;		
 		if(jobTrigger.containsKey(jobName)) {			
@@ -72,11 +72,11 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		return cronExpr;
 	}
 
-	@Override
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#getNextFireDate
 	 */
+	@Override
 	public Date getNextFireDate(String jobName) {		
 		Date nextFireTime = null;		
 		if(jobTrigger.containsKey(jobName)){
@@ -86,14 +86,15 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		return nextFireTime;
 	}
 
-	@Override
 	/**
 	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#hasName
+	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#doesJobExists(String)
 	 */
-	public boolean hasName(String jobName) {
-		if(this.jobTrigger.containsKey(jobName))
+	@Override
+	public boolean doesJobExists(String jobName) {
+		if(this.jobTrigger.containsKey(jobName)) {
 			return true;
+		}
 		return false;
 	}
 }

@@ -50,7 +50,6 @@ import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
-
 /**
  * The <code>SimpleJobService</code> class is an implementation of {@link JobService} that delegates most of its work to the standard Spring Batch 
  * components
@@ -58,7 +57,7 @@ import org.trpr.platform.core.spi.logging.Logger;
  * @author Regunath B
  * @version 1.0, 19 Sep 2012
  * 
- * Modification:
+ * Change log :
  * Implements {@link JobService} to hold an additional {@link ScheduleRepository}
  * @author devashishshankar
  * @version 1.1 09 Jan 2013
@@ -92,8 +91,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Scheduler component */
 	private ScheduleRepository scheduleRepository;
-	
-	
+		
 	/**
 	 * Constructor for this class
 	 * @param jobRepository the JobRepository
@@ -104,7 +102,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
 		this.scheduleRepository = scheduleRepository;
-
 	}
 	
 	/**
@@ -603,7 +600,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getCronExpression
 	 */
 	public String getCronExpression(String jobName) {		
-		return scheduleRepository.getCronExpression(jobName);
+		return this.scheduleRepository.getCronExpression(jobName);
 	}
 
 	@Override
@@ -612,7 +609,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getNextFireDate
 	 */
 	public Date getNextFireDate(String jobName) {
-		return scheduleRepository.getNextFireDate(jobName);
+		return this.scheduleRepository.getNextFireDate(jobName);
 	}
 
 	/** End getter/setter methods*/

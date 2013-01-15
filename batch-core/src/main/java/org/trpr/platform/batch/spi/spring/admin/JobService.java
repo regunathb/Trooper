@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.trpr.platform.batch.spi.spring.admin;
 
 import java.util.Date;
@@ -22,8 +20,8 @@ import java.util.Date;
 import org.quartz.impl.SchedulerRepository;
 
 /**
- * The <code>JobService</code> interface is an extension of {@link JobService} that holds {@link SchedulerRepository} which will have access to the trigger information
- * 
+ * The <code>JobService</code> interface is an extension of {@link JobService} that holds {@link SchedulerRepository} which will have access to the 
+ * trigger information
  * 
  * @author devashishshankar
  * @version 1.0, 10 Jan 2013

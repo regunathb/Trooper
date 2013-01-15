@@ -16,8 +16,9 @@
 
 package org.trpr.platform.batch.impl.spring.web;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-
 
 /**
  * The <code>JobInfo</code> class is an extension of {@link JobInfo} that stores extra information about 
@@ -28,38 +29,37 @@ import java.util.Date;
  * @version 1.0, 09 Jan 2013
  */
 public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
+	
+	/** The Date format*/
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
 
-	//Holds the Cron Expression of the job trigger
+	/** Holds the Cron Expression of the job trigger */
 	private final String cronExpression;
-	//Holds the next fire time of the job
+	
+	/** Holds the next fire time of the job */
 	private final Date nextFireTime;
 	
 	/**
 	 * Constructor for initialising JobInfo
 	 */
 	public JobInfo(String name, int executionCount, Long jobInstanceId,
-			boolean launchable, boolean incrementable, String cronExpression, Date nextFireTime) {
-		
+			boolean launchable, boolean incrementable, String cronExpression, Date nextFireTime) {		
 		//Calling super constructor to initialise the remaining attributes
 		super(name, executionCount, jobInstanceId, launchable, incrementable);
 		
 		this.cronExpression = cronExpression;
-		this.nextFireTime = nextFireTime;
-		
+		this.nextFireTime = nextFireTime;		
 	}
 	
 	/**
 	 * Getter methods
-	 */
-	
+	 */	
 	public String getcronExpression() {
-		return cronExpression;
-	}
-	
+		return this.cronExpression;
+	}	
 	public String getnextFireTime() {
-		return nextFireTime.toGMTString();
+		return DATE_FORMAT.format(this.nextFireTime);
 	}
-	
 	/**
 	 * End of getter methods
 	 */

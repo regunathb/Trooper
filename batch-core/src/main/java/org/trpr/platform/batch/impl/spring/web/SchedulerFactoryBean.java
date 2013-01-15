@@ -26,7 +26,6 @@ import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
 import org.trpr.platform.batch.impl.spring.admin.SimpleScheduleRepository;
 import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 
-
 /**
  * The <code>SchedulerFactoryBean</code> class is an extension of 
  * {@link org.springframework.scheduling.quartz.SchedulerFactoryBean } that injects extra information 
@@ -37,6 +36,10 @@ import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
  */
 public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.SchedulerFactoryBean {
 
+	/**
+	 * Overriden method to inject additional attributes post bean initialization
+	 * @see org.springframework.scheduling.quartz.SchedulerFactoryBean#afterPropertiesSet()
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		

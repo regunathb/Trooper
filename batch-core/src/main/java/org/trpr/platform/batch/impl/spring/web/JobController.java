@@ -42,6 +42,7 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
 
 @Controller
 public class JobController extends org.springframework.batch.admin.web.JobController {
+	
 	//An instance of JobService which holds all the information about jobs
 	private JobService jobService;
 
@@ -54,13 +55,13 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 		this.jobService = jobService;
 	}
 
-	@Override
 	/**
 	 * Overridden method from @link {org.springframework.batch.admin.web.JobController}. It now uses 
 	 * @link {org.trpr.platform.batch.impl.spring.web.JobInfo} to hold additional details about job
 	 * (Mainly scheduler related information). This is returned and added to the model so that it
 	 * can be accessed by the ftl files
 	 */
+	@Override
 	@RequestMapping(value = "/jobs", method = RequestMethod.GET)
 	public void jobs(ModelMap model, @RequestParam(defaultValue = "0") int startJob,
 			@RequestParam(defaultValue = "20") int pageSize) {

@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.trpr.platform.batch.spi.spring.admin;
 
 import java.util.Date;
 
 import org.quartz.Trigger;
-
 
 /**
  * An interface to hold information about the JobScheduler and trigger.
@@ -28,7 +25,6 @@ import org.quartz.Trigger;
  * @author devashishshankar
  * @version 1.0 10 Jan 2013
  */
-
 public interface ScheduleRepository {
 	/**
 	 * Returns the cron expression based on the jobName.
@@ -45,10 +41,10 @@ public interface ScheduleRepository {
 	public Date getNextFireDate(String jobName);
 	
 	/**
-	 * Function to check whether the job is in the repository.
+	 * Checks whether the job is in the repository.
 	 * @param jobName Name of the job
 	 */
-	public boolean hasName(String jobName);
+	public boolean doesJobExists(String jobName);
 	
 	/**
 	 * Injector function to inject the Trigger information related to the job in the repository
