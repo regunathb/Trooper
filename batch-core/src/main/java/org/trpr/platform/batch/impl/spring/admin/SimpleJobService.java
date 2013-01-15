@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.springframework.batch.admin.service.JobService;
 import org.springframework.batch.admin.service.NoSuchStepExecutionException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -47,6 +45,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.trpr.platform.batch.spi.spring.admin.JobService;
+import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -57,7 +57,13 @@ import org.trpr.platform.core.spi.logging.Logger;
  * 
  * @author Regunath B
  * @version 1.0, 19 Sep 2012
+ * 
+ * Modification:
+ * Implements {@link JobService} to hold an additional {@link ScheduleRepository}
+ * @author devashishshankar
+ * @version 1.1 09 Jan 2013
  */
+
 public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Default shutdown timeout - 60 seconds */
@@ -84,17 +90,23 @@ public class SimpleJobService implements JobService, DisposableBean {
 	/** The JobExplorer component*/
 	private JobExplorer jobExplorer;
 	
+	/** Scheduler component */
+	private ScheduleRepository scheduleRepository;
+	
+	
 	/**
 	 * Constructor for this class
 	 * @param jobRepository the JobRepository
 	 */
-	public SimpleJobService(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher) {
+	public SimpleJobService(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher, ScheduleRepository scheduleRepository) {
 		this.jobRepository = jobRepository;
 		this.jobExplorer = jobExplorer;
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
-	}
+		this.scheduleRepository = scheduleRepository;
 
+	}
+	
 	/**
 	 * Interface method implementation.Stops all the active jobs and wait for them (up to a time out) to finish
 	 * processing.
@@ -377,7 +389,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * Interface method implementation
 	 * @see org.springframework.batch.admin.service.JobService#isLaunchable(java.lang.String)
 	 */
-	public boolean isLaunchable(String jobName) {
+	public boolean isLaunchable(String jobName) {	
 		return this.jobRegistry.getJobNames().contains(jobName);
 	}
 
@@ -574,7 +586,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		return allExecutions.size();
 	}
-	
+
+
 	/** Getter/Setter methods*/
 	/**
 	 * Timeout for shutdown waiting for jobs to finish processing.
@@ -582,7 +595,25 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 */
 	public void setShutdownTimeout(int shutdownTimeout) {
 		this.shutdownTimeout = shutdownTimeout;
-	}	
-	/** End getter/setter methods*/
+	}
 
+	@Override
+	/**
+	 * Interface method implementation. Returns the Cron Expression of the job.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getCronExpression
+	 */
+	public String getCronExpression(String jobName) {		
+		return scheduleRepository.getCronExpression(jobName);
+	}
+
+	@Override
+	/**
+	 * Interface method implementation. Returns the next Fire Date of the job.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getNextFireDate
+	 */
+	public Date getNextFireDate(String jobName) {
+		return scheduleRepository.getNextFireDate(jobName);
+	}
+
+	/** End getter/setter methods*/
 }
