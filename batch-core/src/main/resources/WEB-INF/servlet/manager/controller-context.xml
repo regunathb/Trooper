@@ -7,7 +7,7 @@
 
 	<context:annotation-config />
 
-	<bean class="org.springframework.batch.admin.web.JobController" />
+	<bean class="org.trpr.platform.batch.impl.spring.web.JobController" />
 	<bean class="org.springframework.batch.admin.web.FileController" />
 	<bean class="org.springframework.batch.admin.web.StepExecutionController" />
 	<bean class="org.springframework.batch.admin.web.JobExecutionController" />

@@ -9,6 +9,7 @@
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
+	
 	<!-- This event producer bean is declared primarily for publishing Bootstrap lifecycle events -->
 	<bean id="platformEventProducer" class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
 	</bean>  	
@@ -44,6 +45,7 @@
 		<constructor-arg index="1"><ref bean="jobExplorer"/></constructor-arg>
 		<constructor-arg index="2"><ref bean="jobRegistry"/></constructor-arg>
 		<constructor-arg index="3"><ref bean="jobLauncher"/></constructor-arg>
+		<constructor-arg index="4"><ref bean="scheduleRepository"/></constructor-arg>
 	</bean>	
 
 	<!--
@@ -62,6 +64,9 @@
 		<property name="repositoryFactory" ref="&amp;jobRepository" />
 	</bean>
 	
+	<!-- Configuring Common ScheduleRepository  -->
+	<bean id ="scheduleRepository" class="org.trpr.platform.batch.impl.spring.admin.SimpleScheduleRepository" />
+	
 	<!-- Configuring Common Batch Job Registry.  -->
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />	
 	
@@ -73,7 +78,8 @@
 
 	<!-- Async Task executor used in all jobs -->
 	<bean id="asyncJobExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-
+	
+	
 	<!-- The Job operator bean for launching adhoc jobs -->
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
 		<property name="jobLauncher" ref="jobLauncher"/>

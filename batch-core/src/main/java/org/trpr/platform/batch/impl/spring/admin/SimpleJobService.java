@@ -19,16 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import org.quartz.JobDataMap;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.springframework.batch.admin.service.NoSuchStepExecutionException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -39,7 +33,6 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -51,18 +44,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.quartz.JobDetailBean;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
-import org.quartz.*;
 
 
 /**
@@ -77,6 +63,7 @@ import org.quartz.*;
  * @author devashishshankar
  * @version 1.1 09 Jan 2013
  */
+
 public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Default shutdown timeout - 60 seconds */
@@ -106,10 +93,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 	/** Scheduler component */
 	private ScheduleRepository scheduleRepository;
 	
-
-	
-	//@Autowired
-	 //private ApplicationContext appContext;
 	
 	/**
 	 * Constructor for this class
@@ -124,8 +107,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 
 	}
 	
-	
-
 	/**
 	 * Interface method implementation.Stops all the active jobs and wait for them (up to a time out) to finish
 	 * processing.
@@ -408,10 +389,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * Interface method implementation
 	 * @see org.springframework.batch.admin.service.JobService#isLaunchable(java.lang.String)
 	 */
-	public boolean isLaunchable(String jobName) {
-		
-		
-		
+	public boolean isLaunchable(String jobName) {	
 		return this.jobRegistry.getJobNames().contains(jobName);
 	}
 
@@ -438,7 +416,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 		if (jobExecution.isRunning()) {
 			this.activeExecutions.add(jobExecution);
 		}
-
 		return jobExecution;
 	}
 
@@ -512,8 +489,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#listJobs(int, int)
 	 */
 	public Collection<String> listJobs(int start, int count) {
-		
-		//System.out.println("Creating listJobs");
 		List<String> jobNames = new LinkedList<String>();
 		jobNames.addAll(this.jobRegistry.getJobNames());
 		if (start >= jobNames.size()) {
@@ -611,30 +586,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		return allExecutions.size();
 	}
-	
-	@Override
-	/**
-	 * Interface method implementation
-	 * @see 
-	 */
-	public String getCronExpression(String jobName) 
-	{
-
-		
-		return scheduleRepository.getCronExpression(jobName);
-	}
-
-
-	@Override
-	/**
-	 * Interface method implementation
-	 */
-	public Date getNextFireDate(String jobName) 
-	{
-
-		return scheduleRepository.getNextFireDate(jobName);
-	}
-
 
 
 	/** Getter/Setter methods*/
@@ -646,12 +597,23 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.shutdownTimeout = shutdownTimeout;
 	}
 
+	@Override
+	/**
+	 * Interface method implementation. Returns the Cron Expression of the job.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getCronExpression
+	 */
+	public String getCronExpression(String jobName) {		
+		return scheduleRepository.getCronExpression(jobName);
+	}
 
+	@Override
+	/**
+	 * Interface method implementation. Returns the next Fire Date of the job.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getNextFireDate
+	 */
+	public Date getNextFireDate(String jobName) {
+		return scheduleRepository.getNextFireDate(jobName);
+	}
 
 	/** End getter/setter methods*/
-
-
-	
-		
-
 }

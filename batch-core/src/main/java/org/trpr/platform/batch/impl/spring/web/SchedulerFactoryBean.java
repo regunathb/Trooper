@@ -1,98 +1,74 @@
+/*
+ * Copyright 2012-2015, the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.trpr.platform.batch.impl.spring.web;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.springframework.batch.admin.web.JobController;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
 import org.trpr.platform.batch.impl.spring.admin.SimpleScheduleRepository;
 import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 
 
-
 /**
- * The <code>SchedulerFactoryBean</code> class is an extension of {@link org.springframework.scheduling.quartz.SchedulerFactoryBean } that injects extra information about trigger, such as cronexpression, next fire time, etc. into {@link ScheduleRepository}
+ * The <code>SchedulerFactoryBean</code> class is an extension of 
+ * {@link org.springframework.scheduling.quartz.SchedulerFactoryBean } that injects extra information 
+ * about trigger, such as cronexpression, next fire time, etc. into {@link ScheduleRepository}
  * 
  * @author devashishshankar
  * @version 1.0, 09 Jan 2013
  */
-
-public class SchedulerFactoryBean extends
-		org.springframework.scheduling.quartz.SchedulerFactoryBean 
-
-{
-	private List triggers;
-	
-	private List jobDetails;
-	
-	public void setJobDetails(JobDetail[] jobDetails) {
-		
-		super.setJobDetails(jobDetails);
-		this.jobDetails = Arrays.asList(jobDetails);
-	}
-	
-	public void setTriggers(Trigger[] triggers) {
-		
-		super.setTriggers(triggers);
-		
-		this.triggers = Arrays.asList(triggers);
-	}
+public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.SchedulerFactoryBean {
 
 	@Override
-	public void afterPropertiesSet() throws Exception
-	{
+	public void afterPropertiesSet() throws Exception {
+		
+		//Calling the super class method to perform all the functions it was previously performing
 		super.afterPropertiesSet();
-		
+		//Getting ApplicationContext
 		ApplicationContext context = SpringBatchComponentContainer.getCommonBatchBeansContext();
-		
-		
-		//Instance of bean SimpleScheduleRepsitory
+		//Instance of bean SimpleScheduleRepsitory from ApplicationContext
 		SimpleScheduleRepository rep = context.getBean(SimpleScheduleRepository.class);
-		
-		
-		System.out.print(this.triggers.get(0));
-		
-	
-	      
+		//Getting the scheduler from super
 		Scheduler sch = super.getScheduler();
-		try
-		{
-				for (String groupName : sch.getJobGroupNames()) 
-				{
-
-					//loop all jobs by groupname
-					for (String jobName : sch.getJobNames(groupName)) 
-					{
-				 
-				      //get job's trigger
-					  Trigger[] triggers = sch.getTriggersOfJob(jobName,groupName);				 
-					  JobDetail jd = sch.getJobDetail(jobName, groupName);
-				      JobDataMap jdm = jd.getJobDataMap();
-				      FlowJob fj = (FlowJob)jdm.get("jobName");
-				      
-				      //System.out.println("Adding to scheduleRep: "+fj.getName()+" "+triggers[0]);
-				      
-				      //Injecting into SimpleScheduleRepository
-					  rep.addTrigger(fj.getName(), triggers[0]);
-			 
-					}
-			 
-			    }
-			
-		}
-		catch(SchedulerException temp)
-		{
-			System.out.println("Exception while fetching info from scheduler : "+temp.getMessage());
-		}
+		
+		//loop all groups in the scheduler
+		for (String groupName : sch.getJobGroupNames()) {
+			//loop all jobs by groupname
+			for (String jobName : sch.getJobNames(groupName)) {
+				
+		      //get job's trigger
+			  Trigger[] triggers = sch.getTriggersOfJob(jobName,groupName);	
+			  
+			  //get job's JobDetail 
+			  JobDetail jd = sch.getJobDetail(jobName, groupName);
+			  
+			  //Extract job's name from JobDetail
+		      JobDataMap jdm = jd.getJobDataMap();
+		      FlowJob fj = (FlowJob)jdm.get("jobName");
+		      
+		      //Injecting into SimpleScheduleRepository
+			  rep.addTrigger(fj.getName(), triggers[0]);
+	 
+			}
+	    }		
 	}
-
 }
+
