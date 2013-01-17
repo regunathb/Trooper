@@ -28,6 +28,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.trpr.platform.batch.impl.spring.partitioner.SimpleRangePartitioner;
 import org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 
 /**
  * The <code>CompositeItemStreamReader</code> class is an implementation of the {@link BatchItemStreamReader} that implements the Composite design
@@ -39,6 +41,9 @@ import org.trpr.platform.batch.spi.spring.reader.BatchItemStreamReader;
  * @version 1.0, 28 Aug 2012
  */
 public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, InitializingBean {
+	
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(CompositeItemStreamReader.class);
 	
 	/** The delegate that does the actual data reading*/
 	private BatchItemStreamReader<T> delegate;
@@ -100,6 +105,9 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 				return this.localQueue.remove();
 			}	
 		}
+		
+		LOGGER.info("Completed reading from all partitions. Read complete!");
+		
 		return null;
 	}
 
