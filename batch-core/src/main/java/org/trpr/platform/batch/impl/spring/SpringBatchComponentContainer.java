@@ -17,13 +17,18 @@
 package org.trpr.platform.batch.impl.spring;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.trpr.platform.batch.BatchFrameworkConstants;
+import org.trpr.platform.batch.spi.spring.admin.JobService;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
@@ -47,9 +52,6 @@ import org.trpr.platform.runtime.spi.component.ComponentContainer;
  */
 public class SpringBatchComponentContainer implements ComponentContainer {
 
-	/** The prefix to be added to file absolute paths when loading Spring XMLs using the FileSystemXmlApplicationContext*/
-	private static final String FILE_PREFIX = "file:";
-
 	/**
 	 * The default Event producer bean name 
 	 */
@@ -59,12 +61,15 @@ public class SpringBatchComponentContainer implements ComponentContainer {
     private static AbstractApplicationContext commonBatchBeansContext;    
     
 	/**
-	 * The list of Spring application contexts that would hold all job instances loaded by this container
+	 * The list of BatchConfigInfo holding all job instances loaded by this container
 	 */
-    private List<AbstractApplicationContext> jobsContextList = new LinkedList<AbstractApplicationContext>();	
+    private List<BatchConfigInfo> jobsContextList = new LinkedList<BatchConfigInfo>();	
     
     /** Local reference for all BootstrapExtensionS loaded by the Container and set on this ComponentContainer*/
     private BootstrapExtension[] loadedBootstrapExtensions;
+    
+	/** The Thread's context class loader that is used in on the fly loading of Job definitions */
+	private ClassLoader tccl; 
     
 	/**
 	 * Returns the common Batch Spring beans application context that is intended as parent of all batch application contexts 
@@ -97,6 +102,9 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 */
 	public void init() throws PlatformException {
 		
+		// store the thread's context class loader for later use in on the fly loading of Job app contexts
+		this.tccl = Thread.currentThread().getContextClassLoader();
+		
 		// The common batch beans context is loaded first using the Platform common beans context as parent
 		// load this from classpath as it is packaged with the binaries
 		ApplicationContextFactory defaultCtxFactory = null;
@@ -110,24 +118,27 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 		SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_CONFIG}, 
 				defaultCtxFactory.getCommonBeansContext());
 		
+		// Look up the JobService bean and set this class instance as the ComponentContainer that loaded it
+		((JobService)SpringBatchComponentContainer.commonBatchBeansContext.getBean(BatchFrameworkConstants.JOB_SERVICE_BEAN)).setComponentContainer(this);
+		
 		// add the common batch beans to the contexts list
-		this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
+		this.jobsContextList.add(new BatchConfigInfo(new File(BatchFrameworkConstants.COMMON_BATCH_CONFIG), null, SpringBatchComponentContainer.commonBatchBeansContext));
 
 		// Load additional if runtime nature is "server". This context is the new common beans context
 		if (RuntimeVariables.getRuntimeNature().equalsIgnoreCase(RuntimeConstants.SERVER)) {
 			SpringBatchComponentContainer.commonBatchBeansContext = new ClassPathXmlApplicationContext(new String[]{BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG},
 					SpringBatchComponentContainer.commonBatchBeansContext);
 			// now add the common server nature batch beans to the contexts list
-			this.jobsContextList.add(SpringBatchComponentContainer.commonBatchBeansContext);
+			this.jobsContextList.add(new BatchConfigInfo(new File(BatchFrameworkConstants.COMMON_BATCH_SERVER_NATURE_CONFIG), null, 
+					SpringBatchComponentContainer.commonBatchBeansContext));
 		}
 		
 		// locate and load the individual job bean XML files using the common batch beans context as parent
 		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
 		for (File jobBeansFile : jobBeansFiles) {
-			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
-			// to relative path
-			this.jobsContextList.add(new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobBeansFile.getAbsolutePath()},
-					SpringBatchComponentContainer.commonBatchBeansContext));
+			BatchConfigInfo jobConfigInfo = new BatchConfigInfo(jobBeansFile);
+			// load the job's appcontext
+			this.loadJobContext(jobConfigInfo);
 		}
 		
 	}
@@ -137,8 +148,8 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 * @see ComponentContainer#destroy()
 	 */
 	public void destroy() throws PlatformException {
-		for (AbstractApplicationContext context : this.jobsContextList) {
-			context.close();
+		for (BatchConfigInfo batchConfigInfo : this.jobsContextList) {
+			batchConfigInfo.getJobContext().close();
 		}
 		this.jobsContextList = null;		
 	}
@@ -160,5 +171,53 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	public void publishBootstrapEvent(PlatformEvent bootstrapEvent) {	
 		this.publishEvent(bootstrapEvent);
 	}
-    
+	
+	/**
+	 * Interface method implementation. Loads/Reloads batch job(s) defined in the specified {@link FileSystemResource} 
+	 * @see org.trpr.platform.runtime.spi.component.ComponentContainer#loadComponent(org.springframework.core.io.Resource)
+	 */
+	public void loadComponent(Resource resource) {
+		if (!FileSystemResource.class.isAssignableFrom(resource.getClass()) || 
+				!((FileSystemResource)resource).getFilename().equalsIgnoreCase(BatchFrameworkConstants.SPRING_BATCH_CONFIG)) {
+			throw new UnsupportedOperationException("Batch jobs can be loaded only from files by name : " + BatchFrameworkConstants.SPRING_BATCH_CONFIG);
+		}
+		loadJobContext(new BatchConfigInfo(((FileSystemResource)resource).getFile()));
+	}
+	
+	/**
+	 * Loads the job context from path specified in the BatchConfigInfo. Looks for file by name BatchFrameworkConstants.SPRING_BATCH_CONFIG. 
+	 * @param batchConfigInfo containing absolute path to the job's configuration location i.e. folder
+	 */
+	public void loadJobContext(BatchConfigInfo batchConfigInfo) {
+		// check if a context exists already for this config path 
+		for (BatchConfigInfo loadedJobInfo : this.jobsContextList) {
+			if (loadedJobInfo.equals(batchConfigInfo)) {
+				batchConfigInfo = loadedJobInfo;
+				break;
+			}
+		}
+		if (batchConfigInfo.getJobContext() != null) {
+			// close the context and remove from list
+			batchConfigInfo.getJobContext().close();
+			this.jobsContextList.remove(batchConfigInfo);
+		}
+		ClassLoader jobCL = this.tccl;
+		// check to see if the job has job and dependent binaries deployed outside of the runtime class path. If yes, include them using a custom URL classloader.
+		File customLibPath = new File (batchConfigInfo.getJobConfigXML().getParentFile(), BatchConfigInfo.BINARIES_PATH);
+		if (customLibPath.exists() && customLibPath.isDirectory()) {
+			try {
+				File[] libFiles = customLibPath.listFiles();
+				URL[] libURLs = new URL[libFiles.length];
+				for (int i=0; i < libFiles.length; i++) {
+					libURLs[i] = new URL(BatchConfigInfo.FILE_PREFIX + libFiles[i].getAbsolutePath());
+				}
+				jobCL = new URLClassLoader(libURLs, this.tccl);
+			} catch (MalformedURLException e) {
+				throw new PlatformException(e);
+			}
+		} 
+		// now load the job context and add it into the jobcontexts list
+		batchConfigInfo.loadJobContext(jobCL);
+		this.jobsContextList.add(batchConfigInfo);
+	}	
 }

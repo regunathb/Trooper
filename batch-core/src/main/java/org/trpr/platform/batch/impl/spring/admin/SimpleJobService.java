@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.batch.admin.service.NoSuchStepExecutionException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -49,6 +50,7 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
 import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
+import org.trpr.platform.runtime.spi.component.ComponentContainer;
 
 /**
  * The <code>SimpleJobService</code> class is an implementation of {@link JobService} that delegates most of its work to the standard Spring Batch 
@@ -91,6 +93,9 @@ public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Scheduler component */
 	private ScheduleRepository scheduleRepository;
+	
+	/** The ComponentContainer that loaded this JobService*/
+	private ComponentContainer componentContainer;
 		
 	/**
 	 * Constructor for this class
@@ -102,6 +107,22 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
 		this.scheduleRepository = scheduleRepository;
+	}
+
+	/**
+	 * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()
+	 */
+	public ComponentContainer getComponentContainer() {
+		return this.componentContainer;
+	}
+	
+	/**
+	 * Interface method implementation.Sets the ComponentContainer that loaded this JobService
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#setComponentContainer(ComponentContainer)
+	 */
+	public void setComponentContainer(ComponentContainer componentContainer) {
+		this.componentContainer = componentContainer;
 	}
 	
 	/**

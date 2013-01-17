@@ -28,6 +28,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
@@ -278,6 +279,14 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
      */
     public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions) {
     	this.loadedBootstrapExtensions = bootstrapExtensions;
+    }
+    
+    /**
+     * Interface method implementation. Throws an {@link UnsupportedOperationException} by default
+     * @see org.trpr.platform.runtime.spi.component.ComponentContainer#loadComponent(org.springframework.core.io.Resource)
+     */
+    public void loadComponent(Resource resource) {
+    	throw new UnsupportedOperationException("Loading of independent services is presently not supported!");
     }
     
 	/**

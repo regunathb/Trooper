@@ -33,4 +33,9 @@ public abstract class BatchFrameworkConstants {
 	public static final String COMMON_BATCH_SERVER_NATURE_CONFIG = "packaged/common-batch-server-nature-config.xml"; // its a file picked up from classpath
 	public static final String SPRING_BATCH_CONFIG = "spring-batch-config.xml";
 	
+	/**
+	 * Constants for framework beans
+	 */
+	public static final String JOB_SERVICE_BEAN = "jobService";
+	
 }

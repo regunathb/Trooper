@@ -15,6 +15,7 @@
  */
 package org.trpr.platform.runtime.spi.component;
 
+import org.springframework.core.io.Resource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
@@ -64,5 +65,11 @@ public interface ComponentContainer extends PlatformEventProducer {
 	 * @param bootstrapExtensions BootstrapExtension instances that were successfully loaded before this ComponentContainer
 	 */
 	public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions);
+	
+	/**
+	 * Loads/Re-loads a component defined by the specified resource
+	 * @param resource Resource implementation containing the component definition
+	 */
+	public void loadComponent(Resource resource);
 
 }

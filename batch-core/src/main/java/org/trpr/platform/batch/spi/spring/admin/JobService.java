@@ -18,6 +18,7 @@ package org.trpr.platform.batch.spi.spring.admin;
 import java.util.Date;
 
 import org.quartz.impl.SchedulerRepository;
+import org.trpr.platform.runtime.spi.component.ComponentContainer;
 
 /**
  * The <code>JobService</code> interface is an extension of {@link JobService} that holds {@link SchedulerRepository} which will have access to the 
@@ -41,4 +42,17 @@ public interface JobService extends org.springframework.batch.admin.service.JobS
 	 * @return NextFireDate in a Date
 	 */
 	public Date getNextFireDate(String jobName);
+	
+	/**
+	 * Gets the {@link ComponentContainer} that loaded this JobService
+	 * @return the ComponentContainer that loaded this JobService
+	 */
+	public ComponentContainer getComponentContainer();
+	
+	/**
+	 * Sets the {@link ComponentContainer} that loaded this JobService
+	 * @param componentContainer the ComponentContainer that loaded this JobService
+	 */
+	public void setComponentContainer(ComponentContainer componentContainer);
+	
 }
