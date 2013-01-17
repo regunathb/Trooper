@@ -73,6 +73,7 @@ public class BatchConfigInfo {
 		// to relative path
 		this.jobContext = new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobConfigXML.getAbsolutePath()}, 
 				SpringBatchComponentContainer.getCommonBatchBeansContext());
+		// now reset the thread's TCCL to the one that existed prior to loading the job
 		Thread.currentThread().setContextClassLoader(existingTCCL);
 		return this.jobContext;
 	}
