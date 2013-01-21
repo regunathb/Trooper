@@ -38,7 +38,6 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 * A Map holding the Trigger information related to the job. The key is the jobName and the value is org.quartz.Trigger
 	 */
 	private Map<String, Trigger> jobTrigger;
-	
 	private Map<String, String> jobBeanName;
 	
 	/**
@@ -56,10 +55,7 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	@Override
 	public void addTrigger(String jobName, String jobBeanName, Trigger trigger) {
 		this.jobTrigger.put(jobName, trigger);		
-		this.jobBeanName.put(jobName, jobBeanName);
-		
-		System.out.println("ADDED: "+jobName+" "+jobBeanName);
-		
+		this.jobBeanName.put(jobName, jobBeanName);		
 	}
 
 	/**
@@ -104,7 +100,10 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		}
 		return false;
 	}
-
+	/**
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#getJobBeanName
+	 */
 	@Override
 	public String getJobBeanName(String jobName) {
 		if(this.jobBeanName.containsKey(jobName))
