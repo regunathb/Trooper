@@ -34,8 +34,10 @@
 	<!-- Support for Spring Integration HTTP endpoints -->
 	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
 
-	<!-- Support for Freemarker beans as views -->
+	<!-- Support for Freemarker beans as views  -->
 	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+	
+	<bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver" />
 
 	<bean id="baseMenu" abstract="true">
 		<property name="prefix" value="#{resourceService.servletPath}" />

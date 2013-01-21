@@ -51,6 +51,11 @@ public interface ScheduleRepository {
 	 * @param jobName Name of the job
 	 * @param trigger Quartz trigger related to the job
 	 */
-	public void addTrigger(String jobName, Trigger trigger);
+	void addTrigger(String jobName, String jobBeanName, Trigger trigger);
+	
+	/**
+	 * Gets the beanName of the job.	 *
+	 */
+	public String getJobBeanName(String jobName);
 
 }

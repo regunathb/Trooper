@@ -10,6 +10,7 @@
 			<#assign menu_url><@spring.url relativeUrl="${menu.url}"/></#assign>
 			<li><a href="${menu_url}">${menu.label}</a></li>
 			</#list>
+			<li><a href="/configuration/">Job Configuration </a></li>
 		</ul>
 	</div>
 	<div id="primary-right">
