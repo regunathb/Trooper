@@ -26,12 +26,15 @@ import org.quartz.Trigger;
  * @version 1.0 10 Jan 2013
  */
 public interface ScheduleRepository {
+	
+	public String getJobBeanName(String jobName);
 	/**
 	 * Returns the cron expression based on the jobName.
 	 * @param jobName Name of the job
 	 * @return CronExpression in String. Returns null if the requested job is not found in the repository.
 	 */
 	public String getCronExpression(String jobName);
+	
 	
 	/**
 	 * Returns the next fire time based on the jobName.
@@ -51,6 +54,7 @@ public interface ScheduleRepository {
 	 * @param jobName Name of the job
 	 * @param trigger Quartz trigger related to the job
 	 */
-	public void addTrigger(String jobName, Trigger trigger);
+
+	void addTrigger(String jobName, String jobBeanName, Trigger trigger);
 
 }

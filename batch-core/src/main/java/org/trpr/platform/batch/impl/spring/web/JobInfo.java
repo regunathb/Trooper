@@ -31,7 +31,7 @@ import java.util.Date;
 public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	
 	/** The Date format*/
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy HH:mm:ss zzz");
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
 
 	/** Holds the Cron Expression of the job trigger */
 	private final String cronExpression;

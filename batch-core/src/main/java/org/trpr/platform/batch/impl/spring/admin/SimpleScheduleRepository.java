@@ -39,11 +39,14 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 */
 	private Map<String, Trigger> jobTrigger;
 	
+	private Map<String, String> jobBeanName;
+	
 	/**
 	 * Default constructor. Initializes jobTrigger Map as a new HashMap
 	 */
 	public SimpleScheduleRepository() {		
 		this.jobTrigger = new HashMap<String, Trigger> ();
+		this.jobBeanName = new HashMap<String, String>();
 	}
 
 	/**
@@ -51,8 +54,12 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#addTrigger
 	 */
 	@Override
-	public void addTrigger(String jobName, Trigger trigger) {
+	public void addTrigger(String jobName, String jobBeanName, Trigger trigger) {
 		this.jobTrigger.put(jobName, trigger);		
+		this.jobBeanName.put(jobName, jobBeanName);
+		
+		System.out.println("ADDED: "+jobName+" "+jobBeanName);
+		
 	}
 
 	/**
@@ -96,5 +103,13 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getJobBeanName(String jobName) {
+		if(this.jobBeanName.containsKey(jobName))
+			return this.jobBeanName.get(jobName);
+		
+		return null;
 	}
 }
