@@ -22,7 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.trpr.platform.batch.impl.spring.admin.SimpleJobService;
 import org.trpr.platform.batch.spi.spring.admin.FileService;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 /**
  * Implementation of @link {FileService}
  * @author devashishshankar
@@ -30,6 +33,8 @@ import org.trpr.platform.batch.spi.spring.admin.FileService;
  *
  */
 public class SimpleFileService implements FileService {
+	
+	private static final Logger LOGGER = LogFactory.getLogger(SimpleFileService.class);
 	
 	/**
 	 * Interface Method Implementation.
@@ -46,7 +51,7 @@ public class SimpleFileService implements FileService {
 			return new String(buffer,"UTF-8").trim();
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		return null;
 	}
@@ -64,9 +69,9 @@ public class SimpleFileService implements FileService {
 				file.transferTo(dest_file);
 				return true;				
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage());
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage());
 			}
 			return false;	
 	}
