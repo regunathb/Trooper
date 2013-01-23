@@ -175,13 +175,45 @@
 	<bean name="configuration" parent="standard">
 		<property name="attributes">
 			<props merge="true">
-				<prop key="body">/manager/files/html/configuration.ftl</prop>
+				<prop key="body">/manager/configuration/html/configuration.ftl</prop>
 				<prop key="side">/manager/files/html/side.ftl</prop>
 				<prop key="titleCode">configuration.title</prop>
-				<prop key="titleText">Trooper Batch Admin: Job Configuration Upload</prop>
+				<prop key="titleText">Trooper Batch Admin: Job Configurations</prop>
 			</props>
 		</property>
 	</bean>
+	
+	<bean name="configuration/jobs/job" parent="standard">
+		<property name="attributes">
+			<props merge="true">
+				<prop key="body">/manager/configuration/html/viewJobConfig.ftl</prop>
+				<prop key="titleCode">job.title</prop>
+				<prop key="tit	leText">Trooper Batch Admin: Job Configuration</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean name="configuration/modifyJob" parent="standard">
+		<property name="attributes">
+			<props merge="true">
+				<prop key="body">/manager/configuration/html/modifyJob.ftl</prop>
+				<prop key="titleCode">job.title</prop>
+				<prop key="titleText">Trooper Batch Admin: New Job</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean name="configuration/modify/jobs/job" parent="standard">
+		<property name="attributes">
+			<props merge="true">
+				<prop key="body">/manager/configuration/html/modifyJob.ftl</prop>
+				<prop key="titleCode">job.title</prop>
+				<prop key="titleText">Trooper Batch Admin: Add/Edit Job</prop>
+			</props>
+		</property>
+	</bean>
+	
+	
 
 	<bean id="configurationHandler" name="/configuration" class="org.springframework.batch.admin.web.ViewHandler">
 		<property name="view" ref="configuration" />

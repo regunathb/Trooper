@@ -19,10 +19,11 @@ package org.trpr.platform.batch.impl.spring.web;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The <code>JobInfo</code> class is an extension of {@link JobInfo} that stores extra information about 
- * trigger, such as cronexpression, next fire time, etc.
+ * trigger, such as cronexpression, next fire time, hostnames, etc.
  * 
  * 
  * @author devashishshankar
@@ -31,13 +32,16 @@ import java.util.Date;
 public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	
 	/** The Date format*/
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy HH:mm:ss zzz");
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
 
 	/** Holds the Cron Expression of the job trigger */
 	private final String cronExpression;
 	
 	/** Holds the next fire time of the job */
 	private final Date nextFireTime;
+
+	/** Holds the hostname of the job */
+	private List<String> hostNames;
 	
 	/**
 	 * Constructor for initialising JobInfo
@@ -50,6 +54,17 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 		this.cronExpression = cronExpression;
 		this.nextFireTime = nextFireTime;		
 	}
+	/**Setter Methods **/
+	
+	public void addHost(String hostName) {
+		this.hostNames.add(hostName);
+	}
+	
+	public void removeHost(String hostName) {
+		if(this.hostNames.contains(hostName)) {
+			this.hostNames.remove(hostName);
+		}
+	}
 	
 	/**
 	 * Getter methods
@@ -57,6 +72,7 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	public String getcronExpression() {
 		return this.cronExpression;
 	}	
+	
 	public String getnextFireTime() {
 		return DATE_FORMAT.format(this.nextFireTime);
 	}
