@@ -40,8 +40,6 @@ import org.trpr.platform.batch.spi.spring.admin.FileService;
  * Controller for handling requests related to job configuration (Uploading job files, dependencies, editing job Files)
  * @author devashishshankar
  * @version 1.0 22 Jan, 2012
- * 
- * TODO: Support for restoring previous version of config file if loading fails
  * TODO: Make redirect work (Code will be cleaner)
  */
 
@@ -70,7 +68,7 @@ public class JobConfigController {
 	}
 
 	/**
-	 * Controller for job edit page
+	 * Controller for job edit page. Adds XML File contents and dependencies to the view
 	 */
 	@RequestMapping(value = "/configuration/modify/jobs/{jobName}", method = RequestMethod.GET)
 	public String modifyJob(ModelMap model, @ModelAttribute("jobName") String jobName) {
@@ -106,19 +104,20 @@ public class JobConfigController {
 		}
 		//Read file to view
 		else {
+			boolean invalidJobFile=false;
 			try {
 					byte[] buffer = jobFile.getBytes();
 					String XMLFileContents = new String(buffer, "UTF-8");
 					model.addAttribute("XMLFileContents", XMLFileContents);
-					
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
+			} 
+			catch (UnsupportedEncodingException e) {
+				invalidJobFile=true;
+			} 
+			catch (IOException e) {
+				invalidJobFile=true;
+			}
 			String jobName= jobConfigService.getJobNameFromXML(jobFile);
-			if(jobName==null) {
+			if(jobName==null || invalidJobFile) {
 				model.clear();
 				model.addAttribute("Error", "invalid jobFile. Couldn't find job's name");	
 				return "redirect:/configuration";
@@ -163,11 +162,9 @@ public class JobConfigController {
 				model.addAttribute("XMLFileContents", XMLFileContents);
 			}
 		}
-		
 		//Button 2: Upload dependencies
 		else if(identifier.equals("Upload dependency")) {
 			String depFileName = depFile.getOriginalFilename();	
-			
 			if (depFile.isEmpty()||(depFileName.lastIndexOf('.')<0)) {
 				model.addAttribute("DepFileError", "File is Empty or invalid. Only .jar files can be uploaded");
 			}
@@ -184,7 +181,6 @@ public class JobConfigController {
 				jobConfigService.addJobDependency(jobName,depFile);
 			}
 		}
-		
 		//Button 3: Save. Overwrite the modified XML File
 		else {
 			//Is XML File modified?
@@ -252,7 +248,7 @@ public class JobConfigController {
 	 * This method gets the XMLFile, Dependencies from jobService and displays it.
 	 */
 	@RequestMapping(value = "/configuration/jobs/{jobName}", method = RequestMethod.GET)
-	public String config_details(ModelMap model, @ModelAttribute("jobName") String jobName, Errors errors,
+	public String viewConfigDetails(ModelMap model, @ModelAttribute("jobName") String jobName, Errors errors,
 			@RequestParam(defaultValue = "0") int startJobInstance, @RequestParam(defaultValue = "20") int pageSize) throws IOException {	
 		//Adding jobName to view
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);		

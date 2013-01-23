@@ -77,7 +77,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		this.fileService = fileService;
 		this.jobDependencies = new HashMap<String, List<String>>();
 		this.jobXMLFile = new HashMap<String, String>();
-		this.deleteEmptyFolders();
 	}
 	
 	/**
@@ -88,8 +87,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		String XMLFilePath = this.getXMLFile(jobName);
 		if(XMLFilePath==null) {
 			return RuntimeVariables.getProjectsRoot()+this.JOB_FOLDER+jobName+"/";	
-		}
-		else {
+		}else {
 			return XMLFilePath.substring(0, XMLFilePath.lastIndexOf('/'));
 		}
 	}
@@ -111,8 +109,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		List<String> dependencyList = null;
 		if(this.jobDependencies.containsKey(jobName)) {
 			dependencyList = this.jobDependencies.get(jobName);
-		}
-		else {
+		}else {
 			dependencyList = new LinkedList<String>();
 			this.jobDependencies.put("jobName", dependencyList);
 		}
@@ -141,7 +138,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	public String getXMLFile(String jobName) {
 		if(this.jobXMLFile.isEmpty())
 			this.scanXMLFiles();
-
 		if(this.jobXMLFile.containsKey(jobName)) {
 			return this.jobXMLFile.get(jobName);
 		}
@@ -156,7 +152,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	public boolean setXMLFile(String jobName, String XMLFileContents) throws IOException {
 		if(this.jobXMLFile.isEmpty())
 			this.scanXMLFiles();
-		
 		//Check if jobName has been changed
 		if(!this.getJobNameFromXML(XMLFileContents).equals(jobName)) {
 			return false;
@@ -171,8 +166,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			xmlFile = new File(dest_path);
 			xmlFile.getParentFile().mkdirs();
 			xmlFile.createNewFile();
-		}
-		else {
+		}else {
 			dest_path = this.getXMLFile(jobName);
 			File prevXMLFile = new File(dest_path.substring(0, dest_path.lastIndexOf('/'))+this.SPRING_BATCH_PREV);
 			xmlFile = new File(dest_path);
@@ -235,13 +229,10 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			}	
 		}
 		catch(ParserConfigurationException pce) {
-			pce.printStackTrace();
 		}
 		catch(SAXException se) {
-			se.printStackTrace();
 		}
 		catch(IOException ioe) {
-			ioe.printStackTrace();
 		}
 		return null;
 	}
@@ -272,13 +263,10 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			}	
 		}
 		catch(ParserConfigurationException pce) {
-			pce.printStackTrace();
 		}
 		catch(SAXException se) {
-			se.printStackTrace();
 		}
 		catch(IOException ioe) {
-			ioe.printStackTrace();
 		}
 		return null;
 	}
@@ -300,21 +288,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			  }
 			  this.jobDependencies.put(jobName, dependencyList);
 		}
-	}
-	
-	private void deleteEmptyFolders() {
-		File jobDirectory = new File(RuntimeVariables.getProjectsRoot()+this.JOB_FOLDER);
-		File[] listOfFiles=jobDirectory.listFiles();
-		
-		  if(listOfFiles!=null) {
-			  for(File jobFolder: listOfFiles) {
-				  if(jobFolder.isDirectory()) {
-					  if(jobFolder.delete()) {
-						  LOGGER.info("Deleted empty folder: "+jobFolder.getName());
-					  }
-				  }
-			  }
-		  }
 	}
 	
 	/**

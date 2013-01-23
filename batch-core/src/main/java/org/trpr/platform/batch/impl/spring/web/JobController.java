@@ -16,8 +16,6 @@
 
 package org.trpr.platform.batch.impl.spring.web;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;

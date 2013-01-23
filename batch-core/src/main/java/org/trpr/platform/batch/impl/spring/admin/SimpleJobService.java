@@ -63,41 +63,31 @@ import org.trpr.platform.runtime.spi.component.ComponentContainer;
  * Implements {@link JobService} to hold an additional {@link ScheduleRepository}
  * @author devashishshankar
  * @version 1.1 09 Jan 2013
- * 
  */
 
 public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Default shutdown timeout - 60 seconds */
 	private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
-	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobService.class);
-	
 	/** The shutdown timeout*/
 	private int shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
-
 	/** List of active JobExecutionS*/
 	private Collection<JobExecution> activeExecutions = Collections.synchronizedList(new ArrayList<JobExecution>());
-	
 	/** The JobRepository component*/
 	private JobRepository jobRepository;
-
 	/** The JobRepository component*/
 	private JobRegistry jobRegistry;
- 
 	/** The JobLauncher component*/
 	private JobLauncher jobLauncher;
-
 	/** The JobExplorer component*/
 	private JobExplorer jobExplorer;
-	
 	/** Scheduler component */
-	private ScheduleRepository scheduleRepository;
-		
+	private ScheduleRepository scheduleRepository;	
 	/** The ComponentContainer that loaded this JobService*/
 	private ComponentContainer componentContainer;
-		
+	
 	/**
 	 * Constructor for this class
 	 */

@@ -70,7 +70,7 @@ public class SimpleFileService implements FileService {
 			}
 			return false;	
 	}
-
+	
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#delete(String)
@@ -83,6 +83,7 @@ public class SimpleFileService implements FileService {
 		}
 		return false;
 	}
+	
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#deleteFolder(File)
