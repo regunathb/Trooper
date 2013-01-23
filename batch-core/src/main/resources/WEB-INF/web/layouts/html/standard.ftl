@@ -19,17 +19,28 @@
 <script src="${url}" type="text/javascript"></script>
 <#assign url><@spring.url relativeUrl="${servletPath}/resources/js/jquery.validate-1.7.0.min.js"/></#assign>
 <script src="${url}" type="text/javascript"></script>
+
+<link rel="stylesheet" href="${servletPath}/resources/codemirror/lib/codemirror.css">
+    <script src="${servletPath}/resources/codemirror//lib/codemirror.js"></script>
+    <script src="${servletPath}/resources/codemirror//mode/xml/xml.js"></script>
+    <link rel="stylesheet" href="${servletPath}/resources/codemirror/theme/neat.css">
+
+
+ <style type="text/css">
+      .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+      .activeline {background: #e8f2ff !important;}
+    </style>
 <!-- 
 Some icons from Silk icon set 1.3 by Mark James, http://www.famfamfam.com/lab/icons/silk/
  -->
 </head>
-<body class="main">
+<body class="main" >
 <div id="page"><#include "header.ftl"> <#include "navigation.ftl">
 <div id="container">
 <#if side??>
-<div id="secondary-navigation">
+<!--<div id="secondary-navigation">
 	<#include side>
-</div>
+</div>-->
 </#if>
 <#assign class><#if side??><#else>class="no-side-nav"</#if></#assign>
 <div id="content" ${class}>

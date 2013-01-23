@@ -7,11 +7,11 @@
 	
 			<table title="Jobs Names" class="bordered-table">
 				<tr>
-					<th>Name! changed</th>
+					<th>Name</th>
 					<th>Description</th>
 					<th>Execution&nbsp;Count</th>
-					<th>Launchable</th>
-					<th>Incrementable</th>
+			<!--		<th>Launchable</th>
+					<th>Incrementable</th> -->
 					<th>Cron Expression </th>
 					<th>Next Fire Time </th>
 				</tr>
@@ -26,8 +26,8 @@
 						<td><a href="${job_url}">${job.name}</a></td>
 						<td><@spring.messageText code="${job.name}.description" text="No description"/></td>
 						<td>${job.executionCount}</td>
-						<td><#if job.launchable??>${job.launchable?string}<#else>?</#if></td>
-						<td><#if job.incrementable??>${job.incrementable?string}<#else>?</#if></td>
+				<!--		<td><#if job.launchable??>${job.launchable?string}<#else>?</#if></td>
+						<td><#if job.incrementable??>${job.incrementable?string}<#else>?</#if></td>  -->
 						<td>${job.cronExpression}</td>
 						<td>${job.nextFireTime}</td> 
 					</tr>

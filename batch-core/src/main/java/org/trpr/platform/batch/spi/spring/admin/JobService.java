@@ -42,17 +42,24 @@ public interface JobService extends org.springframework.batch.admin.service.JobS
 	 * @return NextFireDate in a Date
 	 */
 	public Date getNextFireDate(String jobName);
-	
-	/**
-	 * Gets the {@link ComponentContainer} that loaded this JobService
-	 * @return the ComponentContainer that loaded this JobService
-	 */
+
+  /** 	
+   * Gets the {@link ComponentContainer} that loaded this JobService
+   * @return the ComponentContainer that loaded this JobService
+   */
 	public ComponentContainer getComponentContainer();
-	
-	/**
-	 * Sets the {@link ComponentContainer} that loaded this JobService
-	 * @param componentContainer the ComponentContainer that loaded this JobService
-	 */
+
+  /**
+   * Sets the {@link ComponentContainer} that loaded this JobService
+   * @param componentContainer the ComponentContainer that loaded this JobService
+   */
 	public void setComponentContainer(ComponentContainer componentContainer);
 	
+	/**
+	 * Returns whether the job is in jobService
+	 */
+	public boolean contains(String jobName);
+		
+	 
+  
 }

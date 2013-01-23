@@ -11,8 +11,6 @@
             "resource" : "${baseUrl}${job_url}",
             "description" : "<@spring.messageText code="${job.name}.description" text="No description"/>",
             "executionCount" : ${job.executionCount?c},
-            "launchable" : <#if job.launchable??>${job.launchable?string}<#else>false</#if>,
-            "incrementable" : <#if job.incrementable??>${job.incrementable?string}<#else>false</#if>,
             "CronExpression" : ${job.cronExpression},
             "NextFireDate" ${job.nextFireTime}:
         }<#if job_index != newjobs?size-1>,</#if>

@@ -51,8 +51,8 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#addTrigger
 	 */
 	@Override
-	public void addTrigger(String jobName, Trigger trigger) {
-		this.jobTrigger.put(jobName, trigger);		
+	public void addTrigger(String jobName, String jobBeanName, Trigger trigger) {
+		this.jobTrigger.put(jobName, trigger);			
 	}
 
 	/**
