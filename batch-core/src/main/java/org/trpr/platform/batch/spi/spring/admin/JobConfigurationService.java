@@ -61,7 +61,7 @@ public interface JobConfigurationService {
 	/**
 	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
 	 * @param jobName Name of the job
-	 * @throws IOException 
+	 * @throws PlatformException in case of errors
 	 */
 	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
 	
