@@ -32,9 +32,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
-import org.trpr.platform.batch.spi.spring.admin.FileService;
 
 /**
  * Controller for handling requests related to job configuration (Uploading job files, dependencies, editing job Files)
@@ -48,15 +48,19 @@ public class JobConfigController {
 	
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
-	private FileService fileService;
 	
+	/**
+	 * Autowired default constructor
+	 */
 	@Autowired
-	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService, FileService fileService) {
+	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService) {
 		this.jobService = jobService;
 		this.jobConfigService = jobConfigService;
-		this.fileService = fileService;		
 	}
 	
+	/**
+	 * Finds the jobname from the request URL
+	 */
 	@ModelAttribute("jobName")
 	public String getJobName(HttpServletRequest request) {
 		String path = request.getPathInfo();
@@ -74,7 +78,7 @@ public class JobConfigController {
 	public String modifyJob(ModelMap model, @ModelAttribute("jobName") String jobName) {
 		//Load & Add JobName, XMLFileContents, Dependencies to the view
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);
-		String XMLFileContents = this.fileService.getFileContents(jobConfigService.getXMLFile(jobName));
+		String XMLFileContents = this.jobConfigService.getFileContents(jobConfigService.getXMLFilePath(jobName));
 		model.addAttribute("jobName", jobName);
 		model.addAttribute("XMLFileContents", XMLFileContents);
 		if(jobConfigService.getJobDependencyList(jobName)!=null) {
@@ -105,10 +109,12 @@ public class JobConfigController {
 		//Read file to view
 		else {
 			boolean invalidJobFile=false;
+			String jobName = null;
 			try {
 					byte[] buffer = jobFile.getBytes();
 					String XMLFileContents = new String(buffer, "UTF-8");
 					model.addAttribute("XMLFileContents", XMLFileContents);
+					jobName= jobConfigService.getJobNameFromXML(jobFile.getBytes());
 			} 
 			catch (UnsupportedEncodingException e) {
 				invalidJobFile=true;
@@ -116,7 +122,6 @@ public class JobConfigController {
 			catch (IOException e) {
 				invalidJobFile=true;
 			}
-			String jobName= jobConfigService.getJobNameFromXML(jobFile);
 			if(jobName==null || invalidJobFile) {
 				model.clear();
 				model.addAttribute("Error", "invalid jobFile. Couldn't find job's name");	
@@ -158,7 +163,7 @@ public class JobConfigController {
 			//Read file to view
 			else {
 				byte[] buffer = jobFile.getBytes();
-				XMLFileContents = new String(buffer, "UTF-8");
+				XMLFileContents = new String(buffer);
 				model.addAttribute("XMLFileContents", XMLFileContents);
 			}
 		}
@@ -178,7 +183,7 @@ public class JobConfigController {
 			}
 			//Move uploaded file
 			else {
-				jobConfigService.addJobDependency(jobName,depFile);
+				jobConfigService.addJobDependency(jobName,depFile.getOriginalFilename(),depFile.getBytes());
 			}
 		}
 		//Button 3: Save. Overwrite the modified XML File
@@ -187,13 +192,11 @@ public class JobConfigController {
 			boolean fileModifedFlag=false;
 			try {
 				//Set XML File
-				if(!this.jobConfigService.setXMLFile(jobName, XMLFileContents)) {
-					throw new Exception("Job name cannot be changed");
-				}
+				this.jobConfigService.setXMLFile(jobName, XMLFileContents);
 				//File has been modified if previous exception was not thrown
 				fileModifedFlag = true;
 				//Try a trooper reload (loadResource)
-				this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getJobDirectory(jobName)+"/spring-batch-config.xml"));
+				this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getJobDirectory(jobName)+"/"+BatchFrameworkConstants.SPRING_BATCH_CONFIG));
 			}
 			//Loading didn't work
 			catch (Exception e) {
@@ -201,8 +204,8 @@ public class JobConfigController {
 				if(fileModifedFlag) {
 					jobConfigService.removeXMLFile(jobName);
 					//Previous version restoring
-					if(jobConfigService.getXMLFile(jobName)!=null) {
-						this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getXMLFile(jobName)));
+					if(jobConfigService.getXMLFilePath(jobName)!=null) {
+						this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getXMLFilePath(jobName)));
 					}
 				}
 				//View: Add Error and rest of the attributes
@@ -254,8 +257,8 @@ public class JobConfigController {
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);		
 		model.addAttribute("jobName", jobName);
 		//Adding XMLFileContents & dependencies to view
-		String XMLFileContents = fileService.getFileContents(jobConfigService.getXMLFile(jobName));
-		model.addAttribute("XMLFileName", jobConfigService.getXMLFile(jobName));	
+		String XMLFileContents = jobConfigService.getFileContents(jobConfigService.getXMLFilePath(jobName));
+		model.addAttribute("XMLFileName", jobConfigService.getXMLFilePath(jobName));	
 		model.addAttribute("XMLFileContents", XMLFileContents);
 		String jobDirectory = this.jobConfigService.getJobDirectory(jobName);
 		model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");

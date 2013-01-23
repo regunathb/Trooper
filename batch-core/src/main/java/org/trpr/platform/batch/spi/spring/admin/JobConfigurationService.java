@@ -15,13 +15,10 @@
  */
 package org.trpr.platform.batch.spi.spring.admin;
 
+import java.io.IOException;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.core.PlatformException;
-import org.xml.sax.SAXException;
 
 /**
  * <code>JobConfigurationService</code> provides methods for job configuration such as adding, removing XML Config files and dependencies
@@ -35,6 +32,8 @@ public interface JobConfigurationService {
 	/**
 	 * Gets the absolute directory path of a job, where all the config-files and dependencies are stored.
 	 * Returns a new directory based on jobName if job doesn't exist
+	 * @param jobName job name identifier
+	 * @return Path of job directory
 	 */
 	public String getJobDirectory(String jobName);
 	
@@ -43,16 +42,15 @@ public interface JobConfigurationService {
 	 * @param jobName job name identifier
 	 * @return Path of XMLFile. null if not found
 	 */
-	public String getXMLFile(String jobName);
+	public String getXMLFilePath(String jobName);
 	
 	/**
 	 * Sets the XML File. If the job doesn't have an XML file (new job), a new directory 
 	 * is created and a new XML File is created there. Otherwise, the old file is overwritten.
 	 * @param jobName the job name identifier
-	 * @return true if the deployment of the job configuration file was successful, false otherwise
 	 * @throws PlatformException in case of errors
 	 */
-	public boolean setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
+	public void setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
 	
 	/**
 	 * Removes the job configuration XML file for the specified job name
@@ -63,8 +61,9 @@ public interface JobConfigurationService {
 	/**
 	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
 	 * @param jobName Name of the job
+	 * @throws PlatformException in case of errors
 	 */
-	public void addJobDependency(String jobName, MultipartFile file);
+	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
 	
 	/** 
 	 * Returns the list of dependencies of given job. 
@@ -74,15 +73,17 @@ public interface JobConfigurationService {
 	public List<String> getJobDependencyList(String jobName);
 	
 	/**
-	 * Get the jobname from a spring batch config file
+	 * Get the job name from a spring batch config file.
+	 * @param XMLFileContents A byte array of the configuration file
+	 * @return Job name if found, null otherwise
 	 */
-	public String getJobNameFromXML(MultipartFile jobFile);
+	public String getJobNameFromXML(byte[] XMLFileContents);
 	
 	/**
-	 * Get the jobname from a spring batch config file contents.
-	 * @throws ParserConfigurationException 
-	 * @throws SAXException 
+	 * Gets the contents of a file in a single String
+	 * @param filePath Path of the file
+	 * @return String containing the file contents
 	 */
-	public String getJobNameFromXML(String fileContents) throws ParserConfigurationException, SAXException;
-
+	public String getFileContents(String filePath);
+	
 }
