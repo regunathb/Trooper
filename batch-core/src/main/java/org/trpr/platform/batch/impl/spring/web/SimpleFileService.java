@@ -22,18 +22,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.trpr.platform.batch.spi.spring.admin.TrooperFileService;
+import org.trpr.platform.batch.spi.spring.admin.FileService;
 /**
- * Implementation of @link {TrooperFileService}
+ * Implementation of @link {FileService}
  * @author devashishshankar
  * @version 1.0 Jan 21, 2012
  *
  */
-public class SimpleFileService implements TrooperFileService {
+public class SimpleFileService implements FileService {
 	
 	/**
 	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.TrooperFileService#getFileContents(String)
+	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#getFileContents(String)
 	 */
 	@Override
 	public String getFileContents(String filename) {
@@ -53,7 +53,7 @@ public class SimpleFileService implements TrooperFileService {
 	
 	/**
 	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.TrooperFileService#upload(MultipartFile, String)
+	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#upload(MultipartFile, String)
 	 */
 	@Override
 	public boolean upload(MultipartFile file, String dest_path) {
@@ -73,7 +73,7 @@ public class SimpleFileService implements TrooperFileService {
 
 	/**
 	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.TrooperFileService#delete(String)
+	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#delete(String)
 	 */
 	@Override
 	public boolean delete(String destPath) {
@@ -85,7 +85,7 @@ public class SimpleFileService implements TrooperFileService {
 	}
 	/**
 	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.TrooperFileService#deleteFolder(File)
+	 * @see org.trpr.platform.batch.spi.spring.admin.FileService#deleteFolder(File)
 	 */	
 	@Override
 	public void deleteFolder(File folder) {

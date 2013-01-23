@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
-import org.trpr.platform.batch.spi.spring.admin.TrooperFileService;
+import org.trpr.platform.batch.spi.spring.admin.FileService;
 
 /**
  * Controller for handling requests related to job configuration (Uploading job files, dependencies, editing job Files)
@@ -50,10 +50,10 @@ public class JobConfigController {
 	
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
-	private TrooperFileService fileService;
+	private FileService fileService;
 	
 	@Autowired
-	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService, TrooperFileService fileService) {
+	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService, FileService fileService) {
 		this.jobService = jobService;
 		this.jobConfigService = jobConfigService;
 		this.fileService = fileService;		

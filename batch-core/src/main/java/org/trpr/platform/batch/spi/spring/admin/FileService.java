@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @version 1.0 22 Jan, 2012
  *
  */
-public interface TrooperFileService {
+public interface FileService {
 
 	/**
 	 * Uploads a multipart file to the given path. Creates the path if it doesn't exist

@@ -34,7 +34,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
-import org.trpr.platform.batch.spi.spring.admin.TrooperFileService;
+import org.trpr.platform.batch.spi.spring.admin.FileService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.runtime.common.RuntimeVariables;
@@ -62,7 +62,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	private JobRegistry jobRegistry;
 	
 	/**TrooperFIleSErvice provides filesystem functions such as upload, delete **/
-	private TrooperFileService fileService;
+	private FileService fileService;
 	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
@@ -72,7 +72,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	private final String LIBRARY_FOLDER = "/lib/";
 	private final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
 	
-	public SimpleJobConfigurationService(JobRegistry jobRegistry, TrooperFileService fileService) {
+	public SimpleJobConfigurationService(JobRegistry jobRegistry, FileService fileService) {
 		this.jobRegistry = jobRegistry;		
 		this.fileService = fileService;
 		this.jobDependencies = new HashMap<String, List<String>>();
@@ -179,6 +179,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			if(prevXMLFile.exists()) {
 				prevXMLFile.delete();
 			}
+			xmlFile.renameTo(prevXMLFile);
 			xmlFile.createNewFile();
 		}
 		BufferedWriter writer = new BufferedWriter(new FileWriter(xmlFile));
