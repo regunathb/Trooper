@@ -33,8 +33,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.BatchFrameworkConstants;
-import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
+import org.trpr.platform.batch.impl.spring.BatchConfigInfo;
 import org.trpr.platform.batch.spi.spring.admin.FileService;
+import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
+import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.runtime.common.RuntimeVariables;
@@ -46,7 +48,8 @@ import org.xml.sax.SAXException;
 
 /**
  * An implementation of @link {JobConfigurationService}
- * Provides functions for configuring jobs, their configuration files, dependencies, dynamic loading, etc.
+ * Provides methods for configuring jobs - their configuration files and dependencies.
+ * 
  * @author devashishshankar
  * @version 1.0 22 Jan, 2013
  */
@@ -67,10 +70,10 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
 	
-	private final String SPRING_BATCH_FILE = "/spring-batch-config.xml";
-	private final String JOB_FOLDER = "/src/main/resources/external/";
-	private final String LIBRARY_FOLDER = "/lib/";
-	private final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
+	private static final String SPRING_BATCH_FILE = "/" + BatchFrameworkConstants.SPRING_BATCH_CONFIG;
+	private static final String JOB_FOLDER = "/src/main/resources/external/";
+	private static final String LIBRARY_FOLDER = "/" + BatchConfigInfo.BINARIES_PATH + "/";
+	private static final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
 	
 	public SimpleJobConfigurationService(JobRegistry jobRegistry, FileService fileService) {
 		this.jobRegistry = jobRegistry;		
@@ -86,7 +89,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	public String getJobDirectory(String jobName) {	
 		String XMLFilePath = this.getXMLFile(jobName);
 		if(XMLFilePath==null) {
-			return RuntimeVariables.getProjectsRoot()+this.JOB_FOLDER+jobName+"/";	
+			return RuntimeVariables.getProjectsRoot()+SimpleJobConfigurationService.JOB_FOLDER+jobName+"/";	
 		}else {
 			return XMLFilePath.substring(0, XMLFilePath.lastIndexOf('/'));
 		}
@@ -149,7 +152,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#setXMLFile(String, String)
 	 */
 	@Override
-	public boolean setXMLFile(String jobName, String XMLFileContents) throws IOException {
+	public boolean setXMLFile(String jobName, String XMLFileContents) throws PlatformException {
 		if(this.jobXMLFile.isEmpty())
 			this.scanXMLFiles();
 		//Check if jobName has been changed
@@ -161,25 +164,30 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		String dest_path = null;
 		File xmlFile = null;
 		//NEW JOB
-		if(this.getXMLFile(jobName)==null) {
-			dest_path=this.getJobDirectory(jobName)+this.SPRING_BATCH_FILE;
-			xmlFile = new File(dest_path);
-			xmlFile.getParentFile().mkdirs();
-			xmlFile.createNewFile();
-		}else {
-			dest_path = this.getXMLFile(jobName);
-			File prevXMLFile = new File(dest_path.substring(0, dest_path.lastIndexOf('/'))+this.SPRING_BATCH_PREV);
-			xmlFile = new File(dest_path);
-			if(prevXMLFile.exists()) {
-				prevXMLFile.delete();
+		try {
+			if(this.getXMLFile(jobName)==null) {
+				dest_path=this.getJobDirectory(jobName)+SimpleJobConfigurationService.SPRING_BATCH_FILE;
+				xmlFile = new File(dest_path);
+				xmlFile.getParentFile().mkdirs();
+				xmlFile.createNewFile();
+			}else {
+				dest_path = this.getXMLFile(jobName);
+				File prevXMLFile = new File(dest_path.substring(0, dest_path.lastIndexOf('/'))+SimpleJobConfigurationService.SPRING_BATCH_PREV);
+				xmlFile = new File(dest_path);
+				if(prevXMLFile.exists()) {
+					prevXMLFile.delete();
+				}
+				xmlFile.renameTo(prevXMLFile);
+				xmlFile.createNewFile();
 			}
-			xmlFile.renameTo(prevXMLFile);
-			xmlFile.createNewFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(xmlFile));
+			writer.write(XMLFileContents.trim());
+			writer.close();
+			this.jobXMLFile.put(jobName,dest_path);
+		} catch (IOException ioe) {
+			LOGGER.error("Error creating job configuration file for : " + jobName + " in location : " + dest_path,ioe);
+			throw new PlatformException("Error creating job configuration file for : " + jobName + " in location : " + dest_path, ioe);
 		}
-		BufferedWriter writer = new BufferedWriter(new FileWriter(xmlFile));
-		writer.write(XMLFileContents.trim());
-		writer.close();
-		this.jobXMLFile.put(jobName,dest_path);
 		return true;
 	}
 
@@ -195,8 +203,8 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		//Restore previous file
 		File parentFile = new File(filePath).getParentFile();
 		for (File content:parentFile.listFiles()) {
-			if(content.getName().equals(this.SPRING_BATCH_PREV.substring(1))) {
-				content.renameTo(new File(parentFile.getAbsolutePath()+this.SPRING_BATCH_FILE));
+			if(content.getName().equals(SimpleJobConfigurationService.SPRING_BATCH_PREV.substring(1))) {
+				content.renameTo(new File(parentFile.getAbsolutePath()+SimpleJobConfigurationService.SPRING_BATCH_FILE));
 				return;
 			}
 		}
@@ -257,9 +265,9 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 					//get the employee element
 					Element el = (Element)nl.item(i);
 					if(el.hasAttribute("id")) {
-							return el.getAttribute("id");
-							}
+						return el.getAttribute("id");
 					}
+				}
 			}	
 		}
 		catch(ParserConfigurationException pce) {
@@ -276,7 +284,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 */
 	private void scanJobDependencies() {		
 		for(String jobName:this.jobRegistry.getJobNames()) {			
-			  String jobDirectory = this.getJobDirectory(jobName)+this.LIBRARY_FOLDER;
+			  String jobDirectory = this.getJobDirectory(jobName)+SimpleJobConfigurationService.LIBRARY_FOLDER;
 			  File folder = new File(jobDirectory);
 			  File[] listOfFiles = folder.listFiles(); 
 			  List<String> dependencyList = new LinkedList<String>();

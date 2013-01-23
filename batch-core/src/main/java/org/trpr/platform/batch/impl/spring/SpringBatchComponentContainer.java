@@ -179,7 +179,8 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	public void loadComponent(Resource resource) {
 		if (!FileSystemResource.class.isAssignableFrom(resource.getClass()) || 
 				!((FileSystemResource)resource).getFilename().equalsIgnoreCase(BatchFrameworkConstants.SPRING_BATCH_CONFIG)) {
-			throw new UnsupportedOperationException("Batch jobs can be loaded only from files by name : " + BatchFrameworkConstants.SPRING_BATCH_CONFIG);
+			throw new UnsupportedOperationException("Batch jobs can be loaded only from files by name : " + 
+				BatchFrameworkConstants.SPRING_BATCH_CONFIG + ". Specified resource is : " + resource.toString());
 		}
 		loadJobContext(new BatchConfigInfo(((FileSystemResource)resource).getFile()));
 	}
@@ -188,7 +189,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	 * Loads the job context from path specified in the BatchConfigInfo. Looks for file by name BatchFrameworkConstants.SPRING_BATCH_CONFIG. 
 	 * @param batchConfigInfo containing absolute path to the job's configuration location i.e. folder
 	 */
-	public void loadJobContext(BatchConfigInfo batchConfigInfo) {
+	private void loadJobContext(BatchConfigInfo batchConfigInfo) {
 		// check if a context exists already for this config path 
 		for (BatchConfigInfo loadedJobInfo : this.jobsContextList) {
 			if (loadedJobInfo.equals(batchConfigInfo)) {

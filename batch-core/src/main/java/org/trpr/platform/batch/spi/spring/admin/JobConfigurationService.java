@@ -15,31 +15,32 @@
  */
 package org.trpr.platform.batch.spi.spring.admin;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.trpr.platform.core.PlatformException;
 import org.xml.sax.SAXException;
 
 /**
- * Provides methods for job configuration such as adding, removing XML Config files and dependencies
+ * <code>JobConfigurationService</code> provides methods for job configuration such as adding, removing XML Config files and dependencies
  * 
  * @author devashishshankar
  * @version 1.0, 22 Jan 2013
  */
+
 public interface JobConfigurationService {	
 	
 	/**
-	 * Gets the jobDirectory of a job, where all the config-files and dependencies are stored.
+	 * Gets the absolute directory path of a job, where all the config-files and dependencies are stored.
 	 * Returns a new directory based on jobName if job doesn't exist
 	 */
 	public String getJobDirectory(String jobName);
 	
 	/**
 	 * Gets the XML File path for given job. If not found, returns null.
-	 * @param jobName
+	 * @param jobName job name identifier
 	 * @return Path of XMLFile. null if not found
 	 */
 	public String getXMLFile(String jobName);
@@ -47,20 +48,18 @@ public interface JobConfigurationService {
 	/**
 	 * Sets the XML File. If the job doesn't have an XML file (new job), a new directory 
 	 * is created and a new XML File is created there. Otherwise, the old file is overwritten.
-	 * Returns false if some exceptional condition has occurred.
-	 * @param jobName
-	 * @return
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
+	 * @param jobName the job name identifier
+	 * @return true if the deployment of the job configuration file was successful, false otherwise
+	 * @throws PlatformException in case of errors
 	 */
-	public boolean setXMLFile(String jobName, String XMLFileContents) throws IOException, ParserConfigurationException, SAXException;
+	public boolean setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
 	
 	/**
-	 * 	Removes an XML File. Should be used if a wrong XML File has been uploaded
-	 * @param jobName
+	 * Removes the job configuration XML file for the specified job name
+	 * @param jobName the job name identifier
 	 */
 	public void removeXMLFile(String jobName);
+	
 	/**
 	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
 	 * @param jobName Name of the job
