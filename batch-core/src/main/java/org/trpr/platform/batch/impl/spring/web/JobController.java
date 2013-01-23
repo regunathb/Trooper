@@ -94,12 +94,7 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 		//Adding the list to the model "newjobs" to be accessed in the FTL files
 		model.addAttribute("newjobs", jobs);
 	}	
-	
 	/**
 	 * End controller Methods
 	 */
-	
-	
-	
-	
 }

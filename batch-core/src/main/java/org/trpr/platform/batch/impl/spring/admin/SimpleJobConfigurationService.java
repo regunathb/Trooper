@@ -46,6 +46,7 @@ import org.xml.sax.SAXException;
 
 /**
  * An implementation of @link {JobConfigurationService}
+ * Provides functions for configuring jobs, their configuration files, dependencies, dynamic loading, etc.
  * @author devashishshankar
  * @version 1.0 22 Jan, 2013
  */

@@ -51,7 +51,6 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 		SimpleScheduleRepository rep = context.getBean(SimpleScheduleRepository.class);
 		//Getting the scheduler from super
 		Scheduler sch = super.getScheduler();
-		
 		//loop all groups in the scheduler
 		for (String groupName : sch.getJobGroupNames()) {
 			//loop all jobs by groupname
