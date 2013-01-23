@@ -100,6 +100,7 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		}
 		return false;
 	}
+	
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.ScheduleRepository#getJobBeanName

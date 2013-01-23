@@ -15,22 +15,14 @@
  */
 package org.trpr.platform.batch.impl.spring.admin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.batch.admin.service.NoSuchStepExecutionException;
 import org.springframework.batch.core.BatchStatus;
@@ -54,19 +46,11 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.multipart.MultipartFile;
-import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
-import org.trpr.platform.runtime.common.RuntimeVariables;
-import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * The <code>SimpleJobService</code> class is an implementation of {@link JobService} that delegates most of its work to the standard Spring Batch 
@@ -80,9 +64,6 @@ import org.xml.sax.SAXException;
  * @author devashishshankar
  * @version 1.1 09 Jan 2013
  * 
- * Added additional fucntions to support adding dependencies and uploading config files through UI.
- * @author devashishshankar
- * @version 1.2 18 Jan 2013
  */
 
 public class SimpleJobService implements JobService, DisposableBean {
@@ -113,16 +94,12 @@ public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Scheduler component */
 	private ScheduleRepository scheduleRepository;
-	
-	/**Holds the list of job Dependencies */
-	private Map<String,List<String>> jobDependencies;
 		
 	/** The ComponentContainer that loaded this JobService*/
 	private ComponentContainer componentContainer;
 		
 	/**
 	 * Constructor for this class
-	 * @param jobRepository the JobRepository
 	 */
 	public SimpleJobService(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher, ScheduleRepository scheduleRepository) {
 		this.jobRepository = jobRepository;
@@ -130,7 +107,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
 		this.scheduleRepository = scheduleRepository;
-		this.jobDependencies = new HashMap<String, List<String>>();
 	}
 	
 	/**
@@ -195,7 +171,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 			throw new JobExecutionAlreadyRunningException(
 					"JobExecution is running or complete and therefore cannot be aborted");
 		}
-
 		LOGGER.info("Aborting job execution: " + jobExecution);
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
 		jobExecution.setEndTime(new Date());
@@ -616,46 +591,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 
 	/** Getter/Setter methods*/
 	/**
-	 * Interface method implementation. 
-	 * @see org.springframework.batch.admin.service.JobService#getJobDirectory()
-	 */
-	public String getJobDirectory(String jobName) {	
-		String XMLFilePath = this.getXMLFile(jobName);
-		if(XMLFilePath==null) {
-
-			return RuntimeVariables.getProjectsRoot()+"/main/resources/external/"+jobName+"/";	
-		}
-		else {
-			return XMLFilePath.substring(0, XMLFilePath.lastIndexOf('/'));
-		}
-	}
-	
-	/**
-	 * Interface method implementation. 
-	 * @see org.springframework.batch.admin.service.JobService#addJobDependency()
-	 */
-	@Override
-	public void addJobDependency(String jobName, MultipartFile jobFile) {
-		//Scan for dependencies
-		this.scanJobDependencies();
-		
-		//Upload file
-		String destFileName = jobFile.getOriginalFilename();
-		String dest_path = this.getJobDirectory(jobName);
-		upload(jobFile,dest_path+"/lib/"+destFileName);
-		List<String> dependencyList = null;
-		if(this.jobDependencies.containsKey(jobName)) {
-			dependencyList = this.jobDependencies.get(jobName);
-		}
-		else {
-			dependencyList = new LinkedList<String>();
-			this.jobDependencies.put("jobName", dependencyList);
-		}
-		dependencyList.add(destFileName);
-		this.jobDependencies.put(jobName, dependencyList);
-	}
-	
-	/**
 	 * Timeout for shutdown waiting for jobs to finish processing.
 	 * @param shutdownTimeout in milliseconds (default 60 secs)
 	 */
@@ -683,38 +618,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 	}
 
 	/**
-	 * Interface Method Implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin#getXMLFile
-	 */
-	@Override
-	public String getXMLFile(String jobName) {
-		
-		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
-		for (File jobBeansFile : jobBeansFiles) {
-			
-			
-				if(this.doesXmlFileHaveBean(this.scheduleRepository.getJobBeanName(jobName), jobBeansFile.getAbsolutePath())) {
-					return jobBeansFile.getAbsolutePath().toString();
-				}
-				
-		}
-		return null;
-	}
-
-	
-	/**
-	 * Interface Method Implementation. Gets the list of dependencies of given job. Returns null if 
-	 * jobName doesn't exist or doesn't have any dependency
-	 * @see org.trpr.platform.batch.spi.spring.admin#getJobDependencyList
-	 */
-	@Override
-	public List<String> getJobDependencyList(String jobName) {
-		//Scan for jobDependencies
-		this.scanJobDependencies();
-		return this.jobDependencies.get(jobName);
-	}
-	
-	/**
    * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
    * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()	
    */
@@ -731,83 +634,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 	  }
 
 	/** End getter/setter methods*/
-	
-	
-	/**
-	  * Private method
-	  * Checks whether the given bean name exists in the given XML File
-      */
-	private boolean doesXmlFileHaveBean(String requiredName,String filename){
-			//get the factory
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			//Using factory get an instance of document builder
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			//parse using builder to get DOM representation of the XML file
-			Document dom = db.parse(filename);
-			Element docEle = dom.getDocumentElement();
-			//get a nodelist of nodes with the name "bean" 
-			NodeList nl = docEle.getElementsByTagName("bean");
-			//Loop over all found nodes
-			if(nl != null && nl.getLength() > 0) {
-				for(int i = 0 ; i < nl.getLength();i++) {
-					//get the employee element
-					Element el = (Element)nl.item(i);
-					if(el.hasAttribute("name")) {
-						if(el.getAttribute("name").equals(requiredName)) {
-							return true;
-						}
-					}
-				}
-			}
-		}catch(ParserConfigurationException pce) {
-			pce.printStackTrace();
-		}catch(SAXException se) {
-			se.printStackTrace();
-		}catch(IOException ioe) {
-			ioe.printStackTrace();
-		}
-		return false;
-	}
-	  
-  	/**
-	 * Uploads a multipart file to the given path
-	 */
-	private boolean upload(MultipartFile file, String dest_path) {
-			try {
-				File dest_file = new File(dest_path);
-				//Creating directory structure
-				dest_file.getParentFile().mkdirs();
-				file.transferTo(dest_file);
-				return true;				
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return false;
-		
-	}
-		
-	/**
-	 * Scan the jobDirectory for any new dependency files and update JobDependencies
-	 */
-	private void scanJobDependencies() {		
-		for(String jobName:this.jobRegistry.getJobNames()) {			
-			  String jobDirectory = this.getJobDirectory(jobName)+"/lib/";
-			  File folder = new File(jobDirectory);
-			  File[] listOfFiles = folder.listFiles(); 
-			  List<String> dependencyList = new LinkedList<String>();
-			  //if directory does exist
-			  if(listOfFiles!=null) {
-				  for(File dependency: listOfFiles) {
-					  dependencyList.add(dependency.getName());
-				  }
-			  }
-			  this.jobDependencies.put(jobName, dependencyList);
-		}
-	}
-
 	@Override
 	public boolean contains(String jobName) {
 		if(jobRegistry.getJobNames().contains(jobName)){

@@ -186,17 +186,17 @@
 	<bean name="configuration/jobs/job" parent="standard">
 		<property name="attributes">
 			<props merge="true">
-				<prop key="body">/manager/configuration/html/jobc.ftl</prop>
+				<prop key="body">/manager/configuration/html/viewJobConfig.ftl</prop>
 				<prop key="titleCode">job.title</prop>
 				<prop key="tit	leText">Trooper Batch Admin: Job Configuration</prop>
 			</props>
 		</property>
 	</bean>
 	
-	<bean name="configuration/modify_job" parent="standard">
+	<bean name="configuration/modifyJob" parent="standard">
 		<property name="attributes">
 			<props merge="true">
-				<prop key="body">/manager/configuration/html/modify_job.ftl</prop>
+				<prop key="body">/manager/configuration/html/modifyJob.ftl</prop>
 				<prop key="titleCode">job.title</prop>
 				<prop key="titleText">Trooper Batch Admin: New Job</prop>
 			</props>
@@ -206,7 +206,7 @@
 	<bean name="configuration/modify/jobs/job" parent="standard">
 		<property name="attributes">
 			<props merge="true">
-				<prop key="body">/manager/configuration/html/modify_job.ftl</prop>
+				<prop key="body">/manager/configuration/html/modifyJob.ftl</prop>
 				<prop key="titleCode">job.title</prop>
 				<prop key="titleText">Trooper Batch Admin: Add/Edit Job</prop>
 			</props>

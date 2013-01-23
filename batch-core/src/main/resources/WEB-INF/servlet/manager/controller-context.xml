@@ -8,6 +8,11 @@
 	<context:annotation-config />
 
 	<bean class="org.trpr.platform.batch.impl.spring.web.JobController" />
+	<bean class="org.trpr.platform.batch.impl.spring.web.JobConfigController">
+		<constructor-arg index="0"><ref bean="jobService" /></constructor-arg>
+		<constructor-arg index="1"><ref bean="jobConfigService" /></constructor-arg>
+		<constructor-arg index="2"><ref bean="trprFileService" /></constructor-arg>
+	</bean>
 	<bean class="org.springframework.batch.admin.web.FileController" />
 	<bean class="org.springframework.batch.admin.web.StepExecutionController" />
 	<bean class="org.springframework.batch.admin.web.JobExecutionController" />
@@ -25,5 +30,4 @@
 		</property>
 	</bean>
 	
-
 </beans>
