@@ -47,7 +47,14 @@
 		<constructor-arg index="3"><ref bean="jobLauncher"/></constructor-arg>
 		<constructor-arg index="4"><ref bean="scheduleRepository"/></constructor-arg>
 	</bean>	
-
+	
+	<bean id="jobConfigService" class="org.trpr.platform.batch.impl.spring.admin.SimpleJobConfigurationService">
+		<constructor-arg index="0"><ref bean="jobRegistry"/></constructor-arg>
+		<constructor-arg index="1"><ref bean="trprFileService"/></constructor-arg>
+	</bean>
+	
+	<!--Configuring File Service -->
+	<bean id="trprFileService" class="org.trpr.platform.batch.impl.spring.web.SimpleFileService" />
 	<!--
 		Configuring Common Batch Job TransactionManager.
 	-->
