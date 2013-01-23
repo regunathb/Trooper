@@ -29,7 +29,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 
 /**
@@ -37,7 +36,7 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
  * to add extra information about trigger, such as cronexpression, next fire time, etc.
  * 
  * @author devashishshankar
- * @version 1.0, 09 Jan 2013
+ * @version 1.0, 09 Jan 2013 
  */
 
 @Controller
@@ -45,16 +44,19 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 	
 	//An instance of JobService which holds all the information about jobs
 	private JobService jobService;
-
-	@Autowired
+	
 	/**
 	 * Autowired default constructor
 	 */
+	@Autowired
 	private JobController(JobService jobService) {
 		super(jobService);
 		this.jobService = jobService;
 	}
-
+		
+	/**
+	 * Controller methods start
+	 */
 	/**
 	 * Overridden method from @link {org.springframework.batch.admin.web.JobController}. It now uses 
 	 * @link {org.trpr.platform.batch.impl.spring.web.JobInfo} to hold additional details about job
@@ -62,13 +64,12 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 	 * can be accessed by the ftl files
 	 */
 	@Override
-	@RequestMapping(value = "/jobs", method = RequestMethod.GET)
+	@RequestMapping(value = {"/jobs","/configuration"}, method = RequestMethod.GET)
 	public void jobs(ModelMap model, @RequestParam(defaultValue = "0") int startJob,
-			@RequestParam(defaultValue = "20") int pageSize) {
+			@RequestParam(defaultValue = "20") int pageSize ) {
 		int total = jobService.countJobs();
 		TableUtils.addPagination(model, total, startJob, pageSize, "Job");
 		Collection<String> names = jobService.listJobs(startJob, pageSize);
-		
 		//List of JobInfo elements to hold information to be displayed on the web console
 		List<JobInfo> jobs = new ArrayList<JobInfo>();
 		
@@ -80,17 +81,18 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			catch (NoSuchJobException e) {
 				// shouldn't happen
 			}
-			
 			//Getting attributes from jobService
 			boolean launchable = jobService.isLaunchable(name);
 			boolean incrementable = jobService.isIncrementable(name);
 			String cronExp = jobService.getCronExpression(name);
 			Date nextFireDate = jobService.getNextFireDate(name);
-
 			//Adding attributes to the list
 			jobs.add(new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate));
 		}
 		//Adding the list to the model "newjobs" to be accessed in the FTL files
 		model.addAttribute("newjobs", jobs);
 	}	
+	/**
+	 * End controller Methods
+	 */
 }

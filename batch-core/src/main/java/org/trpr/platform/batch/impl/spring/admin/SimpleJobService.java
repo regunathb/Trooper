@@ -69,37 +69,27 @@ public class SimpleJobService implements JobService, DisposableBean {
 	
 	/** Default shutdown timeout - 60 seconds */
 	private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
-	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobService.class);
-	
 	/** The shutdown timeout*/
 	private int shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
-
 	/** List of active JobExecutionS*/
 	private Collection<JobExecution> activeExecutions = Collections.synchronizedList(new ArrayList<JobExecution>());
-	
 	/** The JobRepository component*/
 	private JobRepository jobRepository;
-
 	/** The JobRepository component*/
 	private JobRegistry jobRegistry;
- 
 	/** The JobLauncher component*/
 	private JobLauncher jobLauncher;
-
 	/** The JobExplorer component*/
 	private JobExplorer jobExplorer;
-	
 	/** Scheduler component */
-	private ScheduleRepository scheduleRepository;
-	
+	private ScheduleRepository scheduleRepository;	
 	/** The ComponentContainer that loaded this JobService*/
 	private ComponentContainer componentContainer;
-		
+	
 	/**
 	 * Constructor for this class
-	 * @param jobRepository the JobRepository
 	 */
 	public SimpleJobService(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher, ScheduleRepository scheduleRepository) {
 		this.jobRepository = jobRepository;
@@ -107,22 +97,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.jobRegistry = jobRegistry;
 		this.jobLauncher = jobLauncher;
 		this.scheduleRepository = scheduleRepository;
-	}
-
-	/**
-	 * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
-	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()
-	 */
-	public ComponentContainer getComponentContainer() {
-		return this.componentContainer;
-	}
-	
-	/**
-	 * Interface method implementation.Sets the ComponentContainer that loaded this JobService
-	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#setComponentContainer(ComponentContainer)
-	 */
-	public void setComponentContainer(ComponentContainer componentContainer) {
-		this.componentContainer = componentContainer;
 	}
 	
 	/**
@@ -187,7 +161,6 @@ public class SimpleJobService implements JobService, DisposableBean {
 			throw new JobExecutionAlreadyRunningException(
 					"JobExecution is running or complete and therefore cannot be aborted");
 		}
-
 		LOGGER.info("Aborting job execution: " + jobExecution);
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
 		jobExecution.setEndTime(new Date());
@@ -604,7 +577,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		return allExecutions.size();
 	}
-
+	
 
 	/** Getter/Setter methods*/
 	/**
@@ -615,23 +588,49 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.shutdownTimeout = shutdownTimeout;
 	}
 
-	@Override
 	/**
 	 * Interface method implementation. Returns the Cron Expression of the job.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getCronExpression
 	 */
+	@Override
 	public String getCronExpression(String jobName) {		
 		return this.scheduleRepository.getCronExpression(jobName);
 	}
 
-	@Override
+	
 	/**
 	 * Interface method implementation. Returns the next Fire Date of the job.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getNextFireDate
 	 */
+	@Override
 	public Date getNextFireDate(String jobName) {
 		return this.scheduleRepository.getNextFireDate(jobName);
 	}
 
+	/**
+   * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
+   * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()	
+   */
+	public ComponentContainer getComponentContainer() {
+	    return this.componentContainer;
+	  }
+
+  /**	
+   * Interface method implementation.Sets the ComponentContainer that loaded this JobService
+   * @see org.trpr.platform.batch.spi.spring.admin.JobService#setComponentContainer(ComponentContainer)
+   */
+	public void setComponentContainer(ComponentContainer componentContainer) {
+	    this.componentContainer = componentContainer;
+	  }
+
 	/** End getter/setter methods*/
+	@Override
+	public boolean contains(String jobName) {
+		if(jobRegistry.getJobNames().contains(jobName)){
+			return true;
+		}
+		return false;
+	}
+		
+		
 }
