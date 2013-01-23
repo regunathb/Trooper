@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 
@@ -48,12 +49,18 @@ public class JobConfigController {
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
 	
+	/**
+	 * Autowired default constructor
+	 */
 	@Autowired
 	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService) {
 		this.jobService = jobService;
 		this.jobConfigService = jobConfigService;
 	}
 	
+	/**
+	 * Finds the jobname from the request URL
+	 */
 	@ModelAttribute("jobName")
 	public String getJobName(HttpServletRequest request) {
 		String path = request.getPathInfo();
@@ -156,7 +163,7 @@ public class JobConfigController {
 			//Read file to view
 			else {
 				byte[] buffer = jobFile.getBytes();
-				XMLFileContents = new String(buffer, "UTF-8");
+				XMLFileContents = new String(buffer);
 				model.addAttribute("XMLFileContents", XMLFileContents);
 			}
 		}
@@ -189,7 +196,7 @@ public class JobConfigController {
 				//File has been modified if previous exception was not thrown
 				fileModifedFlag = true;
 				//Try a trooper reload (loadResource)
-				this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getJobDirectory(jobName)+"/spring-batch-config.xml"));
+				this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getJobDirectory(jobName)+"/"+BatchFrameworkConstants.SPRING_BATCH_CONFIG));
 			}
 			//Loading didn't work
 			catch (Exception e) {
