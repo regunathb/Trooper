@@ -27,7 +27,7 @@
   	</distributionManagement> 
   	
   	<scm>
-    	<url>https://github.com/regunathb/Troope</url>
+    	<url>https://github.com/regunathb/Trooper</url>
     	<connection>https://github.com/regunathb/Trooper.git</connection>
   	</scm>
   
