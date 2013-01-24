@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -53,6 +54,15 @@ import org.w3c.dom.NodeList;
  */
 public class SimpleJobConfigurationService implements JobConfigurationService {
 
+	/** Constants for file paths, extensions and markup elements*/
+	private static final String SPRING_BATCH_FILE = "/" + BatchFrameworkConstants.SPRING_BATCH_CONFIG;
+	private static final String JOB_FOLDER = "/src/main/resources/external/";
+	private static final String LIBRARY_FOLDER = "/" + BatchConfigInfo.BINARIES_PATH + "/";
+	private static final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
+	private static final String BINARIES_TYPE = ".jar";
+	private static final String BATCH_JOB_TAG = "batch:job";
+	private static final String ID_PROP = "id";
+	
 	/**Holds the list of job Dependencies */
 	private Map<String,List<String>> jobDependencies;
 	
@@ -64,14 +74,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
-	
-	private static final String SPRING_BATCH_FILE = "/" + BatchFrameworkConstants.SPRING_BATCH_CONFIG;
-	private static final String JOB_FOLDER = "/src/main/resources/external/";
-	private static final String LIBRARY_FOLDER = "/" + BatchConfigInfo.BINARIES_PATH + "/";
-	private static final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
-	private static final String BATCH_JOB_TAG = "batch:job";
-	private static final String ID_PROP = "id";
-	
+		
 	/**
 	 * Constructor method
 	 * @param jobRegistry THe registry containing Job Names
@@ -101,7 +104,12 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see JobConfigurationService#addJobDependency(String, MultipartFile)
 	 */
 	@Override
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) {
+	public void addJobDependency(String jobName, String destFileName, byte[] fileContents)  throws PlatformException {
+		
+		if (!destFileName.endsWith(BINARIES_TYPE)) {
+			throw new PlatformException ("Unrecognized binary type. Suppported file type : " + BINARIES_TYPE);
+		}
+		
 		//Scan for dependencies
 		if(this.jobDependencies.isEmpty())
 		this.scanJobDependencies();
@@ -120,7 +128,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			dependencyList = this.jobDependencies.get(jobName);
 		}else {
 			dependencyList = new LinkedList<String>();
-			this.jobDependencies.put("jobName", dependencyList);
+			this.jobDependencies.put(jobName, dependencyList);
 		}
 		dependencyList.add(destFileName);
 		this.jobDependencies.put(jobName, dependencyList);
@@ -255,7 +263,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			byte[] buffer = new byte[(int) f.length()];
 			new DataInputStream(fin).readFully(buffer);
 			fin.close();
-			return new String(buffer,"UTF-8").trim();
+			return new String(buffer).trim();
 		}
 		catch(Exception e) {
 			LOGGER.error("Error while reading contents of: "+filename,e);
@@ -270,7 +278,12 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		for(String jobName:this.jobRegistry.getJobNames()) {			
 			  String jobDirectory = this.getJobDirectory(jobName)+SimpleJobConfigurationService.LIBRARY_FOLDER;
 			  File folder = new File(jobDirectory);
-			  File[] listOfFiles = folder.listFiles(); 
+			  File[] listOfFiles = folder.listFiles(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith(BINARIES_TYPE);
+					}
+			  }); 
 			  List<String> dependencyList = new LinkedList<String>();
 			  //if directory does exist
 			  if(listOfFiles!=null) {

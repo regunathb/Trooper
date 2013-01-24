@@ -15,7 +15,6 @@
  */
 package org.trpr.platform.batch.spi.spring.admin;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.trpr.platform.core.PlatformException;
