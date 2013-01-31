@@ -35,29 +35,37 @@ import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
+import org.trpr.platform.batch.spi.spring.admin.SyncService;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
+
 
 /**
- * Controller for handling requests related to job configuration (Uploading job files, dependencies, editing job Files)
+ * <code> JObConfigController </code> is a controller for handling requests related to 
+ * job configuration (Uploading job files, dependencies, editing job Files)
  * @author devashishshankar
  * @version 1.0 22 Jan, 2012
- * TODO: Make redirect work (Code will be cleaner)
  */
 
 @Controller
 public class JobConfigController {
-	
+
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
-	
+	private SyncService syncService;
+
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(JobConfigController.class);
 	/**
 	 * Autowired default constructor
 	 */
 	@Autowired
-	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService) {
+	public JobConfigController(JobService jobService,JobConfigurationService jobConfigService, SyncService syncService) {
 		this.jobService = jobService;
 		this.jobConfigService = jobConfigService;
+		this.syncService = syncService;
 	}
-	
+
 	/**
 	 * Finds the jobname from the request URL
 	 */
@@ -86,7 +94,7 @@ public class JobConfigController {
 		}
 		return "configuration/modify/jobs/job";	
 	}
-	
+
 	/**
 	 * Controller for new job. Just adds an attribute jobName to the model. And redirects to the job edit page.
 	 */
@@ -111,10 +119,10 @@ public class JobConfigController {
 			boolean invalidJobFile=false;
 			String jobName = null;
 			try {
-					byte[] buffer = jobFile.getBytes();
-					String XMLFileContents = new String(buffer, "UTF-8");
-					model.addAttribute("XMLFileContents", XMLFileContents);
-					jobName= jobConfigService.getJobNameFromXML(jobFile.getBytes());
+				byte[] buffer = jobFile.getBytes();
+				String XMLFileContents = new String(buffer, "UTF-8");
+				model.addAttribute("XMLFileContents", XMLFileContents);
+				jobName= jobConfigService.getJobNameFromXML(jobFile.getBytes());
 			} 
 			catch (UnsupportedEncodingException e) {
 				invalidJobFile=true;
@@ -136,7 +144,7 @@ public class JobConfigController {
 			return "configuration/modify/jobs/job";
 		}
 	}
-	
+
 	/**
 	 * This method handles all the configuration changes:
 	 * 	Uploading of XML File
@@ -145,10 +153,10 @@ public class JobConfigController {
 	 */
 	@RequestMapping(value = "configuration/modify/jobs/{jobName}", method = RequestMethod.POST)
 	public String editJob(ModelMap model, @RequestParam String jobName, 
-		@RequestParam(defaultValue = "") String XMLFileContents, @RequestParam(defaultValue = "0") 
-		MultipartFile jobFile, @RequestParam(defaultValue = "0") MultipartFile depFile, 
-		@RequestParam(defaultValue = "0") String identifier) throws Exception {
-		
+			@RequestParam(defaultValue = "") String XMLFileContents, @RequestParam(defaultValue = "0") 
+	MultipartFile jobFile, @RequestParam(defaultValue = "0") MultipartFile depFile, 
+	@RequestParam(defaultValue = "0") String identifier) throws Exception {
+
 		//Button 1: Upload XML
 		if(identifier.equals("Upload file")) {
 			String jobFileName = jobFile.getOriginalFilename();
@@ -225,9 +233,24 @@ public class JobConfigController {
 				//Redirect
 				return "configuration/modify/jobs/job";
 			}
+			//TODO: Delete the configuration file
+			
 			//Loading worked. Redirect to job configuration page. Load the view details
 			model.addAttribute("SuccessMessage", "The job was successfully deployed!");
 			model.addAttribute("jobName", jobName);
+			//Push jobs to all servers
+			for(Host serverName: this.jobConfigService.getAllServerNames()) {
+				System.out.println(serverName.getAddress());
+				if(serverName.equals(this.jobConfigService.getCurrentServerName())) {
+					continue;
+				}
+				if(this.syncService.pushJobToServer(jobName, serverName.getAddress())) {
+					LOGGER.info("Deployed job: "+jobName+" to server: "+serverName);
+				}
+				else {
+					LOGGER.error("Error while deploying job: "+jobName+" to server: "+serverName);
+				}
+			}
 			if(jobConfigService.getJobDependencyList(jobName)!=null) {
 				model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 			}
@@ -245,7 +268,7 @@ public class JobConfigController {
 		//Redirect to modify page
 		return "configuration/modify/jobs/job";
 	}
-	
+
 	/**
 	 * Displays a non-editable version of job configuration
 	 * This method gets the XMLFile, Dependencies from jobService and displays it.
@@ -268,6 +291,6 @@ public class JobConfigController {
 		}
 		return "configuration/jobs/job";
 	}
-	
+
 
 }

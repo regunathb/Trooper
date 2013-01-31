@@ -26,7 +26,7 @@
   	</distributionManagement> 
   	
   	<scm>
-    	<url>https://github.com/regunathb/Trooper</url>
+    	<url>https://github.com/regunathb/Troope</url>
     	<connection>https://github.com/regunathb/Trooper.git</connection>
   	</scm>
   
@@ -124,8 +124,13 @@
 		<dependency>
 			<groupId>com.netflix.curator</groupId>
 		  	<artifactId>curator-recipes</artifactId>
-		  	<version>1.2.2</version>
-		</dependency>							
+		  	<version>1.2.6</version>
+		</dependency>	
+		<dependency>
+		    <groupId>com.netflix.curator</groupId>
+		    <artifactId>curator-x-discovery</artifactId>
+		    <version>1.2.6</version>
+		</dependency>						
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>

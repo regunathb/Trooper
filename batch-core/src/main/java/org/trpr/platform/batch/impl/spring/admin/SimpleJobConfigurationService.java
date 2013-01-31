@@ -21,8 +21,13 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +40,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.BatchFrameworkConstants;
 import org.trpr.platform.batch.impl.spring.BatchConfigInfo;
+import org.trpr.platform.batch.impl.spring.web.Host;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -54,27 +60,38 @@ import org.w3c.dom.NodeList;
  */
 public class SimpleJobConfigurationService implements JobConfigurationService {
 
-	/** Constants for file paths, extensions and markup elements*/
+	/**Holds the list of job Dependencies */
+	private Map<String,List<String>> jobDependencies;
+
+	/**Holds the list of XML Files */
+	private Map<String,String> jobXMLFile;
+
+	/** Holds the list of servers onto which a job is deployed */
+	private Map<String,List<Host>> jobServerNames;
+
+	/** Holds the list of serverNames*/
+	private List<Host> serverNames;
+
+	/** List of HA jobs in current server **/
+	private List<String> currentJobNames;
+
+	/**JobRegistry. Has the name of jobs */
+	private JobRegistry jobRegistry;
+
+
+	/**Holds the current server details **/
+	private Host serverName;
+
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
+
 	private static final String SPRING_BATCH_FILE = "/" + BatchFrameworkConstants.SPRING_BATCH_CONFIG;
 	private static final String JOB_FOLDER = "/src/main/resources/external/";
 	private static final String LIBRARY_FOLDER = "/" + BatchConfigInfo.BINARIES_PATH + "/";
 	private static final String SPRING_BATCH_PREV = "/spring-batch-config-prev.xml";
-	private static final String BINARIES_TYPE = ".jar";
 	private static final String BATCH_JOB_TAG = "batch:job";
 	private static final String ID_PROP = "id";
-	
-	/**Holds the list of job Dependencies */
-	private Map<String,List<String>> jobDependencies;
-	
-	/**Holds the list of XML Files */
-	private Map<String,String> jobXMLFile;
-	
-	/**JobRegistry. Has the name of jobs */
-	private JobRegistry jobRegistry;
-	
-	/** Logger instance for this class*/
-	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
-		
+
 	/**
 	 * Constructor method
 	 * @param jobRegistry THe registry containing Job Names
@@ -84,8 +101,110 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		this.jobRegistry = jobRegistry;		
 		this.jobDependencies = new HashMap<String, List<String>>();
 		this.jobXMLFile = new HashMap<String, String>();
+		this.jobServerNames = new HashMap<String, List<Host>>();
+		this.serverNames = new LinkedList<Host>();
+		this.currentJobNames =  new LinkedList<String>();
 	}
-	
+
+	/**
+	 * Interface method implementation.
+	 * Also sets the hostName
+	 * @see JobConfigurationService#setPort(int)
+	 */
+	@Override
+	public void setPort(int port) {
+		String hostName = "";
+		String ipAddr = "";
+		try {
+			hostName = InetAddress.getLocalHost().getHostName();
+			ipAddr = InetAddress.getLocalHost().getHostAddress();
+			Enumeration<NetworkInterface> nets = 
+					NetworkInterface.getNetworkInterfaces();
+			while (nets.hasMoreElements())
+			{
+				NetworkInterface netint = (NetworkInterface) nets.nextElement();
+				Enumeration<InetAddress> ips = netint.getInetAddresses();
+				while(ips.hasMoreElements()) {
+					InetAddress ip = ips.nextElement();
+					if (!ip.isLoopbackAddress()  &&  
+							ip.isSiteLocalAddress()) {
+						LOGGER.info("Host IP Address: "+ip.getHostAddress());
+						ipAddr = ip.getHostAddress();
+						break;
+					}
+				}
+			}
+		} catch (UnknownHostException e) {
+			LOGGER.error("Error while getting hostName ",e);
+		} catch (SocketException e) {
+			LOGGER.error("Error while getting hostName ",e);
+		}
+		this.serverName = new Host(hostName,ipAddr,port);
+	}
+
+	/**
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getCurrentServerName()
+	 */
+	@Override
+	public Host getCurrentServerName() {	
+		return this.serverName;
+	}
+
+	/**
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getCurrentServerJobs()
+	 */
+	@Override
+	public Collection<String> getCurrentServerJobs() {
+		return this.currentJobNames;
+	}
+
+	/**
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#addJobInstance(String, Host)
+	 */
+	@Override
+	public void addJobInstance(String jobName, Host serverName) {
+		LOGGER.info("Adding instance: "+jobName+" "+serverName.getPort());
+		if(this.jobServerNames.containsKey(jobName)) {
+			if(!this.jobServerNames.get(jobName).contains(serverName)) {
+				this.jobServerNames.get(jobName).add(serverName);
+				LOGGER.info("added new server");
+			}
+		}
+		else {
+			List<Host> serverList = new LinkedList<Host>();
+			serverList.add(serverName);
+			this.jobServerNames.put(jobName, serverList);
+		}
+		if(!this.serverNames.contains(serverName)) {
+			this.serverNames.add(serverName);
+			LOGGER.info("Added to serverNames: "+serverName+": "+serverName.getAddress());
+		}
+		if(!this.currentJobNames.contains(jobName)) {
+			this.currentJobNames.add(jobName);
+		}
+	}
+
+	/**
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getServerNames(String)
+	 */
+	@Override
+	public List<Host> getServerNames(String jobName) {
+		return this.jobServerNames.get(jobName);		
+	}
+
+	/**
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getAllServerNames()
+	 */
+	@Override
+	public List<Host> getAllServerNames() {
+		return this.serverNames;	
+	}
+
 	/**
 	 * Interface method implementation. 
 	 * @see JobConfigurationService#getJobDirectory(String)
@@ -104,17 +223,17 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see JobConfigurationService#addJobDependency(String, MultipartFile)
 	 */
 	@Override
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents)  throws PlatformException {
-		
-		if (!destFileName.endsWith(BINARIES_TYPE)) {
-			throw new PlatformException ("Unrecognized binary type. Suppported file type : " + BINARIES_TYPE);
-		}
-		
+	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) {
 		//Scan for dependencies
 		if(this.jobDependencies.isEmpty())
-		this.scanJobDependencies();
-		
+			this.scanJobDependencies();
+
 		String destPath = this.getJobDirectory(jobName);
+		if(this.jobDependencies.containsKey(jobName)) {
+			if(this.jobDependencies.get(jobName).contains(destFileName)) {
+				throw new PlatformException("The dependency: "+destFileName+" already exists");
+			}
+		}
 		//Upload file
 		try {
 			this.upload(fileContents,destPath+SimpleJobConfigurationService.LIBRARY_FOLDER+destFileName);
@@ -133,7 +252,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		dependencyList.add(destFileName);
 		this.jobDependencies.put(jobName, dependencyList);
 	}
-	
+
 	/**
 	 * Interface Method Implementation. Gets the list of dependencies of given job. Returns null if 
 	 * jobName doesn't exist or doesn't have any dependency
@@ -162,7 +281,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Interface method implementation. After setting an XML File, also saves the previous file.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#setXMLFile(String, String)
@@ -178,23 +297,23 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 				throw new PlatformException("The Job Name cannot be changed. Expecting: "+jobName+" Got: "+this.getJobNameFromXML(XMLFileContents.getBytes()));
 			}
 			//Code for overwriting file to location
-				//NEW JOB
-				if(this.getXMLFilePath(jobName)==null) {
-					destPath=this.getJobDirectory(jobName)+SimpleJobConfigurationService.SPRING_BATCH_FILE;
-				}else { //Already deployed job. Store the previous file
-					destPath = this.getXMLFilePath(jobName);
-					String prevPath = destPath.substring(0, destPath.lastIndexOf('/'))+SimpleJobConfigurationService.SPRING_BATCH_PREV;
-					File prevXMLFile = new File(prevPath);
-					File xmlFile = new File(destPath);
-					if(prevXMLFile.exists()) {
-						prevXMLFile.delete();
-					}
-					//Rename the old config file
-					xmlFile.renameTo(prevXMLFile);
-					xmlFile.createNewFile();
+			if(this.getXMLFilePath(jobName)==null) {  //NEW JOB
+				destPath=this.getJobDirectory(jobName)+SimpleJobConfigurationService.SPRING_BATCH_FILE;
+			}else { //Already deployed job. Store the previous file
+				destPath = this.getXMLFilePath(jobName);
+				String prevPath = destPath.substring(0, destPath.lastIndexOf('/'))+SimpleJobConfigurationService.SPRING_BATCH_PREV;
+				File prevXMLFile = new File(prevPath);
+				File xmlFile = new File(destPath);
+				if(prevXMLFile.exists()) {
+					prevXMLFile.delete();
 				}
-				this.upload(XMLFileContents.getBytes(), destPath);
-				this.jobXMLFile.put(jobName,destPath);
+				//Rename the old config file
+				xmlFile.renameTo(prevXMLFile);
+				xmlFile.createNewFile();
+				prevXMLFile.deleteOnExit();
+			}
+			this.upload(XMLFileContents.getBytes(), destPath);
+			this.jobXMLFile.put(jobName,destPath);
 		} catch (IOException ioe) {
 			LOGGER.error("Error creating job configuration file for : " + jobName + " in location : " + destPath,ioe);
 			throw new PlatformException("Error creating job configuration file for : " + jobName + " in location : " + destPath, ioe);
@@ -220,7 +339,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		}
 		this.jobXMLFile.remove(jobName);
 	}
-	
+
 	/**
 	 * Interface Method Implementation
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getJobNameFromXML(String)
@@ -263,38 +382,33 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			byte[] buffer = new byte[(int) f.length()];
 			new DataInputStream(fin).readFully(buffer);
 			fin.close();
-			return new String(buffer).trim();
+			return new String(buffer,"UTF-8").trim();
 		}
 		catch(Exception e) {
 			LOGGER.error("Error while reading contents of: "+filename,e);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Scan the jobDirectory for any new dependency files and update JobDependencies.
 	 */
 	private void scanJobDependencies() {		
 		for(String jobName:this.jobRegistry.getJobNames()) {			
-			  String jobDirectory = this.getJobDirectory(jobName)+SimpleJobConfigurationService.LIBRARY_FOLDER;
-			  File folder = new File(jobDirectory);
-			  File[] listOfFiles = folder.listFiles(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return name.endsWith(BINARIES_TYPE);
-					}
-			  }); 
-			  List<String> dependencyList = new LinkedList<String>();
-			  //if directory does exist
-			  if(listOfFiles!=null) {
-				  for(File dependency: listOfFiles) {
-					  dependencyList.add(dependency.getName());
-				  }
-			  }
-			  this.jobDependencies.put(jobName, dependencyList);
+			String jobDirectory = this.getJobDirectory(jobName)+SimpleJobConfigurationService.LIBRARY_FOLDER;
+			File folder = new File(jobDirectory);
+			File[] listOfFiles = folder.listFiles(); 
+			List<String> dependencyList = new LinkedList<String>();
+			//if directory does exist
+			if(listOfFiles!=null) {
+				for(File dependency: listOfFiles) {
+					dependencyList.add(dependency.getName());
+				}
+			}
+			this.jobDependencies.put(jobName, dependencyList);
 		}
 	}
-	
+
 	/**
 	 * Scans XML Spring Batch Config files and adds them to jobXMLFile map
 	 */
@@ -304,16 +418,16 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			this.jobXMLFile.put(this.getJobNameFromXML(this.getFileContents(jobBeansFile.getAbsolutePath()).getBytes()), jobBeansFile.getAbsolutePath());
 		}
 	}
-	
+
 	/**
 	 * Uploads the file to the given path. Creates the file and directory structure, if the file
 	 * or parent directory doesn't exist
 	 */
 	private void upload(byte[] fileContents, String destPath) throws IOException {
-				File destFile = new File(destPath);
-				//Creating directory structure
-				destFile.getParentFile().mkdirs();
-				FileOutputStream fos = new FileOutputStream(destFile);
-				fos.write(fileContents);						
+		File destFile = new File(destPath);
+		//Creating directory structure
+		destFile.getParentFile().mkdirs();
+		FileOutputStream fos = new FileOutputStream(destFile);
+		fos.write(fileContents);						
 	}
 }

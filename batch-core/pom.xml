@@ -26,7 +26,7 @@
   	</distributionManagement> 
   	
   	<scm>
-    	<url>https://github.com/regunathb/Trooper</url>
+    	<url>https://github.com/regunathb/Troope</url>
     	<connection>https://github.com/regunathb/Trooper.git</connection>
   	</scm>
   
@@ -109,6 +109,16 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.26</version>
+		</dependency>	
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.0.1</version>
+		</dependency>
+ 		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpmime</artifactId>
+		    <version>4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -141,7 +151,7 @@
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-model</artifactId>
 			<version>1.0.0</version>
-		</dependency>				
+		</dependency>		
 	</dependencies>
 	
 	<build>

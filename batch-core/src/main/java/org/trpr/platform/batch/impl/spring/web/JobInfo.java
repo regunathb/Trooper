@@ -25,7 +25,6 @@ import java.util.List;
  * The <code>JobInfo</code> class is an extension of {@link JobInfo} that stores extra information about 
  * trigger, such as cronexpression, next fire time, hostnames, etc.
  * 
- * 
  * @author devashishshankar
  * @version 1.0, 09 Jan 2013
  */

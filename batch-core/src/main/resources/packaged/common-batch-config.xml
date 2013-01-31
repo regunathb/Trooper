@@ -51,6 +51,9 @@
 	<bean id="jobConfigService" class="org.trpr.platform.batch.impl.spring.admin.SimpleJobConfigurationService">
 		<constructor-arg index="0"><ref bean="jobRegistry"/></constructor-arg>
 	</bean>
+	<bean id="syncService" class="org.trpr.platform.batch.impl.spring.admin.SyncServiceImpl">
+		<constructor-arg index="0"><ref bean="jobConfigService"/></constructor-arg>
+	</bean>
 	
 	<!--
 		Configuring Common Batch Job TransactionManager.

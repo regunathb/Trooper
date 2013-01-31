@@ -1,5 +1,11 @@
 <#import "/spring.ftl" as spring />
 <div id="jobs">
+	<#if hosts?? && hosts?size!=0>
+	[HA Mode]The following Trooper instances are running: 
+		<#list hosts as host>
+			${host}, 
+		</#list>
+	</#if>
 	
 	<#if newjobs?? && newjobs?size!=0>
 		

@@ -53,6 +53,7 @@ public class HABatchJob extends BatchJob {
 	
 	/** The Zookeeper path prefix for job latch creation*/
 	private static final String ZK_PATH_PREFIX = "/Batch/Latch/";
+	private static final String ZK_PATH_PREFIX2 = "/Batch/Latch";
 	
 	/**
 	 * The Log instance for this class

@@ -19,6 +19,7 @@ package org.trpr.platform.batch.impl.spring.web;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.batch.admin.web.TableUtils;
@@ -29,6 +30,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 
 /**
@@ -38,20 +40,21 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
  * @author devashishshankar
  * @version 1.0, 09 Jan 2013 
  */
-
 @Controller
 public class JobController extends org.springframework.batch.admin.web.JobController {
 	
 	//An instance of JobService which holds all the information about jobs
 	private JobService jobService;
+	private JobConfigurationService jobConfigurationService;
 	
 	/**
 	 * Autowired default constructor
 	 */
 	@Autowired
-	private JobController(JobService jobService) {
+	private JobController(JobService jobService, JobConfigurationService jobConfigurationService) {
 		super(jobService);
 		this.jobService = jobService;
+		this.jobConfigurationService = jobConfigurationService;
 	}
 		
 	/**
@@ -87,7 +90,17 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			String cronExp = jobService.getCronExpression(name);
 			Date nextFireDate = jobService.getNextFireDate(name);
 			//Adding attributes to the list
+			
 			jobs.add(new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate));
+		}
+		//Adding host list to view
+		List<Host> hostList = this.jobConfigurationService.getAllServerNames();
+		List<String> hostAddressList =  new LinkedList<String>();
+		if(hostList!=null) {
+			for(Host host:hostList) {
+				hostAddressList.add(host.getAddress());
+			}
+			model.addAttribute("hosts",hostAddressList);
 		}
 		//Adding the list to the model "newjobs" to be accessed in the FTL files
 		model.addAttribute("newjobs", jobs);
