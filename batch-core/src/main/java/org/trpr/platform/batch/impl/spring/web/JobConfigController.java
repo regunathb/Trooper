@@ -48,15 +48,15 @@ import org.trpr.platform.core.spi.logging.Logger;
  */
 @Controller
 public class JobConfigController {
-	
+
 	/**Trooper services used by this class **/
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
 	private SyncService syncService;
-	
+
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(JobConfigController.class);
-	
+
 	/**
 	 * Autowired default constructor
 	 */
@@ -154,9 +154,10 @@ public class JobConfigController {
 	 */
 	@RequestMapping(value = "configuration/modify/jobs/{jobName}", method = RequestMethod.POST)
 	public String editJob(ModelMap model, @RequestParam String jobName, 
-			@RequestParam(defaultValue = "") String XMLFileContents, @RequestParam(defaultValue = "0") 
-	MultipartFile jobFile, @RequestParam(defaultValue = "0") MultipartFile depFile, 
-	@RequestParam(defaultValue = "0") String identifier) throws Exception {
+						  @RequestParam(defaultValue = "") String XMLFileContents, 
+						  @RequestParam(defaultValue = "0") MultipartFile jobFile, 
+						  @RequestParam(defaultValue = "0") MultipartFile depFile, 
+						  @RequestParam(defaultValue = "0") String identifier) throws Exception {
 		//Button 1: Upload XML
 		if(identifier.equals("Upload file")) {
 			String jobFileName = jobFile.getOriginalFilename();

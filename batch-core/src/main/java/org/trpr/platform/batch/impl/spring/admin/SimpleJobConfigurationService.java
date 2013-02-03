@@ -396,7 +396,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			byte[] buffer = new byte[(int) f.length()];
 			new DataInputStream(fin).readFully(buffer);
 			fin.close();
-			return new String(buffer,"UTF-8").trim();
+			return new String(buffer).trim();
 		}
 		catch(Exception e) {
 			LOGGER.error("Error while reading contents of: "+filename,e);

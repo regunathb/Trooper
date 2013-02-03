@@ -103,7 +103,7 @@
 	</bean>	
 	
 	<bean id="greetingDataReader" class="org.trpr.example.batch.greeting.reader.GreetingJobReader">
-		<property name="batchSize" value="1000" />
+		<property name="batchSize" value="100000" />
 	</bean>	
 	
 	<bean id="greetingDataProcessor" class="org.trpr.example.batch.greeting.processor.GreetingJobProcessor"/>
