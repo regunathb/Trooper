@@ -1,14 +1,6 @@
 <#import "/spring.ftl" as spring />
 <div id="jobs">
-	<#if hosts?? && hosts?size!=0>
-	[HA Mode]The following Trooper instances are running: 
-		<#list hosts as host>
-			${host}, 
-		</#list>
-	</#if>
-	
 	<#if newjobs?? && newjobs?size!=0>
-		
 			<h2>Job Names Registered</h2>
 	
 			<table title="Jobs Names" class="bordered-table">
@@ -16,10 +8,11 @@
 					<th>Name</th>
 					<th>Description</th>
 					<th>Execution&nbsp;Count</th>
-			<!--		<th>Launchable</th>
-					<th>Incrementable</th> -->
 					<th>Cron Expression </th>
 					<th>Next Fire Time </th>
+					<#if host??>
+					<th>Hosts </th>
+					</#if> 
 				</tr>
 				<#list newjobs as job>
 					<#if job_index % 2 == 0>
@@ -32,10 +25,15 @@
 						<td><a href="${job_url}">${job.name}</a></td>
 						<td><@spring.messageText code="${job.name}.description" text="No description"/></td>
 						<td>${job.executionCount}</td>
-				<!--		<td><#if job.launchable??>${job.launchable?string}<#else>?</#if></td>
-						<td><#if job.incrementable??>${job.incrementable?string}<#else>?</#if></td>  -->
 						<td>${job.cronExpression}</td>
 						<td>${job.nextFireTime}</td> 
+						<#if host?? && job.hostnames?size!=0 >
+						<td>
+							<#list job.hostnames as host>
+								${host}, 
+							</#list>						
+						</td>
+						</#if> 
 					</tr>
 				</#list>
 			</table>

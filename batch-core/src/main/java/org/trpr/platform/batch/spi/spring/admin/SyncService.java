@@ -19,21 +19,24 @@ package org.trpr.platform.batch.spi.spring.admin;
  * <code> SyncService </code> is an interface providing methods to perform synchronization
  * of trooper instances, i.e. pushing jobs, their configuration files, dependencies to other running
  * Trooper instances
+ * 
  * @author devashishshankar
  * @version 1.0 31 Jan, 2013
  */
 public interface SyncService {
+	
 	/**
-	 * Pushes a job to a given serverName.
+	 * Pushes a job, including sending it's configuration files, dependency files
+	 * and the final loading request to the given serverName.
 	 * @return true on success, false on failure
 	 */
-	public boolean pushJobToServer(String jobName, String serverName);
+	boolean pushJobToServer(String jobName, String serverName);
 	
 	/**
 	 * Checks whether the jobs running in the current server exist in all the other servers,
 	 * if not, pushes the missing jobs
 	 */
-	public void syncAllServers();
+	void syncAllServers();
 	
 	/**
 	 * Pushes a configuration file
@@ -52,5 +55,4 @@ public interface SyncService {
 	 * @return Server response, empty string if no response received from server, "exception" in case of any other error
 	 */
 	String deploy(String jobName, String servername);
-	
 }

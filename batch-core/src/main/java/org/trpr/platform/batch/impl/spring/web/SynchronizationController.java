@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
-import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -37,30 +36,27 @@ import org.trpr.platform.core.spi.logging.Logger;
  * @author devashishshankar
  * @version 1.0, 28 Jan, 2013
  */
-
 @Controller
 public class SynchronizationController {
 
+	/** Trooper services being used by the class */
 	private JobConfigurationService jobConfigService;
 	private JobService jobService;
-	private SyncService syncService;
 
-	/**
-	 * The URL for various actions
-	 */
+	/** The URL for various actions */
 	public static final String PUSH_JOB_URL = "/sync/pushJob";
 	public static final String PUSH_DEP_URL = "/sync/pushDep";
 	public static final String PUSH_URL = "/sync/push/deploy";
 
+	/** Logger instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(SynchronizationController.class);
 
 	/**
 	 * Default Constructor.
 	 */
-	public SynchronizationController(JobService jobService, JobConfigurationService jobConfigService, SyncService syncService) {
+	public SynchronizationController(JobService jobService, JobConfigurationService jobConfigService) {
 		this.jobConfigService = jobConfigService;		
 		this.jobService = jobService;
-		this.syncService = syncService;
 	}
 
 	/**
@@ -75,6 +71,7 @@ public class SynchronizationController {
 		}
 		return path;
 	}
+	
 	/**
 	 * Receiver methods start
 	 * These methods receive the job configuration files, dependency files and job loading requests.
@@ -85,7 +82,7 @@ public class SynchronizationController {
 	 */
 	@RequestMapping(value="{jobName}"+SynchronizationController.PUSH_JOB_URL,method=RequestMethod.POST)
 	public String addJob(ModelMap model, @RequestParam String jobName, @RequestParam String configFile) {
-		//Job Names can have appending whitespace characters when sent through request
+		//Job Names can have appended whitespace characters when sent through request
 		jobName=jobName.trim();
 		LOGGER.info("Adding jobName: "+jobName);
 		if(this.jobService.contains(jobName)) {
@@ -134,21 +131,19 @@ public class SynchronizationController {
 		jobName=jobName.trim();
 		LOGGER.info("Loading request for: "+jobName);
 		try {
-			System.out.println("Getting XML File: "+this.jobConfigService.getXMLFilePath(jobName));
 			this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getXMLFilePath(jobName)));
 			LOGGER.info("Success in deploying: "+jobName);
 			model.addAttribute("Message","success");
 		} catch (Exception e) {
 			LOGGER.error("Error while deploying job: "+jobName, e);
 			model.addAttribute("Message","Unexpected error while loading: "+jobName);
-			e.printStackTrace();
 		}
 		return "sync/Message";
 	}
-
 	/**
 	 * Receiver methods end
 	 */
+	
 	/**
 	 * Testing method
 	 */
@@ -156,8 +151,6 @@ public class SynchronizationController {
 	public String caller(@ModelAttribute("jobName") String jobName) {
 		String servername = "http://localhost:8082/";
 		LOGGER.info("Pushing "+jobName+" to "+servername);
-
 		return "redirect:/configuration";
 	}
-
 }

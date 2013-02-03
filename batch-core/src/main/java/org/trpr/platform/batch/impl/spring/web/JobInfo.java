@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.web;
 
 import java.text.DateFormat;
@@ -41,7 +40,7 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 
 	/** Holds the hostname of the job */
 	private List<String> hostNames;
-	
+
 	/**
 	 * Constructor for initialising JobInfo
 	 */
@@ -53,8 +52,8 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 		this.cronExpression = cronExpression;
 		this.nextFireTime = nextFireTime;		
 	}
-	/**Setter Methods **/
 	
+	/** Getter/setter Methods */
 	public void addHost(String hostName) {
 		this.hostNames.add(hostName);
 	}
@@ -65,9 +64,10 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 		}
 	}
 	
-	/**
-	 * Getter methods
-	 */	
+	public List<String> getHostNames() {
+		return this.hostNames;
+	}
+	
 	public String getcronExpression() {
 		return this.cronExpression;
 	}	
@@ -75,8 +75,5 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	public String getnextFireTime() {
 		return DATE_FORMAT.format(this.nextFireTime);
 	}
-	/**
-	 * End of getter methods
-	 */
-
+	/** End getter/setter methods */
 }

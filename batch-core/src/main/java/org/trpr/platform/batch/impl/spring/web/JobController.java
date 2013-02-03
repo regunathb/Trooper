@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.web;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.batch.admin.web.TableUtils;
@@ -42,11 +40,11 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
  */
 @Controller
 public class JobController extends org.springframework.batch.admin.web.JobController {
-	
-	//An instance of JobService which holds all the information about jobs
+
+	/** Trooper Services used by this class */
 	private JobService jobService;
 	private JobConfigurationService jobConfigurationService;
-	
+
 	/**
 	 * Autowired default constructor
 	 */
@@ -56,10 +54,7 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 		this.jobService = jobService;
 		this.jobConfigurationService = jobConfigurationService;
 	}
-		
-	/**
-	 * Controller methods start
-	 */
+
 	/**
 	 * Overridden method from @link {org.springframework.batch.admin.web.JobController}. It now uses 
 	 * @link {org.trpr.platform.batch.impl.spring.web.JobInfo} to hold additional details about job
@@ -75,7 +70,6 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 		Collection<String> names = jobService.listJobs(startJob, pageSize);
 		//List of JobInfo elements to hold information to be displayed on the web console
 		List<JobInfo> jobs = new ArrayList<JobInfo>();
-		
 		for (String name : names) {
 			int count = 0;
 			try {
@@ -89,23 +83,18 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			boolean incrementable = jobService.isIncrementable(name);
 			String cronExp = jobService.getCronExpression(name);
 			Date nextFireDate = jobService.getNextFireDate(name);
-			//Adding attributes to the list
-			
-			jobs.add(new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate));
-		}
-		//Adding host list to view
-		List<Host> hostList = this.jobConfigurationService.getAllServerNames();
-		List<String> hostAddressList =  new LinkedList<String>();
-		if(hostList!=null) {
-			for(Host host:hostList) {
-				hostAddressList.add(host.getAddress());
+			JobInfo jobInfo = new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate);
+			//Getting Host attributes from jobConfigService
+			List<Host> listOfHosts = this.jobConfigurationService.getServerNames(name);
+			if(listOfHosts!=null) {
+				model.addAttribute("host", "true");
+				for(Host host: listOfHosts) {
+					jobInfo.addHost(host.getAddress());
+				}
 			}
-			model.addAttribute("hosts",hostAddressList);
+			jobs.add(jobInfo);
 		}
 		//Adding the list to the model "newjobs" to be accessed in the FTL files
 		model.addAttribute("newjobs", jobs);
 	}	
-	/**
-	 * End controller Methods
-	 */
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.admin;
 
 import java.io.ByteArrayInputStream;
@@ -53,7 +52,8 @@ import org.w3c.dom.NodeList;
 
 /**
  * <code> SimpleJobConfigurationService </code>: An implementation of @link {JobConfigurationService}
- * Provides methods for configuring jobs - their configuration files and dependencies.
+ * Provides methods for configuring jobs - their configuration files and dependencies. It also holds the 
+ * list of running Trooper instances and the list of deployed jobs in each of them (for HA mode)
  * 
  * @author devashishshankar
  * @version 1.0 22 Jan, 2013
@@ -78,13 +78,13 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	/**JobRegistry. Has the name of jobs */
 	private JobRegistry jobRegistry;
 
-
 	/**Holds the current server details **/
 	private Host serverName;
 
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobConfigurationService.class);
 
+	/**The params holding the filenames, directories and tag name conventions of Trooper configuration files **/
 	private static final String SPRING_BATCH_FILE = "/" + BatchFrameworkConstants.SPRING_BATCH_CONFIG;
 	private static final String JOB_FOLDER = "/src/main/resources/external/";
 	private static final String LIBRARY_FOLDER = "/" + BatchConfigInfo.BINARIES_PATH + "/";
@@ -227,7 +227,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		//Scan for dependencies
 		if(this.jobDependencies.isEmpty())
 			this.scanJobDependencies();
-
 		String destPath = this.getJobDirectory(jobName);
 		if(this.jobDependencies.containsKey(jobName)) {
 			if(this.jobDependencies.get(jobName).contains(destFileName)) {
@@ -341,6 +340,20 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	}
 
 	/**
+	 * Interface method implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#deploymentSuccess(String)
+	 */
+	@Override
+	public void deploymentSuccess(String jobName) {
+		// DELETE previous XML File
+		String prevFilePath = this.getJobDirectory(jobName)+SimpleJobConfigurationService.SPRING_BATCH_PREV;
+		File prevFile = new File(prevFilePath);
+		if(prevFile.exists()){
+			prevFile.delete();
+		}
+	}
+	
+	/**
 	 * Interface Method Implementation
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getJobNameFromXML(String)
 	 * Get the jobname from a spring batch config file
@@ -370,6 +383,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		}
 		return null;
 	}
+	
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getFileContents(String)

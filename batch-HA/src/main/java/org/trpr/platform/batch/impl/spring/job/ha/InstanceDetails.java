@@ -16,33 +16,34 @@
 package org.trpr.platform.batch.impl.spring.job.ha;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
+
 /**
  * <code> {@link InstanceDetails} </code> is a container holding meta data about job Instances.
  * Currently, it only holds Host Name.
+ * 
  * @author devashishshankar
- *
  */
 @JsonRootName("details")
 public class InstanceDetails {
+	
 	/** Description about the instance.**/
 	private String description;
 
 	/**Default constructor **/
 	public InstanceDetails() {
 	}
+	
 	/**Parameterized constructor **/
 	public InstanceDetails(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * Getter/Setter Methods
-	 */
-
+	/** Getter/Setter Methods  */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	public String getDescription() {
 		return description;
 	}
+	/** End getter/Setter Methods  */
 }

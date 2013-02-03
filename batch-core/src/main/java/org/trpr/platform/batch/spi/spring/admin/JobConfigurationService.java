@@ -22,12 +22,13 @@ import org.trpr.platform.batch.impl.spring.web.Host;
 import org.trpr.platform.core.PlatformException;
 
 /**
- * <code>JobConfigurationService</code> provides methods for job configuration such as adding, removing XML Config files and dependencies
+ * <code>JobConfigurationService</code> provides methods for job configuration such as adding, 
+ * removing configuration files and dependencies. It also holds the list of running Trooper instances
+ * and the list of deployed jobs in each of them (for HA mode)
  * 
  * @author devashishshankar
- * @version 1.0, 22 Jan 2013
+ * @version 1.1, 31 Jan 2013
  */
-
 public interface JobConfigurationService {	
 
 	/**
@@ -36,14 +37,14 @@ public interface JobConfigurationService {
 	 * @param jobName job name identifier
 	 * @return Path of job directory
 	 */
-	public String getJobDirectory(String jobName);
+	String getJobDirectory(String jobName);
 
 	/**
 	 * Gets the XML File path for given job. If not found, returns null.
 	 * @param jobName job name identifier
 	 * @return Path of XMLFile. null if not found
 	 */
-	public String getXMLFilePath(String jobName);
+	String getXMLFilePath(String jobName);
 
 	/**
 	 * Sets the XML File. If the job doesn't have an XML file (new job), a new directory 
@@ -51,42 +52,48 @@ public interface JobConfigurationService {
 	 * @param jobName the job name identifier
 	 * @throws PlatformException in case of errors
 	 */
-	public void setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
+	void setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
 
 	/**
-	 * Removes the job configuration XML file for the specified job name
+	 * Removes the job configuration XML file for the specified job name. Restores the previos XML File,
+	 * if found
 	 * @param jobName the job name identifier
 	 */
-	public void removeXMLFile(String jobName);
+	void removeXMLFile(String jobName);
 
 	/**
 	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
 	 * @param jobName Name of the job
 	 * @throws PlatformException in case of errors
 	 */
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
+	void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
 
 	/** 
 	 * Returns the list of dependencies of given job. 
 	 * @param jobName Name of the job
 	 * @return List of dependencies(filename, not the path). If not found, returns null
 	 */
-	public List<String> getJobDependencyList(String jobName);
+	List<String> getJobDependencyList(String jobName);
 
 	/**
 	 * Get the job name from a spring batch config file.
 	 * @param XMLFileContents A byte array of the configuration file
 	 * @return Job name if found, null otherwise
 	 */
-	public String getJobNameFromXML(byte[] XMLFileContents);
+	String getJobNameFromXML(byte[] XMLFileContents);
 
 	/**
 	 * Gets the contents of a file in a single String
 	 * @param filePath Path of the file
 	 * @return String containing the file contents
 	 */
-	public String getFileContents(String filePath);
+	String getFileContents(String filePath);
 
+	/**
+	 * Inform JobConfiguratinService of successful deployment.
+	 * Cleans up resources such as previous XML File
+	 */
+	void deploymentSuccess(String jobName);
 	/**
 	 * Sets the port of the current Trooper host. 
 	 * And sets the hostName
@@ -96,29 +103,31 @@ public interface JobConfigurationService {
 
 	/**
 	 * Gets the list of hostnames on which a job is running
+	 * @return List of {@link Host}, null if not running in HA mode.
 	 */
 	List<Host> getServerNames(String jobName);
 
 	/**
 	 * Gets a list of all the Trooper hosts
+	 * @return List of {@link Host}, null if not running in HA mode.
 	 */
 	List<Host> getAllServerNames();
 
 	/**
 	 * Returns the current Trooper host
+	 * @return @link{Host} the host name of current Trooper instance, null if not running in HA mode
 	 */
 	Host getCurrentServerName();
 
 	/**
-	 * Gets the list of jobs allocated on the current server
+	 * Gets the list of HA jobs allocated on the current server
 	 */
 	Collection<String> getCurrentServerJobs();
 
 	/**
 	 * Adds a jobname and a server name
 	 * @param jobName name of the job
-	 * @param serverName Host servername
+	 * @param serverName @link{Host} servername
 	 */
 	void addJobInstance(String jobName, Host serverName);
-
 }

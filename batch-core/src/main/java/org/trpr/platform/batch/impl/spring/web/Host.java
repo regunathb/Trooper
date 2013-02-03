@@ -17,11 +17,12 @@ package org.trpr.platform.batch.impl.spring.web;
 
 /**
  * <code>Host</code> is a data container holding the Trooper Host details, i.e. 
- * host name, IP address and port
+ * host name, host's IP address and port.
  * @author devashishshankar
  * @version 1.0 31 Jan, 2013
  */
 public class Host {
+
 	private String hostName;
 	private String IP;
 	private int port;
@@ -34,16 +35,15 @@ public class Host {
 		this.setIP(IP);
 		this.setPort(port);
 	}
+	
 	/**
 	 * If IP address is not passed, default IP address is loopback address
 	 */
 	public Host(String hostName, int port) {
 		this(hostName, "127.0.0.1", port);
 	}
-	
-	/**
-	 * Getter/Setter methods
-	 */
+
+	/** Getter/Setter methods */
 	public String getHostName() {
 		return hostName;
 	}
@@ -62,16 +62,17 @@ public class Host {
 	public void setPort(int port) {
 		this.port = port;
 	}
+	/** End getter/Setter methods */
 	
 	/**
 	 * Returns the Address in the form "IP:port",
 	 * which can be used for HTTP request
-	 * @return
+	 * @return @link{String} address
 	 */
 	public String getAddress() {
 		return this.IP+":"+this.port;
 	}
-	
+
 	/**
 	 * Overriden method from object class
 	 */

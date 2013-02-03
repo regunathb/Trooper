@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.web;
 
 import org.quartz.JobDataMap;
@@ -42,7 +41,6 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		
 		//Calling the super class method to perform all the functions it was previously performing
 		super.afterPropertiesSet();
 		//Getting ApplicationContext

@@ -34,23 +34,26 @@ import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
+
 /**
  * <code> SyncServiceImpl </code> is an implementation of @link {SyncService}. Provides 
  * methods for deploying jobs into different Trooper instances
+ * 
  * @author devashishshankar
- *
  */
 public class SyncServiceImpl implements SyncService {
 
-	/**Logger instance for this class */
+	/** Logger instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(SyncServiceImpl.class);
 
+	/** Trooper services being used by this class */
 	private JobConfigurationService jobConfigService;
 
 	@Autowired
 	public SyncServiceImpl(JobConfigurationService jobConfigurationService) {
 		this.jobConfigService = jobConfigurationService;
 	}
+
 	/**
 	 * Pusher methods start.
 	 * These methods send a request to the Trooper server to which jobs have to be deployed
@@ -80,9 +83,9 @@ public class SyncServiceImpl implements SyncService {
 		else {
 			LOGGER.error("Error while deploying job. The server returns: "+ret1);
 		}
-
 		return false;
 	}
+
 	/**
 	 * Pushes a configuration file
 	 * @return Server response, empty string if no response received from server, "exception" in case of any other error
@@ -112,7 +115,6 @@ public class SyncServiceImpl implements SyncService {
 		String urlToConnect = "http://"+servername+"/"+jobName+SynchronizationController.PUSH_DEP_URL;
 		String returnStr="success";
 		FileUpload fileUpload = new FileUpload() ;
-		System.out.println(this.jobConfigService);
 		for(String dep : this.jobConfigService.getJobDependencyList(jobName)) {
 			File depFile = new File(this.jobConfigService.getJobDirectory(jobName)+"/lib/"+dep);
 			String response = fileUpload.executeMultiPartRequest(urlToConnect, depFile, depFile.getName(), jobName) ;
@@ -124,6 +126,7 @@ public class SyncServiceImpl implements SyncService {
 		}
 		return returnStr;
 	}
+
 	/**
 	 * Send a loading request	 
 	 * @return Server response, empty string if no response received from server, "exception" in case of any other error
@@ -148,7 +151,6 @@ public class SyncServiceImpl implements SyncService {
 	 * @return Response from server, empty string if no response received
 	 */
 	public String pushRequest(String data,String urlToConnect) {
-
 		PrintWriter writer = null;
 		OutputStream output = null;
 		try {
@@ -188,7 +190,5 @@ public class SyncServiceImpl implements SyncService {
 				}
 			}
 		}
-
 	}
-
 }

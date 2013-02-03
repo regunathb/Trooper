@@ -26,6 +26,7 @@ import org.quartz.Trigger;
  * @version 1.0 10 Jan 2013
  */
 public interface ScheduleRepository {
+	
 	/**
 	 * Returns the cron expression based on the jobName.
 	 * @param jobName Name of the job
@@ -52,5 +53,4 @@ public interface ScheduleRepository {
 	 * @param trigger Quartz trigger related to the job
 	 */
 	void addTrigger(String jobName, String jobBeanName, Trigger trigger);
-
 }

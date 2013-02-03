@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.admin;
 
 import java.util.Date;
@@ -31,11 +30,11 @@ import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
  * @author devashishshankar
  * @version 1.1 10 Jan 2013
  */
-
 public class SimpleScheduleRepository implements ScheduleRepository {
 	
 	/**
-	 * A Map holding the Trigger information related to the job. The key is the jobName and the value is org.quartz.Trigger
+	 * A Map holding the Trigger information related to the job. The key is the jobName 
+	 * and the value is org.quartz.Trigger
 	 */
 	private Map<String, Trigger> jobTrigger;
 	

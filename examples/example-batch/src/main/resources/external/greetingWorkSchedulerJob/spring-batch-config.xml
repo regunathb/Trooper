@@ -35,7 +35,7 @@
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0 0/120 * * * ?" />
+		<property name="cronExpression" value="0 4/240 * * * ?" />
 	</bean>
 
 	<!--
@@ -103,7 +103,7 @@
 	</bean>	
 	
 	<bean id="greetingDataReader" class="org.trpr.example.batch.greeting.reader.GreetingJobReader">
-		<property name="batchSize" value="100000" />
+		<property name="batchSize" value="1000" />
 	</bean>	
 	
 	<bean id="greetingDataProcessor" class="org.trpr.example.batch.greeting.processor.GreetingJobProcessor"/>

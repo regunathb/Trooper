@@ -36,26 +36,38 @@ import com.netflix.curator.x.discovery.details.ServiceCacheListener;
  * <code> JobRegistryBeanPostProcessor</code> is an extension of 
  * @link {org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor}.
  * Registers jobs to the Zookeeper service. Updates hostnames in the jobConfigurationService
+ * 
  * @author devashishshankar
- *
+ * @version 1.0, 31 Jan, 2013
  */
 public class JobRegistryBeanPostProcessor extends 
 org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor {
 
+	/** Instance of trooper @link{JobConfigurationService} */
 	private JobConfigurationService jobConfigurationService;
+
+	/** The curator client being used */
 	private CuratorFramework curatorFramework;
+
+	/** The jobName for which the current instance is called */
 	private String jobName;
+
+	/** Instance of trooper {@link SyncService} */
 	private SyncService syncService;
 
+	/** ServiceDiscovery instance for registering and querying Zookeeper services */
 	ServiceDiscovery<InstanceDetails> serviceDiscovery = null;
+
+	/** The zookeeper path prefix for service creation */
 	private static final String ZK_DEP_PATH_PREFIX = "/Batch/Deployment";
+
+	/** ServiceCache for fast access of service instance details and adding a listener for change in instances */
 	private ServiceCache<InstanceDetails> sc;
-	/**
-	 * The Log instance for this class
-	 */
+
+	/** The Log instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(JobRegistryBeanPostProcessor.class);
 
-	/**Setter methods **/
+	/** Setter methods **/
 	public void setJobConfigService(JobConfigurationService jobConfigurationService) {
 		this.jobConfigurationService = jobConfigurationService;
 	}
@@ -69,9 +81,9 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	}
 
 	public void setSyncService(SyncService syncService) {
-		System.out.println("setting syncservice");
 		this.syncService = syncService;
 	}
+	/** End Setter methods **/
 
 	/**This method updates the list of servers in the jobConfigurationService **/
 	public void updateHosts() {
@@ -79,7 +91,6 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 		try {
 			Collection<String> serviceNames = serviceDiscovery.queryForNames();
 			for(String serviceName: serviceNames) {
-				System.out.println("servicename: "+serviceName);
 				//Add all the hosts in the service to jobConfigService
 				Collection<ServiceInstance<InstanceDetails>> instances = this.serviceDiscovery.queryForInstances(serviceName);     
 				for (ServiceInstance<InstanceDetails> instance: instances) {
@@ -93,11 +104,14 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 		//Sync all servers
 		this.syncService.syncAllServers();
 	}
+
+	/**
+	 * Overriden method from {@link org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor#afterPropertiesSet()}
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		try
-		{
+		try {
 			if(!this.curatorFramework.isStarted())
 				this.curatorFramework.start();
 			//For storing metadata, the class is InstanceDetails
@@ -128,7 +142,6 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 				this.sc = this.serviceDiscovery.serviceCacheBuilder().name(serviceName).build();
 				sc.start();
 				sc.addListener(new ServiceListner());
-				//Put this in jobConfigService to all existing   	
 			}
 			//Update
 			this.updateHosts();
@@ -141,6 +154,7 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 			LOGGER.error("Exception while registring jobService", e);
 		}
 	}
+
 	/**
 	 * Implementation of listener class that listens to change in Service cache	 *
 	 */
@@ -149,6 +163,7 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 		public void stateChanged(CuratorFramework arg0, ConnectionState arg1) {
 			LOGGER.info("State changed");
 		}
+
 		/**
 		 * Calls the {@link JobRegistryBeanPostProcessor#updateHosts()} to
 		 * update the hosts as soon as cache is changed

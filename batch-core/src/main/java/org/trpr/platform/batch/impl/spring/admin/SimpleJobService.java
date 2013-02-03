@@ -64,30 +64,38 @@ import org.trpr.platform.runtime.spi.component.ComponentContainer;
  * @author devashishshankar
  * @version 1.1 09 Jan 2013
  */
-
 public class SimpleJobService implements JobService, DisposableBean {
-	
+
 	/** Default shutdown timeout - 60 seconds */
 	private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
+
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleJobService.class);
+
 	/** The shutdown timeout*/
 	private int shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
+
 	/** List of active JobExecutionS*/
 	private Collection<JobExecution> activeExecutions = Collections.synchronizedList(new ArrayList<JobExecution>());
+
 	/** The JobRepository component*/
 	private JobRepository jobRepository;
+
 	/** The JobRepository component*/
 	private JobRegistry jobRegistry;
+
 	/** The JobLauncher component*/
 	private JobLauncher jobLauncher;
+
 	/** The JobExplorer component*/
 	private JobExplorer jobExplorer;
+
 	/** Scheduler component */
 	private ScheduleRepository scheduleRepository;	
+
 	/** The ComponentContainer that loaded this JobService*/
 	private ComponentContainer componentContainer;
-	
+
 	/**
 	 * Constructor for this class
 	 */
@@ -98,7 +106,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		this.jobLauncher = jobLauncher;
 		this.scheduleRepository = scheduleRepository;
 	}
-	
+
 	/**
 	 * Interface method implementation.Stops all the active jobs and wait for them (up to a time out) to finish
 	 * processing.
@@ -150,7 +158,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 			}
 		}
 	}
-	
+
 	/**
 	 * Interface method implementation. 
 	 * @see org.springframework.batch.admin.service.JobService#abandon(java.lang.Long)
@@ -178,7 +186,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 			for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, Integer.MAX_VALUE)) {
 				count += this.jobExplorer.getJobExecutions(jobInstance).size();
 			}
-			
+
 		}
 		return count;
 	}
@@ -389,7 +397,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#launch(java.lang.String, org.springframework.batch.core.JobParameters)
 	 */
 	public JobExecution launch(String jobName, JobParameters jobParameters) throws NoSuchJobException,
-		JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+	JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
 		Job job = this.jobRegistry.getJob(jobName);
 		JobExecution lastJobExecution = this.jobRepository.getLastJobExecution(jobName, jobParameters);
@@ -530,7 +538,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#restart(java.lang.Long)
 	 */
 	public JobExecution restart(Long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException, JobRestartException,
-			JobInstanceAlreadyCompleteException, NoSuchJobException, JobParametersInvalidException {		
+	JobInstanceAlreadyCompleteException, NoSuchJobException, JobParametersInvalidException {		
 		JobExecution target = getJobExecution(jobExecutionId);
 		JobInstance lastInstance = target.getJobInstance();
 		Job job = this.jobRegistry.getJob(lastInstance.getJobName());
@@ -577,7 +585,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		return allExecutions.size();
 	}
-	
+
 
 	/** Getter/Setter methods*/
 	/**
@@ -597,7 +605,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		return this.scheduleRepository.getCronExpression(jobName);
 	}
 
-	
+
 	/**
 	 * Interface method implementation. Returns the next Fire Date of the job.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getNextFireDate
@@ -608,22 +616,22 @@ public class SimpleJobService implements JobService, DisposableBean {
 	}
 
 	/**
-   * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
-   * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()	
-   */
+	 * Interface method implementation. Returns the ComponentContainer that loaded this JobService, if set, null otherwise
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#getComponentContainer()	
+	 */
 	public ComponentContainer getComponentContainer() {
-	    return this.componentContainer;
-	  }
+		return this.componentContainer;
+	}
 
-  /**	
-   * Interface method implementation.Sets the ComponentContainer that loaded this JobService
-   * @see org.trpr.platform.batch.spi.spring.admin.JobService#setComponentContainer(ComponentContainer)
-   */
+	/**	
+	 * Interface method implementation.Sets the ComponentContainer that loaded this JobService
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobService#setComponentContainer(ComponentContainer)
+	 */
 	public void setComponentContainer(ComponentContainer componentContainer) {
-	    this.componentContainer = componentContainer;
-	  }
-
+		this.componentContainer = componentContainer;
+	}
 	/** End getter/setter methods*/
+	
 	@Override
 	public boolean contains(String jobName) {
 		if(jobRegistry.getJobNames().contains(jobName)){
@@ -631,6 +639,4 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		return false;
 	}
-		
-		
 }

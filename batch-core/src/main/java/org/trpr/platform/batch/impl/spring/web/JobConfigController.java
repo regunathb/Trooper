@@ -39,23 +39,24 @@ import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
-
 /**
- * <code> JObConfigController </code> is a controller for handling requests related to 
+ * <code> JobConfigController </code> is a controller for handling requests related to 
  * job configuration (Uploading job files, dependencies, editing job Files)
+ * 
  * @author devashishshankar
  * @version 1.0 22 Jan, 2012
  */
-
 @Controller
 public class JobConfigController {
-
+	
+	/**Trooper services used by this class **/
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
 	private SyncService syncService;
-
+	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(JobConfigController.class);
+	
 	/**
 	 * Autowired default constructor
 	 */
@@ -156,7 +157,6 @@ public class JobConfigController {
 			@RequestParam(defaultValue = "") String XMLFileContents, @RequestParam(defaultValue = "0") 
 	MultipartFile jobFile, @RequestParam(defaultValue = "0") MultipartFile depFile, 
 	@RequestParam(defaultValue = "0") String identifier) throws Exception {
-
 		//Button 1: Upload XML
 		if(identifier.equals("Upload file")) {
 			String jobFileName = jobFile.getOriginalFilename();
@@ -233,14 +233,13 @@ public class JobConfigController {
 				//Redirect
 				return "configuration/modify/jobs/job";
 			}
-			//TODO: Delete the configuration file
-			
+			//Delete the configuration file
+			this.jobConfigService.deploymentSuccess(jobName);
 			//Loading worked. Redirect to job configuration page. Load the view details
 			model.addAttribute("SuccessMessage", "The job was successfully deployed!");
 			model.addAttribute("jobName", jobName);
 			//Push jobs to all servers
 			for(Host serverName: this.jobConfigService.getAllServerNames()) {
-				System.out.println(serverName.getAddress());
 				if(serverName.equals(this.jobConfigService.getCurrentServerName())) {
 					continue;
 				}
@@ -270,7 +269,7 @@ public class JobConfigController {
 	}
 
 	/**
-	 * Displays a non-editable version of job configuration
+	 * Displays a read only version of job configuration
 	 * This method gets the XMLFile, Dependencies from jobService and displays it.
 	 */
 	@RequestMapping(value = "/configuration/jobs/{jobName}", method = RequestMethod.GET)
@@ -291,6 +290,4 @@ public class JobConfigController {
 		}
 		return "configuration/jobs/job";
 	}
-
-
 }
