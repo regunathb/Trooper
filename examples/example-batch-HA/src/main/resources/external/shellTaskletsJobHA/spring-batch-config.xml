@@ -45,7 +45,7 @@
 	-->
 	<bean id="shellJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="shellJobDetailBean" />
-		<property name="cronExpression" value="0 0/155 * * * ?" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
 
 	<!--
