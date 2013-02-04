@@ -85,6 +85,8 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			}			
 		}
 		
+		LOGGER.info("No items found. To batch read by partitions");
+		
 		ExecutionContext context = null;
 		// else, check to see if any of the ExecutionContext(s) exist for processing
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
@@ -94,6 +96,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		}
 		
 		if (context != null) {
+			LOGGER.info("Calling batch read for a partition");
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
