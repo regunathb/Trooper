@@ -79,6 +79,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 */
 	public T read() throws Exception, UnexpectedInputException, ParseException {		
 		// return data from local queue if available already
+		LOGGER.info("Queue size is : " + this.localQueue.size());
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.localQueue.isEmpty()) {
 				return this.localQueue.remove();
@@ -95,7 +96,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			}
 		}
 		
-		if (context != null) {
+		if (context != null && this.countDownLatch != null) {
 			LOGGER.info("Calling batch read for a partition");
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
