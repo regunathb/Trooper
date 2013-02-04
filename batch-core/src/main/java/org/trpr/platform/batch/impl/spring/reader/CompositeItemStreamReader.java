@@ -127,7 +127,8 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 				return this.localQueue.remove();
 			}	
 		}
-				
+		
+		LOGGER.info("Size of queue before exit : " + this.localQueue.size());
 		return null;
 	}
 
