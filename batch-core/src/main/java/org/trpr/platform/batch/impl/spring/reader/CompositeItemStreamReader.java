@@ -96,14 +96,16 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			}
 		}
 		
-		if (context != null && this.countDownLatch != null) {
+		if (context != null) {
 			LOGGER.info("Calling batch read for a partition");
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
 					this.localQueue.add(item);
 				}
-				this.countDownLatch.countDown(); // count down on the latch
+				if (this.countDownLatch != null) {
+					this.countDownLatch.countDown(); // count down on the latch
+				}
 				return this.localQueue.remove(); // return an item for processing after populating the local collection
 			}
 		}
