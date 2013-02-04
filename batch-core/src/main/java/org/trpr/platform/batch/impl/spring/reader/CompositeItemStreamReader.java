@@ -19,6 +19,7 @@ package org.trpr.platform.batch.impl.spring.reader;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -42,6 +43,9 @@ import org.trpr.platform.core.spi.logging.Logger;
  */
 public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, InitializingBean {
 	
+	/** The default timeout in seconds that applies to any BatchItemStreamReader#batchRead() call on the delegate*/
+	private static final int DEFAULT_BATCH_READ_TIMEOUT = 60;
+	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(CompositeItemStreamReader.class);
 	
@@ -56,6 +60,9 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	
 	/** The CountDownLatch to keep track of ExecutionContext instances that are processed*/
 	private CountDownLatch countDownLatch;
+	
+	/** The timeout for batch read calls on the delegate*/
+	private int batchReadTimeout = DEFAULT_BATCH_READ_TIMEOUT;
 	
 	/**
 	 * Constructor for this class
@@ -97,7 +104,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			}
 		}
 		
-		this.countDownLatch.await(); // wait for any batch reads on the delegate to complete
+		this.countDownLatch.await(this.getBatchReadTimeout(), TimeUnit.SECONDS); // wait for any batch reads on the delegate to complete
 		
 		// Check again to see if any new items have been added, exit otherwise
 		synchronized(this) {
@@ -160,6 +167,12 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	public BatchItemStreamReader<T> getDelegate() {
 		return this.delegate;
 	}
+	public int getBatchReadTimeout() {
+		return this.batchReadTimeout;
+	}
+	public void setBatchReadTimeout(int batchReadTimeout) {
+		this.batchReadTimeout = batchReadTimeout;
+	}	
 	/** End getter/setter methods */
 
 
