@@ -110,7 +110,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		this.countDownLatch.await(this.getBatchReadTimeout(), TimeUnit.SECONDS); // wait for any batch reads on the delegate to complete
 		
 		// force clear the context list and set the count down latch to null. Enables clean start the next time the job the run
-		if (this.countDownLatch.getCount() > 0) {
+		if (this.countDownLatch != null && this.countDownLatch.getCount() > 0) {
 			LOGGER.info("Count down latch timeout occurred!");
 		}
 		this.countDownLatch = null;
