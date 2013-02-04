@@ -106,15 +106,20 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		
 		this.countDownLatch.await(this.getBatchReadTimeout(), TimeUnit.SECONDS); // wait for any batch reads on the delegate to complete
 		
+		// force clear the context list and set the count down latch to null. Enables clean start the next time the job the run
+		if (this.countDownLatch.getCount() > 0) {
+			LOGGER.info("Count down latch timeout occurred!");
+		}
+		this.countDownLatch = null;
+		this.contextList.clear();
+		
 		// Check again to see if any new items have been added, exit otherwise
 		synchronized(this) {
 			if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
 				return this.localQueue.remove();
 			}	
 		}
-		
-		LOGGER.info("Completed reading from all partitions. Read complete!");
-		
+				
 		return null;
 	}
 
@@ -140,6 +145,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
+		LOGGER.info("Called open for a partition");
 		this.contextList.add(context);
 		if (this.countDownLatch == null || this.countDownLatch.getCount() == 0) { // create a CountDownLatch if variable instance is null or the previous one has counted down to zero
 			this.countDownLatch = new CountDownLatch(context.getInt(SimpleRangePartitioner.TOTAL_PARTITIIONS, 1)); // initialize the CountDownLatch to the partition size
