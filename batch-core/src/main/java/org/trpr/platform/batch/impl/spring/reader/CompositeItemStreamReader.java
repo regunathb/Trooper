@@ -101,7 +101,9 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
-					this.localQueue.add(item);
+					if (item != null) {
+						this.localQueue.add(item);
+					}
 				}
 				if (this.countDownLatch != null) {
 					this.countDownLatch.countDown(); // count down on the latch
