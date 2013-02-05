@@ -11,7 +11,6 @@
 	<bean class="org.trpr.platform.batch.impl.spring.web.JobConfigController">
 		<constructor-arg index="0"><ref bean="jobService" /></constructor-arg>
 		<constructor-arg index="1"><ref bean="jobConfigService" /></constructor-arg>
-		<constructor-arg index="2"><ref bean="syncService" /></constructor-arg>
 	</bean>
 	<bean class="org.springframework.batch.admin.web.FileController" />
 	<bean class="org.springframework.batch.admin.web.StepExecutionController" />

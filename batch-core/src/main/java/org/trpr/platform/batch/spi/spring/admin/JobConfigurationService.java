@@ -15,10 +15,12 @@
  */
 package org.trpr.platform.batch.spi.spring.admin;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
-import org.trpr.platform.batch.impl.spring.web.Host;
+import org.springframework.core.io.Resource;
+import org.trpr.platform.batch.common.JobHost;
 import org.trpr.platform.core.PlatformException;
 
 /**
@@ -30,104 +32,102 @@ import org.trpr.platform.core.PlatformException;
  * @version 1.1, 31 Jan 2013
  */
 public interface JobConfigurationService {	
+	
+	/**
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getSyncService()
+	 */
+	public SyncService getSyncService();
 
 	/**
-	 * Gets the absolute directory path of a job, where all the config-files and dependencies are stored.
-	 * Returns a new directory based on jobName if job doesn't exist
-	 * @param jobName job name identifier
-	 * @return Path of job directory
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#setSyncService(SyncService)
 	 */
-	String getJobDirectory(String jobName);
+	public void setSyncService(SyncService syncService);
 
 	/**
-	 * Gets the XML File path for given job. If not found, returns null.
-	 * @param jobName job name identifier
-	 * @return Path of XMLFile. null if not found
+	 * Interface method implementation.
+	 * Also sets the hostName
+	 * @see JobConfigurationService#setPort(int)
 	 */
-	String getXMLFilePath(String jobName);
+	public void setPort(int port);
 
 	/**
-	 * Sets the XML File. If the job doesn't have an XML file (new job), a new directory 
-	 * is created and a new XML File is created there. Otherwise, the old file is overwritten.
-	 * @param jobName the job name identifier
-	 * @throws PlatformException in case of errors
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getCurrentHostName()
 	 */
-	void setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
+	public JobHost getCurrentHostName();
 
 	/**
-	 * Removes the job configuration XML file for the specified job name. Restores the previos XML File,
-	 * if found
-	 * @param jobName the job name identifier
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getCurrentHostJobs()
 	 */
-	void removeXMLFile(String jobName);
+	public Collection<String> getCurrentHostJobs();
 
 	/**
-	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
-	 * @param jobName Name of the job
-	 * @throws PlatformException in case of errors
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#addJobInstance(String, JobHost)
 	 */
-	void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
-
-	/** 
-	 * Returns the list of dependencies of given job. 
-	 * @param jobName Name of the job
-	 * @return List of dependencies(filename, not the path). If not found, returns null
-	 */
-	List<String> getJobDependencyList(String jobName);
+	public void addJobInstance(String jobName, JobHost hostName);
 
 	/**
-	 * Get the job name from a spring batch config file.
-	 * @param XMLFileContents A byte array of the configuration file
-	 * @return Job name if found, null otherwise
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#clearJobInstances()
 	 */
-	String getJobNameFromXML(byte[] XMLFileContents);
+	public void clearJobInstances();
 
 	/**
-	 * Gets the contents of a file in a single String
-	 * @param filePath Path of the file
-	 * @return String containing the file contents
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getHostNames(String)
 	 */
-	String getFileContents(String filePath);
+	public List<JobHost> getHostNames(String jobName);
 
 	/**
-	 * Inform JobConfiguratinService of successful deployment.
-	 * Cleans up resources such as previous XML File
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getAllHostNames()
 	 */
-	void deploymentSuccess(String jobName);
-	/**
-	 * Sets the port of the current Trooper host. 
-	 * And sets the hostName
-	 * @param port port number
-	 */
-	void setPort(int port);
+	public List<JobHost> getAllHostNames();
 
 	/**
-	 * Gets the list of hostnames on which a job is running
-	 * @return List of {@link Host}, null if not running in HA mode.
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#getJobStoreURI(String)
 	 */
-	List<Host> getServerNames(String jobName);
+	public URI getJobStoreURI(String jobName);
 
 	/**
-	 * Gets a list of all the Trooper hosts
-	 * @return List of {@link Host}, null if not running in HA mode.
+	 * Interface method implementation. 
+	 * @see JobConfigurationService#addJobDependency(String, String, byte[])
 	 */
-	List<Host> getAllServerNames();
+	public void addJobDependency(String jobName, String destFileName, byte[] fileContents);
 
 	/**
-	 * Returns the current Trooper host
-	 * @return @link{Host} the host name of current Trooper instance, null if not running in HA mode
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getJobDependencyList
 	 */
-	Host getCurrentServerName();
+	public List<String> getJobDependencyList(String jobName);
 
 	/**
-	 * Gets the list of HA jobs allocated on the current server
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getJobConfig(String)
 	 */
-	Collection<String> getCurrentServerJobs();
+	public Resource getJobConfig(String jobName);
 
 	/**
-	 * Adds a jobname and a server name
-	 * @param jobName name of the job
-	 * @param serverName @link{Host} servername
+	 * Interface method implementation. After setting an XML File, also saves the previous file.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#setJobconfig(String, byte[])
 	 */
-	void addJobInstance(String jobName, Host serverName);
+	public void setJobConfig(String jobName, Resource jobConfigFile) throws PlatformException;
+
+	/**
+	 * Interface method implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#deployJob(String)
+	 */
+	public void deployJob(String jobName);
+
+	/**
+	 * Interface method implementation.
+	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#deployJobToAllHosts(String)
+	 */
+	public void deployJobToAllHosts(String jobName);
+
 }

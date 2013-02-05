@@ -27,10 +27,10 @@
 						<td>${job.executionCount}</td>
 						<td>${job.cronExpression}</td>
 						<td>${job.nextFireTime}</td> 
-						<#if host?? && job.hostnames?size!=0 >
+						<#if job.hostNames?? && job.hostNames?size!=0 >
 						<td>
-							<#list job.hostnames as host>
-								${host}, 
+							<#list job.hostNames as host>
+								${host} <br />
 							</#list>						
 						</td>
 						</#if> 

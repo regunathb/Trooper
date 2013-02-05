@@ -30,29 +30,11 @@ public interface SyncService {
 	 * and the final loading request to the given serverName.
 	 * @return true on success, false on failure
 	 */
-	boolean pushJobToServer(String jobName, String serverName);
+	boolean pushJobToHost(String jobName, String serverName);
 	
 	/**
 	 * Checks whether the jobs running in the current server exist in all the other servers,
 	 * if not, pushes the missing jobs
 	 */
-	void syncAllServers();
-	
-	/**
-	 * Pushes a configuration file
-	 * @return Server response, empty string if no response received from server, "exception" in case of any other error
-	 */
-	String pushConfig(String jobName, String servername);
-	
-	/**
-	 * Push all the dependency files for a given job
-	 * @return Server response, empty string if no response received from server
-	 */
-	String pushDependencies(String jobName, String servername);
-
-	/**
-	 * Send a loading request	 
-	 * @return Server response, empty string if no response received from server, "exception" in case of any other error
-	 */
-	String deploy(String jobName, String servername);
+	void syncAllHosts();
 }

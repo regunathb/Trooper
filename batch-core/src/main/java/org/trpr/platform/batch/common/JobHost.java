@@ -13,33 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.web;
+package org.trpr.platform.batch.common;
 
 /**
  * <code>Host</code> is a data container holding the Trooper Host details, i.e. 
  * host name, host's IP address and port.
+ * 
  * @author devashishshankar
  * @version 1.0 31 Jan, 2013
  */
-public class Host {
+public class JobHost {
 
+	/** Host name */
 	private String hostName;
+
+	/** IP Address */
 	private String IP;
+
+	/** Port no. on which server is running */
 	private int port;
 
 	/**
 	 * Default constructor
 	 */
-	public Host(String hostName, String IP, int port) {
+	public JobHost(String hostName, String IP, int port) {
 		this.setHostName(hostName);
 		this.setIP(IP);
 		this.setPort(port);
 	}
-	
+
 	/**
 	 * If IP address is not passed, default IP address is loopback address
 	 */
-	public Host(String hostName, int port) {
+	public JobHost(String hostName, int port) {
 		this(hostName, "127.0.0.1", port);
 	}
 
@@ -63,7 +69,7 @@ public class Host {
 		this.port = port;
 	}
 	/** End getter/Setter methods */
-	
+
 	/**
 	 * Returns the Address in the form "IP:port",
 	 * which can be used for HTTP request
@@ -74,12 +80,13 @@ public class Host {
 	}
 
 	/**
-	 * Overriden method from object class
+	 * Overridden method from object class
+	 * @return true, if the two Host objects are referring to the same Host, false otherwise
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Host) {
-			Host a = (Host) obj;
+		if(obj instanceof JobHost) {
+			JobHost a = (JobHost) obj;
 			if(a.hostName.equals(this.hostName) && a.port == this.port) {
 				return true;
 			}

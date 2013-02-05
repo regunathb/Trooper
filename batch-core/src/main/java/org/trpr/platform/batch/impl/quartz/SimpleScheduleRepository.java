@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.admin;
+package org.trpr.platform.batch.impl.quartz;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.quartz.CronTrigger;
 import org.quartz.Trigger;
-import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
+import org.trpr.platform.batch.spi.quartz.ScheduleRepository;
 
 /**
  * The <code>SimpleScheduleRepository</code> class is an implementation of {@link ScheduleRepository} and holds 

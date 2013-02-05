@@ -17,6 +17,7 @@ package org.trpr.platform.batch.impl.spring.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -47,6 +48,9 @@ public class SynchronizationController {
 	public static final String PUSH_JOB_URL = "/sync/pushJob";
 	public static final String PUSH_DEP_URL = "/sync/pushDep";
 	public static final String PUSH_URL = "/sync/push/deploy";
+
+	/** The success message to be returned by the server */
+	public static final String SUCCESS_STRING = "success";
 
 	/** Logger instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(SynchronizationController.class);
@@ -90,7 +94,7 @@ public class SynchronizationController {
 		}
 		try {
 			//Set XML File
-			this.jobConfigService.setXMLFile(jobName,new String(configFile.getBytes()));
+			this.jobConfigService.setJobConfig(jobName,new ByteArrayResource(configFile.getBytes()));
 			LOGGER.info("Success in deploying configuration file for: "+jobName);
 			model.addAttribute("Message","success");
 		} catch (Exception e) {
@@ -131,7 +135,7 @@ public class SynchronizationController {
 		jobName=jobName.trim();
 		LOGGER.info("Loading request for: "+jobName);
 		try {
-			this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getXMLFilePath(jobName)));
+			this.jobConfigService.deployJob(jobName);
 			LOGGER.info("Success in deploying: "+jobName);
 			model.addAttribute("Message","success");
 		} catch (Exception e) {

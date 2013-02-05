@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.job.ha;
+package org.trpr.platform.batch.impl.spring;
 
 import java.util.Collection;
 
-import org.trpr.platform.batch.impl.spring.web.Host;
+import org.trpr.platform.batch.common.JobHost;
+import org.trpr.platform.batch.impl.job.ha.JobInstanceDetails;
+import org.trpr.platform.batch.impl.job.ha.service.SyncServiceImpl;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -56,13 +58,13 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	private SyncService syncService;
 
 	/** ServiceDiscovery instance for registering and querying Zookeeper services */
-	ServiceDiscovery<InstanceDetails> serviceDiscovery = null;
+	private ServiceDiscovery<JobInstanceDetails> serviceDiscovery = null;
 
 	/** The zookeeper path prefix for service creation */
 	private static final String ZK_DEP_PATH_PREFIX = "/Batch/Deployment";
 
 	/** ServiceCache for fast access of service instance details and adding a listener for change in instances */
-	private ServiceCache<InstanceDetails> sc;
+	private ServiceCache<JobInstanceDetails> sc;
 
 	/** The Log instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(JobRegistryBeanPostProcessor.class);
@@ -71,30 +73,25 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	public void setJobConfigService(JobConfigurationService jobConfigurationService) {
 		this.jobConfigurationService = jobConfigurationService;
 	}
-
 	public void setCuratorClient(CuratorFramework curatorFramework) {
 		this.curatorFramework= curatorFramework;
 	}
-
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
-	}
-
-	public void setSyncService(SyncService syncService) {
-		this.syncService = syncService;
 	}
 	/** End Setter methods **/
 
 	/**This method updates the list of servers in the jobConfigurationService **/
 	public void updateHosts() {
 		LOGGER.info("updating list of servers");
+		this.jobConfigurationService.clearJobInstances();
 		try {
 			Collection<String> serviceNames = serviceDiscovery.queryForNames();
 			for(String serviceName: serviceNames) {
 				//Add all the hosts in the service to jobConfigService
-				Collection<ServiceInstance<InstanceDetails>> instances = this.serviceDiscovery.queryForInstances(serviceName);     
-				for (ServiceInstance<InstanceDetails> instance: instances) {
-					Host instHost = new Host(instance.getPayload().getDescription(),instance.getAddress(),instance.getPort());
+				Collection<ServiceInstance<JobInstanceDetails>> instances = this.serviceDiscovery.queryForInstances(serviceName);     
+				for (ServiceInstance<JobInstanceDetails> instance: instances) {
+					JobHost instHost = new JobHost(instance.getPayload().getHostName(),instance.getAddress(),instance.getPort());
 					this.jobConfigurationService.addJobInstance(serviceName, instHost);   
 				}
 			}
@@ -102,7 +99,7 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 			LOGGER.error("Error while updating server list",e);
 		}
 		//Sync all servers
-		this.syncService.syncAllServers();
+		this.syncService.syncAllHosts();
 	}
 
 	/**
@@ -111,28 +108,35 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		//Create new syncService
+		this.syncService = new SyncServiceImpl(this.jobConfigurationService);
+		//Inject syncService into jobConfigurationService
+		if((this.jobConfigurationService.getSyncService()==null)) {
+			this.jobConfigurationService.setSyncService(this.syncService);
+		}
 		try {
+			//Throws an exception if isStarted not used - "Cannot be started more than once"
 			if(!this.curatorFramework.isStarted())
 				this.curatorFramework.start();
 			//For storing metadata, the class is InstanceDetails
-			JsonInstanceSerializer<InstanceDetails> serializer = new JsonInstanceSerializer<InstanceDetails>(InstanceDetails.class);
+			JsonInstanceSerializer<JobInstanceDetails> serializer = new JsonInstanceSerializer<JobInstanceDetails>(JobInstanceDetails.class);
 			//Get serviceDiscovery
-			this.serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class)
+			this.serviceDiscovery = ServiceDiscoveryBuilder.builder(JobInstanceDetails.class)
 					.client(this.curatorFramework)
 					.basePath(ZK_DEP_PATH_PREFIX).serializer(serializer)
 					.build();
 			this.serviceDiscovery.start();
 			//Get current host attributes
-			Host currentHost = this.jobConfigurationService.getCurrentServerName();
+			JobHost currentHost = this.jobConfigurationService.getCurrentHostName();
 			String hostName = currentHost.getHostName();
 			String hostAddress = currentHost.getIP();
 			int hostPort = currentHost.getPort();
 			//Register current job to current server
-			this.serviceDiscovery.registerService(ServiceInstance.<InstanceDetails> builder()
+			this.serviceDiscovery.registerService(ServiceInstance.<JobInstanceDetails> builder()
 					.name(this.jobName)
 					.address(hostAddress)
 					.port(hostPort)
-					.payload(new InstanceDetails(hostName))
+					.payload(new JobInstanceDetails(hostName))
 					.build());
 			//Add instance to jobConfigService
 			this.jobConfigurationService.addJobInstance(jobName, currentHost);   
@@ -146,9 +150,9 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 			//Update
 			this.updateHosts();
 			//Some useful info for Logs
-			LOGGER.info("jobConfigService: current server: "+this.jobConfigurationService.getCurrentServerName());
-			LOGGER.info("ALl servers: "+this.jobConfigurationService.getAllServerNames());
-			LOGGER.info("jobs in current server: "+this.jobConfigurationService.getCurrentServerJobs());
+			LOGGER.info("JobConfigService: current server: "+this.jobConfigurationService.getCurrentHostName());
+			LOGGER.info("All servers: "+this.jobConfigurationService.getAllHostNames());
+			LOGGER.info("Jobs in current server: "+this.jobConfigurationService.getCurrentHostJobs());
 		}
 		catch(Exception e) {
 			LOGGER.error("Exception while registring jobService", e);

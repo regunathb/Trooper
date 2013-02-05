@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.web;
+package org.trpr.platform.batch.impl.quartz;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -22,8 +22,7 @@ import org.quartz.Trigger;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.context.ApplicationContext;
 import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
-import org.trpr.platform.batch.impl.spring.admin.SimpleScheduleRepository;
-import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
+import org.trpr.platform.batch.spi.quartz.ScheduleRepository;
 
 /**
  * The <code>SchedulerFactoryBean</code> class is an extension of 
@@ -36,7 +35,7 @@ import org.trpr.platform.batch.spi.spring.admin.ScheduleRepository;
 public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.SchedulerFactoryBean {
 
 	/**
-	 * Overriden method to inject additional attributes post bean initialization
+	 * Overridden method to inject additional attributes post bean initialization
 	 * @see org.springframework.scheduling.quartz.SchedulerFactoryBean#afterPropertiesSet()
 	 */
 	@Override

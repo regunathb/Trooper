@@ -28,6 +28,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.trpr.platform.batch.common.JobHost;
+import org.trpr.platform.batch.common.JobInfo;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 
@@ -85,10 +87,10 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			Date nextFireDate = jobService.getNextFireDate(name);
 			JobInfo jobInfo = new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate);
 			//Getting Host attributes from jobConfigService
-			List<Host> listOfHosts = this.jobConfigurationService.getServerNames(name);
+			List<JobHost> listOfHosts = this.jobConfigurationService.getHostNames(name);
 			if(listOfHosts!=null) {
 				model.addAttribute("host", "true");
-				for(Host host: listOfHosts) {
+				for(JobHost host: listOfHosts) {
 					jobInfo.addHost(host.getAddress());
 				}
 			}

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.web;
+package org.trpr.platform.batch.common;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,13 +29,13 @@ import java.util.List;
  * @version 1.0, 09 Jan 2013
  */
 public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
-	
+
 	/** The Date format*/
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
 
 	/** Holds the Cron Expression of the job trigger */
 	private final String cronExpression;
-	
+
 	/** Holds the next fire time of the job */
 	private final Date nextFireTime;
 
@@ -48,30 +49,30 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 			boolean launchable, boolean incrementable, String cronExpression, Date nextFireTime) {		
 		//Calling super constructor to initialise the remaining attributes
 		super(name, executionCount, jobInstanceId, launchable, incrementable);
-		
 		this.cronExpression = cronExpression;
-		this.nextFireTime = nextFireTime;		
+		this.nextFireTime = nextFireTime;	
+		this.hostNames = new LinkedList<String>();
 	}
-	
+
 	/** Getter/setter Methods */
 	public void addHost(String hostName) {
 		this.hostNames.add(hostName);
 	}
-	
+
 	public void removeHost(String hostName) {
 		if(this.hostNames.contains(hostName)) {
 			this.hostNames.remove(hostName);
 		}
 	}
-	
+
 	public List<String> getHostNames() {
 		return this.hostNames;
 	}
-	
+
 	public String getcronExpression() {
 		return this.cronExpression;
 	}	
-	
+
 	public String getnextFireTime() {
 		return DATE_FORMAT.format(this.nextFireTime);
 	}

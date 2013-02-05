@@ -13,37 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.job.ha;
+package org.trpr.platform.batch.impl.job.ha;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
 
 /**
- * <code> {@link InstanceDetails} </code> is a container holding meta data about job Instances.
+ * <code> {@link JobInstanceDetails} </code> is a container holding meta data about job Instances.
  * Currently, it only holds Host Name.
  * 
  * @author devashishshankar
+ * @version 1.0, Jan 31, 2013
  */
 @JsonRootName("details")
-public class InstanceDetails {
+public class JobInstanceDetails {
 	
 	/** Description about the instance.**/
-	private String description;
+	private String hostName;
 
 	/**Default constructor **/
-	public InstanceDetails() {
+	public JobInstanceDetails() {
 	}
 	
 	/**Parameterized constructor **/
-	public InstanceDetails(String description) {
-		this.description = description;
+	public JobInstanceDetails(String hostName) {
+		this.hostName = hostName;
 	}
 
 	/** Getter/Setter Methods  */
-	public void setDescription(String description) {
-		this.description = description;
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
 	}
-	public String getDescription() {
-		return description;
+	public String getHostName() {
+		return hostName;
 	}
 	/** End getter/Setter Methods  */
 }
