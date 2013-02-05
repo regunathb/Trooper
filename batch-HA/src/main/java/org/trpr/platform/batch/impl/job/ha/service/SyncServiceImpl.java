@@ -99,7 +99,7 @@ public class SyncServiceImpl implements SyncService {
 		} else {
 			LOGGER.error("Error while deploying job. The server returns: "+configReturnString);
 		}
-		//Even if one of the above two steps fail, try t deploy
+		//Even if one of the above two steps fail, try to deploy
 		String deployReturnString = this.deploy(jobName, serverName);
 		if(deployReturnString.equals(SyncServiceImpl.SUCCESS_STRING)) {
 			return true;

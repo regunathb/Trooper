@@ -58,7 +58,6 @@ public class FileUpload {
 			HttpResponse response = client.execute(requestBase) ;
 			if (response != null){
 				HttpEntity responseEntity = response.getEntity() ;
-
 				if (responseEntity != null){
 					responseStream = responseEntity.getContent() ;
 					if (responseStream != null){

@@ -436,6 +436,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			prevFile.renameTo(configFile);
 		}
 	}
+	
 	/**
 	 * Scan the jobDirectory for any new dependency files and update JobDependencies.
 	 */

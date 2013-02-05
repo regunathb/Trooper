@@ -147,14 +147,4 @@ public class SynchronizationController {
 	/**
 	 * Receiver methods end
 	 */
-	
-	/**
-	 * Testing method
-	 */
-	@RequestMapping(value="/sync/test/jobs/{jobName}", method=RequestMethod.GET)
-	public String caller(@ModelAttribute("jobName") String jobName) {
-		String servername = "http://localhost:8082/";
-		LOGGER.info("Pushing "+jobName+" to "+servername);
-		return "redirect:/configuration";
-	}
 }
