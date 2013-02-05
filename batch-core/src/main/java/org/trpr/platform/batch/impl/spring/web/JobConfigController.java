@@ -84,7 +84,7 @@ public class JobConfigController {
 	public String modifyJob(ModelMap model, @ModelAttribute("jobName") String jobName) {
 		//Load & Add JobName, XMLFileContents, Dependencies to the view
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);
-		model.addAttribute("XMLFileContents", ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName)));
+		model.addAttribute("XMLFileContents", ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName)).trim());
 		model.addAttribute("jobName", jobName);
 		if(jobConfigService.getJobDependencyList(jobName)!=null) {
 			model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
