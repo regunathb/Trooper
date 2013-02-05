@@ -111,6 +111,8 @@ public class SyncServiceImpl implements SyncService {
 
 	/**
 	 * Pushes a configuration file
+	 * @param jobName name of the job
+	 * @param serverName server name in format IP:port
 	 * @return Host response, empty string if no response received from server, "exception" in case of any other error
 	 */
 	private String pushConfig(String jobName,String servername) {
@@ -130,6 +132,8 @@ public class SyncServiceImpl implements SyncService {
 
 	/**
 	 * Push all the dependency files for a given job
+	 * @param jobName name of the job
+	 * @param serverName server name in format IP:port
 	 * @return Host response, empty string if no response received from server
 	 */
 	private String pushDependencies(String jobName,String servername) {
@@ -152,6 +156,8 @@ public class SyncServiceImpl implements SyncService {
 
 	/**
 	 * Send a loading request	 
+	 * @param jobName name of the job
+	 * @param serverName server name in format IP:port
 	 * @return Host response, empty string if no response received from server, "exception" in case of any other error
 	 */
 	private String deploy(String jobName,String servername) {

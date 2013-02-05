@@ -28,6 +28,8 @@ public interface SyncService {
 	/**
 	 * Pushes a job, including sending it's configuration files, dependency files
 	 * and the final loading request to the given serverName.
+	 * @param jobName name of the job
+	 * @param serverName server name in format IP:port
 	 * @return true on success, false on failure
 	 */
 	boolean pushJobToHost(String jobName, String serverName);
