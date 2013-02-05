@@ -4,7 +4,7 @@
 	<bean id="bootstrapInfo" class="org.trpr.platform.runtime.spi.bootstrap.BootstrapInfo">
 		<property name="projectsRoot" value="$RUNTIME_CONFIG_PATH/../../../../" />
 		<property name="applicationName" value="Test Runtime" />
-		<property name="runtimeNature" value="standalone" />
+		<property name="runtimeNature" value="server" />
 		<property name="container" ref="containerImpl" />
 		<property name="componentContainerClassName" value="org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer" />
 	</bean>

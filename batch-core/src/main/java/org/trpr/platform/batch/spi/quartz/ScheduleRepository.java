@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.spi.spring.admin;
+package org.trpr.platform.batch.spi.quartz;
 
 import java.util.Date;
 
@@ -26,6 +26,7 @@ import org.quartz.Trigger;
  * @version 1.0 10 Jan 2013
  */
 public interface ScheduleRepository {
+	
 	/**
 	 * Returns the cron expression based on the jobName.
 	 * @param jobName Name of the job
@@ -51,6 +52,5 @@ public interface ScheduleRepository {
 	 * @param jobName Name of the job
 	 * @param trigger Quartz trigger related to the job
 	 */
-	void addTrigger(String jobName, String jobBeanName, Trigger trigger);
-
+	public void addTrigger(String jobName, String jobBeanName, Trigger trigger);
 }

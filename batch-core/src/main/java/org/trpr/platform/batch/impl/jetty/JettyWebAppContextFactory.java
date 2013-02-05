@@ -31,11 +31,17 @@ import org.trpr.platform.runtime.impl.config.FileLocator;
  */
 public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 	
+	/** The default max form contents size*/
+	public static final int DEFAULT_MAX_FORM_SIZE = 2000000;
+	
 	/** The name of the web app context */
 	private String contextName;
 	
 	/** The web app context path i.e. where WEB-INF is located*/
 	private String contextPath;
+	
+	/** The max form size property*/
+	private int maxFormContentSize = DEFAULT_MAX_FORM_SIZE;
 
 	/**
 	 * Interface method implementation. Returns the Jetty WebAppContext type
@@ -75,7 +81,9 @@ public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 		if (path.endsWith("WEB-INF")) {
 			path = path.replace("WEB-INF", "");
 		}
-		return new WebAppContext(path, this.getContextName());
+		WebAppContext webAppContext = new WebAppContext(path, this.getContextName());
+		webAppContext.setMaxFormContentSize(this.getMaxFormContentSize());
+		return webAppContext;
 	}
 
 	/** Getter/Setter methods */
@@ -94,6 +102,12 @@ public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 	public void setContextPath(String contextPath) {
 		this.contextPath = contextPath;
 	}	
+	public int getMaxFormContentSize() {
+		return this.maxFormContentSize;
+	}
+	public void setMaxFormContentSize(int maxFormContentSize) {
+		this.maxFormContentSize = maxFormContentSize;
+	}
 	/** End Getter/Setter methods */	
 
 }

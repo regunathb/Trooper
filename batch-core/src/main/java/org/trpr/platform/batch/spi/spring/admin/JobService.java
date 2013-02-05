@@ -21,21 +21,21 @@ import org.quartz.impl.SchedulerRepository;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
 
 /**
- * The <code>JobService</code> interface is an extension of {@link JobService} that holds {@link SchedulerRepository} which will have access to the 
- * trigger information
+ * <code>JobService</code> interface is an extension of {@link JobService} that holds {@link SchedulerRepository} 
+ * which will have access to the trigger information
  * 
  * @author devashishshankar
  * @version 1.0, 10 Jan 2013
  */
 public interface JobService extends org.springframework.batch.admin.service.JobService {
-	
+
 	/**
 	 * Returns the CronExpression based on the jobName
 	 * @param jobName The name of the job
 	 * @return CronExpression in a String
 	 */
 	public String getCronExpression(String jobName);
-	
+
 	/**
 	 * Returns the NextFireDate based on the jobName
 	 * @param jobName The name of the job
@@ -43,23 +43,20 @@ public interface JobService extends org.springframework.batch.admin.service.JobS
 	 */
 	public Date getNextFireDate(String jobName);
 
-  /** 	
-   * Gets the {@link ComponentContainer} that loaded this JobService
-   * @return the ComponentContainer that loaded this JobService
-   */
+	/** 	
+	 * Gets the {@link ComponentContainer} that loaded this JobService
+	 * @return the ComponentContainer that loaded this JobService
+	 */
 	public ComponentContainer getComponentContainer();
 
-  /**
-   * Sets the {@link ComponentContainer} that loaded this JobService
-   * @param componentContainer the ComponentContainer that loaded this JobService
-   */
+	/**
+	 * Sets the {@link ComponentContainer} that loaded this JobService
+	 * @param componentContainer the ComponentContainer that loaded this JobService
+	 */
 	public void setComponentContainer(ComponentContainer componentContainer);
-	
+
 	/**
 	 * Returns whether the job is in jobService
 	 */
 	public boolean contains(String jobName);
-		
-	 
-  
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.trpr.platform.batch.impl.spring.web;
 
 import java.util.ArrayList;
@@ -29,6 +28,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.trpr.platform.batch.common.JobHost;
+import org.trpr.platform.batch.common.JobInfo;
+import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 
 /**
@@ -38,25 +40,23 @@ import org.trpr.platform.batch.spi.spring.admin.JobService;
  * @author devashishshankar
  * @version 1.0, 09 Jan 2013 
  */
-
 @Controller
 public class JobController extends org.springframework.batch.admin.web.JobController {
-	
-	//An instance of JobService which holds all the information about jobs
+
+	/** Trooper Services used by this class */
 	private JobService jobService;
-	
+	private JobConfigurationService jobConfigurationService;
+
 	/**
 	 * Autowired default constructor
 	 */
 	@Autowired
-	private JobController(JobService jobService) {
+	private JobController(JobService jobService, JobConfigurationService jobConfigurationService) {
 		super(jobService);
 		this.jobService = jobService;
+		this.jobConfigurationService = jobConfigurationService;
 	}
-		
-	/**
-	 * Controller methods start
-	 */
+
 	/**
 	 * Overridden method from @link {org.springframework.batch.admin.web.JobController}. It now uses 
 	 * @link {org.trpr.platform.batch.impl.spring.web.JobInfo} to hold additional details about job
@@ -72,7 +72,6 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 		Collection<String> names = jobService.listJobs(startJob, pageSize);
 		//List of JobInfo elements to hold information to be displayed on the web console
 		List<JobInfo> jobs = new ArrayList<JobInfo>();
-		
 		for (String name : names) {
 			int count = 0;
 			try {
@@ -86,13 +85,18 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			boolean incrementable = jobService.isIncrementable(name);
 			String cronExp = jobService.getCronExpression(name);
 			Date nextFireDate = jobService.getNextFireDate(name);
-			//Adding attributes to the list
-			jobs.add(new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate));
+			JobInfo jobInfo = new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate);
+			//Getting Host attributes from jobConfigService
+			List<JobHost> listOfHosts = this.jobConfigurationService.getHostNames(name);
+			if(listOfHosts!=null) {
+				model.addAttribute("host", "true");
+				for(JobHost host: listOfHosts) {
+					jobInfo.addHost(host.getAddress());
+				}
+			}
+			jobs.add(jobInfo);
 		}
 		//Adding the list to the model "newjobs" to be accessed in the FTL files
 		model.addAttribute("newjobs", jobs);
 	}	
-	/**
-	 * End controller Methods
-	 */
 }

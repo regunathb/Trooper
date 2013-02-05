@@ -13,8 +13,9 @@
     <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
         <property name="connectors">
             <list>
-                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
-                    <property name="port" value="8182"/>
+                <bean id="Connector" class="org.trpr.platform.batch.impl.jetty.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
+                    <property name="jobConfigService" ref="jobConfigService" />
+                    <property name="port" value="8184"/>
                 </bean>
             </list>
         </property>
@@ -29,7 +30,8 @@
                                 <list>
                                     <bean class="org.trpr.platform.batch.impl.jetty.JettyWebAppContextFactory">
 										<property name="contextName" value="/"/>
-										<property name="contextPath" value="WEB-INF"/>	                                    	
+										<property name="contextPath" value="WEB-INF"/>	
+										<property name="maxFormContentSize" value="60000000"/>                                    	
                                     </bean>
                                 </list>
                             </property>
@@ -39,5 +41,4 @@
             </bean>
         </property>
     </bean>
-     
 </beans>
