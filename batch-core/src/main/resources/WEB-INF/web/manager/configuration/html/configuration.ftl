@@ -29,6 +29,12 @@
 				<!--	<td><a href="${del_url}">Delete</a></td> -->
 		</tr>
 	</#list>
+	<#else>
+	<tr>
+		<td> <span style="font-style:italic">Did not find any Job. Try refresh or add new jobs.</span> </td>
+		<td> </td>
+	</tr>
+	</#if>
 	<tr>
 	<#assign new_url><@spring.url relativeUrl="${servletPath}/configuration/modify_job"/></#assign>				
 	<form id="addNewJob" action="${new_url}" method="POST" enctype="multipart/form-data" encoding="multipart/form-data">
@@ -38,7 +44,6 @@
 	</td>
 	</form>
 	</tr>
-	</#if>
 	</table>
 
 

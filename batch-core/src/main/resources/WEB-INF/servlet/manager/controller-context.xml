@@ -15,7 +15,10 @@
 	<bean class="org.springframework.batch.admin.web.FileController" />
 	<bean class="org.springframework.batch.admin.web.StepExecutionController" />
 	<bean class="org.springframework.batch.admin.web.JobExecutionController" />
-
+	<bean class="org.trpr.platform.batch.impl.spring.web.SynchronizationController">
+		<constructor-arg index="0"><ref bean="jobService" /></constructor-arg>
+		<constructor-arg index="1"><ref bean="jobConfigService" /></constructor-arg>
+	</bean>
 	<!-- Override the location of the resource descriptors for the home page -->
 	<util:properties id="defaultResources" location="classpath:/org/springframework/batch/admin/web/manager/html-resources.properties" />
 	<util:properties id="jsonResources" location="classpath:/org/springframework/batch/admin/web/manager/json-resources.properties" />

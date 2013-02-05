@@ -213,6 +213,18 @@
 		</property>
 	</bean>
 	
+		
+	<bean name="sync/Message" parent="parentLayout">
+		<property name="attributes">
+			<props merge="true">
+				<prop key="body">/manager/sync/Message.ftl</prop>
+				<prop key="titleCode">syncMessage</prop>
+				<prop key="titleText">syncMessage</prop>
+			</props>
+		</property>
+		<property name="url" value="/manager/sync/Message.ftl" />
+	</bean>
+	
 	
 
 	<bean id="configurationHandler" name="/configuration" class="org.springframework.batch.admin.web.ViewHandler">

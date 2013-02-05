@@ -35,14 +35,14 @@
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0 0/120 * * * ?" />
+		<property name="cronExpression" value="0 0/110 5 * * ?" />
 	</bean>
 
 	<!--
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->
 	<bean
-		class="org.trpr.platform.batch.impl.spring.web.SchedulerFactoryBean">
+		class="org.trpr.platform.batch.impl.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<ref bean="greetingJobCronTrigger" />
@@ -138,4 +138,9 @@
 	<!-- End Rabbit configuration for publishing to queue -->	
 	
 </beans>
+				
+				
+				
+				
+				
 				

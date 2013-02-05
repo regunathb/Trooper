@@ -15,74 +15,127 @@
  */
 package org.trpr.platform.batch.spi.spring.admin;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+import org.trpr.platform.batch.common.JobHost;
 import org.trpr.platform.core.PlatformException;
 
 /**
- * <code>JobConfigurationService</code> provides methods for job configuration such as adding, removing XML Config files and dependencies
+ * <code>JobConfigurationService</code> provides methods for job configuration such as adding, 
+ * removing configuration files and dependencies. It also holds the list of running Trooper instances
+ * and the list of deployed jobs in each of them (for HA mode)
  * 
  * @author devashishshankar
- * @version 1.0, 22 Jan 2013
+ * @version 1.1, 31 Jan 2013
  */
-
 public interface JobConfigurationService {	
 	
 	/**
-	 * Gets the absolute directory path of a job, where all the config-files and dependencies are stored.
-	 * Returns a new directory based on jobName if job doesn't exist
-	 * @param jobName job name identifier
-	 * @return Path of job directory
+	 * Gets the syncService
+	 * @return <code>SyncService</code>
 	 */
-	public String getJobDirectory(String jobName);
-	
+	public SyncService getSyncService();
+
 	/**
-	 * Gets the XML File path for given job. If not found, returns null.
-	 * @param jobName job name identifier
-	 * @return Path of XMLFile. null if not found
+	 * Sets the syncService
+	 * @param syncService <code>SyncService</code>
 	 */
-	public String getXMLFilePath(String jobName);
-	
+	public void setSyncService(SyncService syncService);
+
 	/**
-	 * Sets the XML File. If the job doesn't have an XML file (new job), a new directory 
-	 * is created and a new XML File is created there. Otherwise, the old file is overwritten.
-	 * @param jobName the job name identifier
-	 * @throws PlatformException in case of errors
+	 * Sets the port
+	 * @param port port no. of the current Trooper host
 	 */
-	public void setXMLFile(String jobName, String XMLFileContents) throws PlatformException;
-	
+	public void setPort(int port);
+
 	/**
-	 * Removes the job configuration XML file for the specified job name
-	 * @param jobName the job name identifier
+	 * Gets the current trooper host information
+	 * @return <code>JobHost</code> current server JobHost, null if not running in HA mode
 	 */
-	public void removeXMLFile(String jobName);
-	
+	public JobHost getCurrentHostName();
+
 	/**
-	 * Add a job dependency for a given job. Also uploads the dependency file to its directory
-	 * @param jobName Name of the job
-	 * @throws PlatformException in case of errors
+	 * Gets the list of jobs allocated on the current server
+	 * @return A list of <code>String</code>, where each String is a job name, null null if not running in HA mode
 	 */
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) throws PlatformException;
-	
-	/** 
-	 * Returns the list of dependencies of given job. 
-	 * @param jobName Name of the job
-	 * @return List of dependencies. If not found, returns null
+	public Collection<String> getCurrentHostJobs();
+
+	/**
+	 * Adds a jobName and a host instance
+	 * @param jobName name of the job
+	 * @param hostName <code>JobHost</code> host name
+	 */
+	public void addJobInstance(String jobName, JobHost hostName);
+
+	/**
+	 * Clears all the jobnames and hostnames from {@link JobConfigurationService} 
+	 */
+	public void clearJobInstances();
+
+	/**
+	 * Gets the hosts on which a job is running
+	 * @param jobName name of the job
+	 * @return List of <code>JobHost</code>
+	 */
+	public List<JobHost> getHostNames(String jobName);
+
+	/**
+	 * Gets all the known job hosts
+	 * @return List of <code>JobHost</code>
+	 */
+	public List<JobHost> getAllHostNames();
+
+	/**
+	 * Gets the URI of the directory where job, including it's configuration and dependencies
+	 * is stored
+	 * @param jobName name of the job
+	 * @return directory path as a URI
+	 */
+	public URI getJobStoreURI(String jobName);
+
+	/**
+	 * Adds a dependency to a job
+	 * @param jobName name of the job
+	 * @param destFileName name of the dependency file
+	 * @param fileContents contents of dependency file as <code>byte[]</code>
+	 */
+	public void addJobDependency(String jobName, String destFileName, byte[] fileContents);
+
+	/**
+	 * Gets the dependencies associated with a job
+	 * @param jobName name of the job
+	 * @return list of job names
 	 */
 	public List<String> getJobDependencyList(String jobName);
-	
+
 	/**
-	 * Get the job name from a spring batch config file.
-	 * @param XMLFileContents A byte array of the configuration file
-	 * @return Job name if found, null otherwise
+	 * Gets the job Configuration as a <code>Resource</code>
+	 * @param jobName name of the job
+	 * @return job configuration contents as a <code>Resource</code>
 	 */
-	public String getJobNameFromXML(byte[] XMLFileContents);
-	
+	public Resource getJobConfig(String jobName);
+
 	/**
-	 * Gets the contents of a file in a single String
-	 * @param filePath Path of the file
-	 * @return String containing the file contents
+	 * Sets the job configuration for a job.
+	 * @param jobName name of the job
+	 * @param jobConfigFile
+	 * @throws PlatformException in case of errors
 	 */
-	public String getFileContents(String filePath);
-	
+	public void setJobConfig(String jobName, Resource jobConfigFile) throws PlatformException;
+
+	/**
+	 * Deploy a job to current host. 
+	 * @param jobName name of the job
+	 */
+	public void deployJob(String jobName);
+
+	/**
+	 * Deploys a job to all the known job hosts
+	 * @param jobName name of the job
+	 */
+	public void deployJobToAllHosts(String jobName);
+
 }

@@ -10,15 +10,18 @@
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
 	<!-- Bean for registering the jobs with the JobRegistry. Mandatory bean -->
-	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+	<bean class="org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobRegistry"/>
+		<property name="jobConfigService" ref="jobConfigService"/>
+		<property name="curatorClient" ref="curatorClient" />
+		<property name="jobName" value="shellTaskletsJobHA" />
 	</bean>		
 
 	<!--
 		Configuring the Shell Job Scheduler Bean that will be executed when the trigger fires.
 	-->
 	<bean name="shellJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
-		<property name="jobClass" value="org.trpr.platform.batch.impl.spring.job.ha.HABatchJob" />
+		<property name="jobClass" value="org.trpr.platform.batch.impl.job.ha.HABatchJob" />
 		<property name="group" value="sample-batch" />
 		<property name="jobDataAsMap">
 			<map>
@@ -30,7 +33,7 @@
 		</property>
 	</bean>
 	
-	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.job.ha.CuratorClientFactory">
+	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.CuratorClientFactory">
 		<property name="zkConnectString" value="stage-flo-zk1.nm.flipkart.com:2181" />
 	</bean>
 	
@@ -41,14 +44,14 @@
 	-->
 	<bean id="shellJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="shellJobDetailBean" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="0 0/100 * 2 1 ?" />
 	</bean>
 
 	<!--
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->
 	<bean
-		class="org.trpr.platform.batch.impl.spring.web.SchedulerFactoryBean">
+		class="org.trpr.platform.batch.impl.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<ref bean="shellJobCronTrigger" />
@@ -83,3 +86,7 @@
 	</bean>
 
 </beans>
+
+	
+				
+

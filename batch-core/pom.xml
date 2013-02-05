@@ -141,7 +141,7 @@
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-model</artifactId>
 			<version>1.0.0</version>
-		</dependency>				
+		</dependency>		
 	</dependencies>
 	
 	<build>

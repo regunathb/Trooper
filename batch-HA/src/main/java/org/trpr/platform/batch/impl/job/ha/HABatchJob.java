@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.batch.impl.spring.job.ha;
+package org.trpr.platform.batch.impl.job.ha;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

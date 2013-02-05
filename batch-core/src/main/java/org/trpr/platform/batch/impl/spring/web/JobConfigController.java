@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
@@ -32,23 +32,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.trpr.platform.batch.BatchFrameworkConstants;
+import org.trpr.platform.batch.common.utils.ConfigFileUtils;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 
 /**
- * Controller for handling requests related to job configuration (Uploading job files, dependencies, editing job Files)
+ * <code> JobConfigController </code> is a controller for handling requests related to 
+ * job configuration (Uploading job files, dependencies, editing job Files)
+ * 
  * @author devashishshankar
- * @version 1.0 22 Jan, 2012
- * TODO: Make redirect work (Code will be cleaner)
+ * @version 1.1, 5 Feb, 2013
  */
-
 @Controller
 public class JobConfigController {
-	
+
+	/**Trooper services used by this class **/
 	private JobService jobService;
 	private JobConfigurationService jobConfigService;
-	
+
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(JobConfigController.class);
+
 	/**
 	 * Autowired default constructor
 	 */
@@ -57,7 +63,7 @@ public class JobConfigController {
 		this.jobService = jobService;
 		this.jobConfigService = jobConfigService;
 	}
-	
+
 	/**
 	 * Finds the jobname from the request URL
 	 */
@@ -78,15 +84,14 @@ public class JobConfigController {
 	public String modifyJob(ModelMap model, @ModelAttribute("jobName") String jobName) {
 		//Load & Add JobName, XMLFileContents, Dependencies to the view
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);
-		String XMLFileContents = this.jobConfigService.getFileContents(jobConfigService.getXMLFilePath(jobName));
+		model.addAttribute("XMLFileContents", ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName)).trim());
 		model.addAttribute("jobName", jobName);
-		model.addAttribute("XMLFileContents", XMLFileContents);
 		if(jobConfigService.getJobDependencyList(jobName)!=null) {
 			model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 		}
 		return "configuration/modify/jobs/job";	
 	}
-	
+
 	/**
 	 * Controller for new job. Just adds an attribute jobName to the model. And redirects to the job edit page.
 	 */
@@ -98,23 +103,18 @@ public class JobConfigController {
 			model.remove("jobFile");
 			model.addAttribute("Error", "File is Empty or invalid. Only .xml files can be uploaded");
 			return "redirect:/configuration";
-		}
-		//Check if file is .xml
-		else if(!jobFileName.substring(jobFileName.lastIndexOf('.')).equals(".xml")) {
-
+		} else if(!jobFileName.substring(jobFileName.lastIndexOf('.')).equals(".xml")) { //Check if file is .xml
 			model.remove("jobFile");
 			model.addAttribute("Error", "Only .xml files can be uploaded");
 			return "redirect:/configuration";
-		}
-		//Read file to view
-		else {
+		} else { //Read file to view
 			boolean invalidJobFile=false;
 			String jobName = null;
 			try {
-					byte[] buffer = jobFile.getBytes();
-					String XMLFileContents = new String(buffer, "UTF-8");
-					model.addAttribute("XMLFileContents", XMLFileContents);
-					jobName= jobConfigService.getJobNameFromXML(jobFile.getBytes());
+				byte[] buffer = jobFile.getBytes();
+				String XMLFileContents = new String(buffer);
+				model.addAttribute("XMLFileContents", XMLFileContents);
+				jobName= ConfigFileUtils.getJobName(new ByteArrayResource(jobFile.getBytes()));
 			} 
 			catch (UnsupportedEncodingException e) {
 				invalidJobFile=true;
@@ -136,7 +136,7 @@ public class JobConfigController {
 			return "configuration/modify/jobs/job";
 		}
 	}
-	
+
 	/**
 	 * This method handles all the configuration changes:
 	 * 	Uploading of XML File
@@ -145,69 +145,45 @@ public class JobConfigController {
 	 */
 	@RequestMapping(value = "configuration/modify/jobs/{jobName}", method = RequestMethod.POST)
 	public String editJob(ModelMap model, @RequestParam String jobName, 
-		@RequestParam(defaultValue = "") String XMLFileContents, @RequestParam(defaultValue = "0") 
-		MultipartFile jobFile, @RequestParam(defaultValue = "0") MultipartFile depFile, 
-		@RequestParam(defaultValue = "0") String identifier) throws Exception {
-		
+			@RequestParam(defaultValue = "") String XMLFileContents, 
+			@RequestParam(defaultValue = "0") MultipartFile jobFile, 
+			@RequestParam(defaultValue = "0") MultipartFile depFile, 
+			@RequestParam(defaultValue = "0") String identifier) throws Exception {
 		//Button 1: Upload XML
 		if(identifier.equals("Upload file")) {
 			String jobFileName = jobFile.getOriginalFilename();
 			//Check if file is empty or doesn't have an extension
 			if (jobFile.isEmpty()||(jobFileName.lastIndexOf('.')<0)) {
 				model.addAttribute("XMLFileError", "File is Empty or invalid. Only .xml files can be uploaded");
-			}
-			//Check if file is .xml
-			else if(!jobFileName.substring(jobFileName.lastIndexOf('.')).equals(".xml")) {
+			} else if(!jobFileName.substring(jobFileName.lastIndexOf('.')).equals(".xml")) {//Check if file is .xml
 				model.addAttribute("XMLFileError", "Only .xml files can be uploaded");
-			}
-			//Read file to view
-			else {
+			} else { //Read file to view
 				byte[] buffer = jobFile.getBytes();
 				XMLFileContents = new String(buffer);
 				model.addAttribute("XMLFileContents", XMLFileContents);
 			}
-		}
-		//Button 2: Upload dependencies
-		else if(identifier.equals("Upload dependency")) {
+		} else if(identifier.equals("Upload dependency")) { 
+			//Button 2: Upload dependencies
 			String depFileName = depFile.getOriginalFilename();	
 			if (depFile.isEmpty()||(depFileName.lastIndexOf('.')<0)) {
 				model.addAttribute("DepFileError", "File is Empty or invalid. Only .jar files can be uploaded");
-			}
-			//Check if file is valid
-			else if(!depFileName.substring(depFileName.lastIndexOf('.')).equals(".jar")) {
+			} else if(!depFileName.substring(depFileName.lastIndexOf('.')).equals(".jar")) { //Check if file is valid
 				model.addAttribute("DepFileError", "Only .jar files can be uploaded");
-			}
-			//Check if file hasn't been added already
-			else if(jobConfigService.getJobDependencyList(jobName)!=null && jobConfigService.getJobDependencyList(jobName).contains(depFileName)){
-				model.addAttribute("DepFileError", "The filename is already added. Duplicates not allowed");
-			}
-			//Move uploaded file
-			else {
+			} else {//Move uploaded file
+				//Check if file hasn't been added already
+				if(jobConfigService.getJobDependencyList(jobName)!=null && jobConfigService.getJobDependencyList(jobName).contains(depFileName)){
+					model.addAttribute("DepFileError", "The filename is already added. Overwriting");
+				}
 				jobConfigService.addJobDependency(jobName,depFile.getOriginalFilename(),depFile.getBytes());
 			}
-		}
-		//Button 3: Save. Overwrite the modified XML File
-		else {
-			//Is XML File modified?
-			boolean fileModifedFlag=false;
+		} else { //Button 3: Save. Overwrite the modified XML File
 			try {
 				//Set XML File
-				this.jobConfigService.setXMLFile(jobName, XMLFileContents);
-				//File has been modified if previous exception was not thrown
-				fileModifedFlag = true;
-				//Try a trooper reload (loadResource)
-				this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getJobDirectory(jobName)+"/"+BatchFrameworkConstants.SPRING_BATCH_CONFIG));
+				this.jobConfigService.setJobConfig(jobName, new ByteArrayResource(XMLFileContents.getBytes()));
+				this.jobConfigService.deployJob(jobName);
 			}
-			//Loading didn't work
 			catch (Exception e) {
-				//If file has been modified, delete the modified file and try to restore previous version
-				if(fileModifedFlag) {
-					jobConfigService.removeXMLFile(jobName);
-					//Previous version restoring
-					if(jobConfigService.getXMLFilePath(jobName)!=null) {
-						this.jobService.getComponentContainer().loadComponent(new FileSystemResource(jobConfigService.getXMLFilePath(jobName)));
-					}
-				}
+				LOGGER.info("Error while deploying job",e);
 				//View: Add Error and rest of the attributes
 				//Get stacktrace as string
 				StringWriter errors = new StringWriter();
@@ -225,14 +201,17 @@ public class JobConfigController {
 				//Redirect
 				return "configuration/modify/jobs/job";
 			}
-			//Loading worked. Redirect to job configuration page. Load the view details
+			//Loading worked. Deploy to all hosts
+			this.jobConfigService.deployJobToAllHosts(jobName);
+			//Redirect to job configuration page. Load the view details
 			model.addAttribute("SuccessMessage", "The job was successfully deployed!");
 			model.addAttribute("jobName", jobName);
+			//Push jobs to all servers
 			if(jobConfigService.getJobDependencyList(jobName)!=null) {
 				model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 			}
 			model.addAttribute("XMLFileContents", XMLFileContents.trim());
-			String jobDirectory = this.jobConfigService.getJobDirectory(jobName);
+			String jobDirectory = this.jobConfigService.getJobStoreURI(jobName).getPath();
 			model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");
 			return "configuration/jobs/job";
 		}
@@ -245,9 +224,9 @@ public class JobConfigController {
 		//Redirect to modify page
 		return "configuration/modify/jobs/job";
 	}
-	
+
 	/**
-	 * Displays a non-editable version of job configuration
+	 * Displays a read only version of job configuration
 	 * This method gets the XMLFile, Dependencies from jobService and displays it.
 	 */
 	@RequestMapping(value = "/configuration/jobs/{jobName}", method = RequestMethod.GET)
@@ -257,10 +236,10 @@ public class JobConfigController {
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);		
 		model.addAttribute("jobName", jobName);
 		//Adding XMLFileContents & dependencies to view
-		String XMLFileContents = jobConfigService.getFileContents(jobConfigService.getXMLFilePath(jobName));
-		model.addAttribute("XMLFileName", jobConfigService.getXMLFilePath(jobName));	
+		String XMLFileContents = ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName));
+		model.addAttribute("XMLFileName", this.jobConfigService.getJobConfig(jobName).getFilename());	
 		model.addAttribute("XMLFileContents", XMLFileContents);
-		String jobDirectory = this.jobConfigService.getJobDirectory(jobName);
+		String jobDirectory = this.jobConfigService.getJobStoreURI(jobName).getPath();
 		model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");
 		//if job has dependencies
 		if(this.jobConfigService.getJobDependencyList(jobName)!=null) {
@@ -268,6 +247,5 @@ public class JobConfigController {
 		}
 		return "configuration/jobs/job";
 	}
-	
 
 }
