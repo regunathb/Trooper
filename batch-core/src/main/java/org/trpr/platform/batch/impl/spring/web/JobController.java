@@ -91,7 +91,7 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			if(listOfHosts!=null) {
 				model.addAttribute("host", "true");
 				for(JobHost host: listOfHosts) {
-					jobInfo.addHost(host.getAddress());
+					jobInfo.addHost(host);
 				}
 			}
 			jobs.add(jobInfo);

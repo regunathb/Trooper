@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.w3c.dom.Document;
@@ -81,6 +82,7 @@ public class ConfigFileUtils {
 		}
 		catch(Exception e) {
 			LOGGER.error("Unable to get the job name from the given Spring Batch configuration file", e);
+			throw new PlatformException(e);
 		}
 		return null;
 	}
