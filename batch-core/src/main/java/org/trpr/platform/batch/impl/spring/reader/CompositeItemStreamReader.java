@@ -79,14 +79,11 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 */
 	public T read() throws Exception, UnexpectedInputException, ParseException {		
 		// return data from local queue if available already
-		LOGGER.info("Queue size is : " + this.localQueue.size());
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.localQueue.isEmpty()) {
 				return this.localQueue.remove();
 			}			
 		}
-		
-		LOGGER.info("No items found. To batch read by partitions");
 		
 		ExecutionContext context = null;
 		// else, check to see if any of the ExecutionContext(s) exist for processing
@@ -97,30 +94,26 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		}
 		
 		if (context != null) {
-			LOGGER.info("Calling batch read for a partition");
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
-					if (item != null) {
+					if (item != null) { // check and add only non null items
 						this.localQueue.add(item);
 					}
 				}
-				if (this.countDownLatch != null) {
-					this.countDownLatch.countDown(); // count down on the latch
-				}
+				this.countDownLatch.countDown(); // count down on the latch
 				return this.localQueue.remove(); // return an item for processing after populating the local collection
 			}
 		}
-		synchronized(this) {
-			if (this.countDownLatch != null) {
-				this.countDownLatch.await(this.getBatchReadTimeout(), TimeUnit.SECONDS); // wait for any batch reads on the delegate to complete		
-				// force clear the context list and set the count down latch to null. Enables clean start the next time the job the run
-				if (this.countDownLatch.getCount() > 0) {
-					LOGGER.info("Count down latch timeout occurred!");
-				}
-			}
-			this.countDownLatch = null;
+		
+		this.countDownLatch.await(this.getBatchReadTimeout(), TimeUnit.SECONDS); // wait for any batch reads on the delegate to complete		
+		// force clear the context list and set the count down latch to zero. Enables clean start the next time the job the run
+		if (this.countDownLatch.getCount() > 0) {
+			LOGGER.info("Count down latch timeout occurred before completion. Counting down to zero and clearing the context list!");
 			this.contextList.clear();
+			while(this.countDownLatch.getCount() > 0) {
+				this.countDownLatch.countDown();
+			}
 		}
 		
 		// Check again to see if any new items have been added, exit otherwise
@@ -130,7 +123,6 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 			}	
 		}
 		
-		LOGGER.info("Size of queue before exit : " + this.localQueue.size());
 		return null;
 	}
 
