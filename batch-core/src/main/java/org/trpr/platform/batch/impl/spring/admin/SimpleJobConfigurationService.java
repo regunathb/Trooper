@@ -138,12 +138,15 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			ipAddr = InetAddress.getLocalHost().getHostAddress();
 			Enumeration<NetworkInterface> nets = 
 					NetworkInterface.getNetworkInterfaces();
+			//Iterate through all network interfaces
 			while (nets.hasMoreElements())
 			{
 				NetworkInterface netint = (NetworkInterface) nets.nextElement();
 				Enumeration<InetAddress> ips = netint.getInetAddresses();
+				//Iterate through all IP adddress
 				while(ips.hasMoreElements()) {
 					InetAddress ip = ips.nextElement();
+					//Take the first address which isn't a loopback and is in the local address
 					if (!ip.isLoopbackAddress()  &&  
 							ip.isSiteLocalAddress()) {
 						LOGGER.info("Host IP Address: "+ip.getHostAddress());
