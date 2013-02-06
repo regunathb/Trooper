@@ -40,7 +40,7 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	private final Date nextFireTime;
 
 	/** Holds the hostname of the job */
-	private List<String> hostNames;
+	private List<JobHost> hostNames;
 
 	/**
 	 * Constructor for initialising JobInfo
@@ -51,21 +51,21 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 		super(name, executionCount, jobInstanceId, launchable, incrementable);
 		this.cronExpression = cronExpression;
 		this.nextFireTime = nextFireTime;	
-		this.hostNames = new LinkedList<String>();
+		this.hostNames = new LinkedList<JobHost>();
 	}
 
 	/** Getter/setter Methods */
-	public void addHost(String hostName) {
+	public void addHost(JobHost hostName) {
 		this.hostNames.add(hostName);
 	}
 
-	public void removeHost(String hostName) {
+	public void removeHost(JobHost hostName) {
 		if(this.hostNames.contains(hostName)) {
 			this.hostNames.remove(hostName);
 		}
 	}
 
-	public List<String> getHostNames() {
+	public List<JobHost> getHostNames() {
 		return this.hostNames;
 	}
 

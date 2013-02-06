@@ -30,7 +30,7 @@
 						<#if job.hostNames?? && job.hostNames?size!=0 >
 						<td>
 							<#list job.hostNames as host>
-								${host} <br />
+								<a href="http://${host.address}/jobs">${host.hostName}:${host.port}</a> <br />
 							</#list>						
 						</td>
 						</#if> 
