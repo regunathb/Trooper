@@ -33,9 +33,11 @@
 		<beans:bean class="org.springframework.batch.admin.integration.JobConfigurationRequestToResourceAdapter" />
 	</service-activator>
 
+	<!--  
 	<file:inbound-channel-adapter directory="${batch.job.configuration.file.dir}" channel="job-configuration-files"
 		filename-pattern=".*\.xml">
 		<poller max-messages-per-poll="1" cron="5/1 * * * * *" />
 	</file:inbound-channel-adapter>
+	-->
 
 </beans:beans>
