@@ -52,7 +52,7 @@ public class SyncServiceImpl implements SyncService {
 
 	/** Protocol used to send request */
 	private static final String PROTOCOL = "http://";	
-
+	
 	/** Encoding scheme to be used for the requests */
 	private static final String ENCODING = "UTF-8";
 
@@ -74,6 +74,7 @@ public class SyncServiceImpl implements SyncService {
 		for(String jobName: this.jobConfigService.getCurrentHostJobs()) {
 			for(JobHost serverName: this.jobConfigService.getAllHostNames()) {
 				if(!this.jobConfigService.getHostNames(jobName).contains(serverName)) {
+					LOGGER.info("Pushing: jobname: "+jobName+" to servername:"+serverName.getAddress());
 					this.pushJobToHost(jobName, serverName.getAddress());
 				}
 			}
@@ -89,7 +90,7 @@ public class SyncServiceImpl implements SyncService {
 	 * @see SyncService#pushJobToHost(String, String)
 	 */
 	@Override
-	public boolean pushJobToHost(String jobName, String serverName) {
+	public synchronized boolean pushJobToHost(String jobName, String serverName) {
 		String configReturnString = this.pushConfig(jobName, serverName);
 		if(configReturnString.equals(SyncServiceImpl.SUCCESS_STRING)) {
 			String depReturnString = this.pushDependencies(jobName, serverName);
@@ -97,14 +98,14 @@ public class SyncServiceImpl implements SyncService {
 				LOGGER.error("Error while pushing dependency file. The server returns: "+depReturnString);
 			}
 		} else {
-			LOGGER.error("Error while deploying job. The server returns: "+configReturnString);
+			LOGGER.error("Error while pushing configuration file. The server returns: "+configReturnString);
 		}
 		//Even if one of the above two steps fail, try to deploy
 		String deployReturnString = this.deploy(jobName, serverName);
 		if(deployReturnString.equals(SyncServiceImpl.SUCCESS_STRING)) {
 			return true;
 		} else {
-			LOGGER.error("Error while pushing configuration file. The server returns: "+deployReturnString);
+			LOGGER.error("Error while deploying"+jobName+". The server returns: "+deployReturnString);
 		}
 		return false;
 	}
