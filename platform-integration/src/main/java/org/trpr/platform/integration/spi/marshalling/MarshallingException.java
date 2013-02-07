@@ -13,35 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.integration.spi.json;
+package org.trpr.platform.integration.spi.marshalling;
 
 import org.trpr.platform.core.PlatformException;
 
 /**
- * Class <code>JSONDataException</code> is a sub-type of the {@link PlatformException} used in the JSON processing modules of the platform.
+ * Class <code>MarshallingException</code> is a sub-type of the {@link PlatformException} used in the data marshalling modules of the platform.
  *  
  * @author Regunath B
  * @version 1.0, 18/09/2012
  */
 
-public class JSONDataException extends PlatformException {
+public class MarshallingException extends PlatformException {
 
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * Constructor for JSONDataException.
+	 * Constructor for MarshallingException.
 	 * @param msg the detail message
 	 */
-	public JSONDataException(String msg) {
+	public MarshallingException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for JSONDataException.
+	 * Constructor for MarshallingException.
 	 * @param msg the detail message
 	 * @param cause the root cause 
 	 */
-	public JSONDataException(String msg, Throwable cause) {
+	public MarshallingException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 	

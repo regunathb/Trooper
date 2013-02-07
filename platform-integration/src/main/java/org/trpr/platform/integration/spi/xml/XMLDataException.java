@@ -15,16 +15,16 @@
  */
 package org.trpr.platform.integration.spi.xml;
 
-import org.trpr.platform.core.PlatformException;
+import org.trpr.platform.integration.spi.marshalling.MarshallingException;
 
 /**
- * Class <code>XMLDataException</code> is a sub-type of the {@link PlatformException} used in the XML processing modules of the platform.
+ * Class <code>XMLDataException</code> is a sub-type of the {@link MarshallingException} used in the XML processing modules of the platform.
  *  
  * @author Regunath B
  * @version 1.0, 25/05/2012
  */
 
-public class XMLDataException extends PlatformException {
+public class XMLDataException extends MarshallingException {
 
 	private static final long serialVersionUID = 1L;
 	

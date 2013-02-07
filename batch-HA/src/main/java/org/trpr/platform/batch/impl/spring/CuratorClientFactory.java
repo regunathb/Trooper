@@ -23,6 +23,8 @@ import com.netflix.curator.retry.ExponentialBackoffRetry;
 
 /**
  * The <code>CuratorClientFactory</code> class is a Spring factory bean for creating the Curator {@link CuratorFramework} instance relevant for Trooper.
+ * Note that this implementation creates a single static instance of CuratorFramework and returns the same for subsequent calls, implying that all application
+ * contexts loaded using the same class loader will share the static instance.
  * 
  * @author Regunath B
  * @version 1.0, 05 Oct 2012
@@ -36,6 +38,9 @@ public class CuratorClientFactory implements FactoryBean<CuratorFramework> {
 	private static final int DEFAULT_RETRY_COUNT = 10;
 	private static final int DEFAULT_BASE_SLEEP_MS = 1000;
 	
+	/** The static instance of the CuratorFramework*/
+	private static CuratorFramework curatorClient;
+	
 	/** The ZK connect string*/
 	private String zkConnectString;
 	
@@ -48,24 +53,29 @@ public class CuratorClientFactory implements FactoryBean<CuratorFramework> {
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	public CuratorFramework getObject() throws Exception {
-		CuratorFramework client = CuratorFrameworkFactory.builder()
-				.namespace(TRPR_NAMESPACE)
-				.retryPolicy(new ExponentialBackoffRetry(this.baseSleepMillis, this.connectionRetryCount))
-				.connectString(this.zkConnectString).build();
-		client.start();
-		return client;
+		synchronized(CuratorClientFactory.class) { // OK to have blanket synchronized block as instantiation is anyway expected to happen in a single thread i.e. thread safe manner
+			if (CuratorClientFactory.curatorClient == null) {
+				CuratorClientFactory.curatorClient = CuratorFrameworkFactory.builder()
+						.namespace(TRPR_NAMESPACE)
+						.retryPolicy(new ExponentialBackoffRetry(this.baseSleepMillis, this.connectionRetryCount))
+						.connectString(this.zkConnectString).build();
+				CuratorClientFactory.curatorClient.start();
+			}
+		}
+		return CuratorClientFactory.curatorClient;
 	}
 
 	/**
 	 * Interface method implementation. Returns type of {@link CuratorFramework}
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	public Class getObjectType() {
+	public Class<CuratorFramework> getObjectType() {
 		return CuratorFramework.class;
 	}
 
 	/**
-	 *  Interface method implementation. Returns true
+	 * Interface method implementation. Returns true as the instance is not just a singleton for the application context, but for all application contexts loaded
+	 * by the same class loader
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {

@@ -25,8 +25,8 @@ import net.sf.json.JSONSerializer;
 import net.sf.json.JsonConfig;
 import net.sf.json.util.NewBeanInstanceStrategy;
 
-import org.trpr.platform.integration.spi.json.JSONDataException;
 import org.trpr.platform.integration.spi.json.JSONTranscoder;
+import org.trpr.platform.integration.spi.marshalling.MarshallingException;
 
 /**
  * The <code> JSONTranscoderImpl </code> is an implementation of the {@link JSONTranscoder} interface. Uses the json-lib library (http://json-lib.sourceforge.net/)
@@ -53,7 +53,7 @@ public class JSONTranscoderImpl implements JSONTranscoder {
 	 * Interface method implementation.
 	 * @see org.trpr.platform.integration.spi.json.JSONTranscoder#marshal(java.lang.Object)
 	 */
-	public String marshal(Object object) throws JSONDataException {
+	public String marshal(Object object) throws MarshallingException {
 		return JSONSerializer.toJSON(object).toString(JSONTranscoderImpl.PRETTY_PRINT_INDENT);
 	}
 
@@ -62,7 +62,7 @@ public class JSONTranscoderImpl implements JSONTranscoder {
 	 * @see org.trpr.platform.integration.spi.json.JSONTranscoder#unmarshal(java.lang.String, java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T unmarshal(String json, Class<T> clazz) throws JSONDataException {
+	public <T> T unmarshal(String json, Class<T> clazz) throws MarshallingException {
 		JsonConfig jsonConfig = new JsonConfig();  
 		jsonConfig.setRootClass(clazz);
 		jsonConfig.setNewBeanInstanceStrategy(new CustomNewInstanceStrategy());
@@ -82,11 +82,12 @@ public class JSONTranscoderImpl implements JSONTranscoder {
 		private Object[] EMPTY_ARGS = new Object[0];
 	    private Class[] EMPTY_PARAM_TYPES = new Class[0];
 	    
-	    public Object newInstance(Class target, JSONObject source) throws InstantiationException, IllegalAccessException, 
+	    @SuppressWarnings({ "unchecked", "rawtypes" })
+		public Object newInstance(Class target, JSONObject source) throws InstantiationException, IllegalAccessException, 
 	    	SecurityException, NoSuchMethodException, InvocationTargetException {
 	    	if( target != null ) {
 	    		if (JSONTranscoderImpl.instantiationMap.containsKey(target.getName())) {
-	    			return target.getDeclaredMethod(JSONTranscoderImpl.instantiationMap.get(target.getName()), null).invoke(null, null);
+	    			return target.getDeclaredMethod(JSONTranscoderImpl.instantiationMap.get(target.getName()), (Class[])null).invoke(null, (Object[])null);
 	    		} else {
 	    			Constructor c = target.getDeclaredConstructor( EMPTY_PARAM_TYPES );
 	    			c.setAccessible( true );
