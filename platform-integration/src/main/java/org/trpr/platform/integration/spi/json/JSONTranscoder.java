@@ -15,28 +15,14 @@
  */
 package org.trpr.platform.integration.spi.json;
 
+import org.trpr.platform.integration.spi.marshalling.Marshaller;
+
 /**
  * The <code> JSONTranscoder </code> interface defines methods for Java-JSON marshalling/unmarshalling.
  * 
  * @author Regunath B
  * @version 1.0, 18/09/2012
  */
-public interface JSONTranscoder {
-
-	/**
-	 * Converts specified Java Object to an equivalent JSON String. 
-	 * @param Object the Java Object to be marshalled to JSON
-	 * @return String JSON String equivalent to Java Object
-	 * @throws JSONDataException in case of errors during marshalling 
-	 */
-	public String marshal(Object object) throws JSONDataException;
+public interface JSONTranscoder extends Marshaller {
 	
-	/**
-	 *Converts specified JSON string to an equivalent Java Object. 
-	 * @param json JSON data as String
-	 * @param clazz the Java Class that the unmarshalled Object belongs to
-	 * @return Java Object unmarshalled from the specified JSON String
-	 * @throws JSONDataException in case of errors during unmarshalling
-	 */
-	 public <T> T unmarshal(String json, Class<T> clazz) throws JSONDataException;
 }

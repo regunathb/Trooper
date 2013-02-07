@@ -17,21 +17,15 @@ package org.trpr.platform.integration.spi.xml;
 
 import javax.xml.transform.Result;
 
+import org.trpr.platform.integration.spi.marshalling.Marshaller;
+
 /**
  * The <code> XMLTranscoder </code> interface defines methods for Java-XML marshalling/unmarshalling.
  * 
  * @author Regunath B
  * @version 1.0, 25/05/2012
  */
-public interface XMLTranscoder {
-
-	/**
-	 * Converts specified Java Object to an equivalent XML String. 
-	 * @param Object the Java Object to be marshalled to XML
-	 * @return String XML String equivalent to Java Object
-	 * @throws XMLDataException in case of errors during marshalling 
-	 */
-	public String marshal(Object object) throws XMLDataException;
+public interface XMLTranscoder extends Marshaller {
 
 	/**
 	 * Converts specified Java Object to an equivalent output as determined by the specified {@link Result} implementation.
@@ -47,12 +41,4 @@ public interface XMLTranscoder {
 	 */
 	public void marshal(Object object, Result result) throws XMLDataException;
 	
-	/**
-	 *Converts specified XML string to an equivalent Java Object. 
-	 * @param xml XML data as String
-	 * @param clazz the Java Class that the unmarshalled Object belongs to
-	 * @return Java Object unmarshalled from the specified XML String
-	 * @throws XMLDataException in case of errors during unmarshalling
-	 */
-	 public <T> T unmarshal(String xml, Class<T> clazz) throws XMLDataException;
 }
