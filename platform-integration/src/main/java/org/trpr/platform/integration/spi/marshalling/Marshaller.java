@@ -15,7 +15,6 @@
  */
 package org.trpr.platform.integration.spi.marshalling;
 
-
 /**
  * The <code> Marshaller </code> interface defines generic methods for marshalling from Java to other data transfer friendly formats.
  * 
