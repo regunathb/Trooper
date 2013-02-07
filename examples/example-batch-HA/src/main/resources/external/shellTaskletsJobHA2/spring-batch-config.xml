@@ -12,7 +12,7 @@
 	<!-- Bean for registering the jobs with the JobRegistry. Mandatory bean -->
 	<bean class="org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobRegistry"/>
-		<property name="jobName" value="shellTaskletsJobHA" />
+		<property name="jobName" value="shellTaskletsJobHA2" />
 		<property name="zkSyncHandler" ref="zkSyncHandler" />
 	</bean>		
 	
@@ -24,7 +24,7 @@
 		<property name="group" value="sample-batch" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="jobName" value-ref="shellTaskletsJobHA" />
+				<entry key="jobName" value-ref="shellTaskletsJobHA2" />
 				<entry key="jobLocator" value-ref="jobRepository" />
 				<entry key="jobLauncher" value-ref="jobLauncher" />
 				<entry key="curatorClient" value-ref="curatorClient" />
@@ -65,7 +65,7 @@
 	<!--
 		Shell Batch Job configuration
 	-->
-	<batch:job id="shellTaskletsJobHA" incrementer="incrementer">
+	<batch:job id="shellTaskletsJobHA2" incrementer="incrementer">
 		<batch:step id="shellStep1" next="shellStep2">
 	       <batch:tasklet ref="fileListingScriptBean1"/>
     	</batch:step>
@@ -90,4 +90,6 @@
 
 </beans>
 				
+
+
 
