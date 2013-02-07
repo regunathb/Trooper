@@ -187,22 +187,24 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 */
 	@Override
 	public void addJobInstance(String jobName, JobHost hostName) {
-		if(this.jobHostNames.containsKey(jobName)) {
+		if(this.jobHostNames.containsKey(jobName)) { //Job is existing
 			if(!this.jobHostNames.get(jobName).contains(hostName)) {
 				this.jobHostNames.get(jobName).add(hostName);
-				LOGGER.info("Added new host: "+hostName+" to "+jobName);
+				LOGGER.info("Added new host: "+hostName.getAddress()+" to "+jobName);
 			}
-		} else {
+		} else { //New job. TODO What if new job and new host
 			List<JobHost> hostList = new LinkedList<JobHost>();
 			hostList.add(hostName);
 			this.jobHostNames.put(jobName, hostList);
+			LOGGER.info("New job: "+jobName+" added to host:"+hostName);
 		}
 		if(!this.hostNames.contains(hostName)) {
 			this.hostNames.add(hostName);
-			LOGGER.info("Added to hostNames: "+hostName+": "+hostName.getAddress());
+			LOGGER.info("Added to hostNames: "+hostName.getAddress());
 		}
 		if(!this.currentJobNames.contains(jobName)) {
-			this.currentJobNames.add(jobName);
+			if(this.jobHostNames.get(jobName).contains(this.getCurrentHostName()))
+				this.currentJobNames.add(jobName);
 		}
 	}
 
@@ -367,15 +369,18 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 */
 	@Override
 	public void deployJobToAllHosts(String jobName) {
-		if(this.getAllHostNames()!=null) {
-			for(JobHost host : this.getAllHostNames()) {
-				if(!host.equals(this.getCurrentHostName())) {
-					this.syncService.pushJobToHost(jobName, host.getAddress());
+		//First check if the job is an HA job
+		if(this.currentJobNames.contains(jobName)) {
+			if(this.getAllHostNames()!=null) {
+				for(JobHost host : this.getAllHostNames()) {
+					if(!host.equals(this.getCurrentHostName())) {
+						this.syncService.pushJobToHost(jobName, host.getAddress());
+					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets the URI of a job config
 	 */
@@ -411,7 +416,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		}
 
 	}
-	
+
 	/**
 	 * This method removes the temporary previous XML File
 	 * @param jobName Name of the job
@@ -439,7 +444,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			prevFile.renameTo(configFile);
 		}
 	}
-	
+
 	/**
 	 * Scan the jobDirectory for any new dependency files and update JobDependencies.
 	 */

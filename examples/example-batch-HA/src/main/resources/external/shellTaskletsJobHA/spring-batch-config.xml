@@ -12,11 +12,10 @@
 	<!-- Bean for registering the jobs with the JobRegistry. Mandatory bean -->
 	<bean class="org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobRegistry"/>
-		<property name="jobConfigService" ref="jobConfigService"/>
-		<property name="curatorClient" ref="curatorClient" />
 		<property name="jobName" value="shellTaskletsJobHA" />
+		<property name="curatorJobSyncHandler" ref="curatorJobSyncHandler" />
 	</bean>		
-
+	
 	<!--
 		Configuring the Shell Job Scheduler Bean that will be executed when the trigger fires.
 	-->
@@ -33,10 +32,6 @@
 		</property>
 	</bean>
 	
-	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.CuratorClientFactory">
-		<property name="zkConnectString" value="stage-flo-zk1.nm.flipkart.com:2181" />
-	</bean>
-	
 	<!--
 		Associating the Shell tasklets Job with a Quartz
 		Cron Trigger. Triggers define when a job is executed.
@@ -44,9 +39,17 @@
 	-->
 	<bean id="shellJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="shellJobDetailBean" />
-		<property name="cronExpression" value="0 0/100 * 2 1 ?" />
+		<property name="cronExpression" value="0 0/55 * 2 1 ?" />
 	</bean>
-
+	
+ 	<bean id="curatorJobSyncHandler" class="org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandlerFactory">
+		<property name="jobConfigService" ref="jobConfigService" />
+		<property name="curatorClient" ref="curatorClient" />
+    </bean>
+    
+	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.CuratorClientFactory">
+		<property name="zkConnectString" value="stage-flo-zk1.nm.flipkart.com:2181" />
+	</bean>
 	<!--
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->
@@ -86,7 +89,5 @@
 	</bean>
 
 </beans>
-
-	
 				
 
