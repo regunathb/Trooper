@@ -4,7 +4,7 @@
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.trpr</groupId>
-	<artifactId>example-batch-HA</artifactId>
+	<artifactId>example-batch-ha</artifactId>
 	<name>Example Batch HA</name>
 	<version>1.0.0</version>
 	<description>Trooper Example Batch HA</description>
