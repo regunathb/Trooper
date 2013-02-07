@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2015, the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.trpr.platform.batch.impl.job.ha.service;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -6,15 +21,15 @@ import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import com.netflix.curator.framework.CuratorFramework;
 
 /**
- *  * The <code>ZKSyncHandlerFactory</code> class is a Spring factory bean for creating the ZKSyncHandler 
+ * The <code>ZKSyncHandlerFactory</code> class is a Spring factory bean for creating the ZKSyncHandler 
  * Note that this implementation creates a single static instance of ZKSyncHandler
- *  and returns the same for subsequent calls, implying that all application
+ * and returns the same for subsequent calls, implying that all application
  * contexts loaded using the same class loader will share the static instance.
  * 
  * @author devashishshankar
  * @version 1.0, 7 Feb, 2013
  */
-public class ZKSyncHandlerFactory implements FactoryBean<ZKSyncHandler> {
+public class CuratorJobSyncHandlerFactory implements FactoryBean<CuratorJobSyncHandler> {
 
 	/** Instance of Job Configuration service*/
 	private JobConfigurationService jobConfigurationService;
@@ -23,7 +38,7 @@ public class ZKSyncHandlerFactory implements FactoryBean<ZKSyncHandler> {
 	private CuratorFramework curatorFramework;
 
 	/** The static instance of the {@link ZKSyncHandler}*/
-	private static ZKSyncHandler zkSyncHandler;
+	private static CuratorJobSyncHandler zkSyncHandler;
 	
 	/**
 	 * Interface method implementation. 
@@ -31,11 +46,11 @@ public class ZKSyncHandlerFactory implements FactoryBean<ZKSyncHandler> {
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */	
 	@Override
-	public ZKSyncHandler getObject() throws Exception {
+	public CuratorJobSyncHandler getObject() throws Exception {
 		if(zkSyncHandler==null) {
-			ZKSyncHandlerFactory.zkSyncHandler = new ZKSyncHandler(jobConfigurationService, curatorFramework);
+			CuratorJobSyncHandlerFactory.zkSyncHandler = new CuratorJobSyncHandler(jobConfigurationService, curatorFramework);
 		}
-		return ZKSyncHandlerFactory.zkSyncHandler;
+		return CuratorJobSyncHandlerFactory.zkSyncHandler;
 	}
 	
 	/**
@@ -44,7 +59,7 @@ public class ZKSyncHandlerFactory implements FactoryBean<ZKSyncHandler> {
 	 */
 	@Override
 	public Class<?> getObjectType() {
-		return ZKSyncHandler.class;
+		return CuratorJobSyncHandler.class;
 	}
 	
 	/**

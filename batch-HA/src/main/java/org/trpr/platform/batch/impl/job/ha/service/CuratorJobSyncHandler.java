@@ -46,7 +46,7 @@ import com.netflix.curator.x.discovery.details.ServiceCacheListener;
  * @author devashishshankar
  * @version 1.0, 7 Feb, 2013
  */
-public class ZKSyncHandler {
+public class CuratorJobSyncHandler {
 
 	/** Instance of trooper @link{JobConfigurationService} */
 	private JobConfigurationService jobConfigurationService;
@@ -71,7 +71,7 @@ public class ZKSyncHandler {
 
 	/** Autowired Constructor */
 	@Autowired
-	public ZKSyncHandler(JobConfigurationService jobConfigurationService, CuratorFramework curatorFramework) {
+	public CuratorJobSyncHandler(JobConfigurationService jobConfigurationService, CuratorFramework curatorFramework) {
 		this.curatorFramework= curatorFramework;
 		this.jobConfigurationService = jobConfigurationService;
 		this.syncService = new SyncServiceImpl(this.jobConfigurationService);
@@ -188,7 +188,7 @@ public class ZKSyncHandler {
 		@Override
 		public void cacheChanged() {
 			LOGGER.info("Cache changed");
-			ZKSyncHandler.this.updateHosts();
+			CuratorJobSyncHandler.this.updateHosts();
 		}
 	}
 }

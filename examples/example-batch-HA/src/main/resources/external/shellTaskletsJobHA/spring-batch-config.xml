@@ -13,7 +13,7 @@
 	<bean class="org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobRegistry"/>
 		<property name="jobName" value="shellTaskletsJobHA" />
-		<property name="zkSyncHandler" ref="zkSyncHandler" />
+		<property name="curatorJobSyncHandler" ref="curatorJobSyncHandler" />
 	</bean>		
 	
 	<!--
@@ -42,7 +42,7 @@
 		<property name="cronExpression" value="0 0/55 * 2 1 ?" />
 	</bean>
 	
- 	<bean id="zkSyncHandler" class="org.trpr.platform.batch.impl.job.ha.service.ZKSyncHandlerFactory">
+ 	<bean id="curatorJobSyncHandler" class="org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandlerFactory">
 		<property name="jobConfigService" ref="jobConfigService" />
 		<property name="curatorClient" ref="curatorClient" />
     </bean>

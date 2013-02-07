@@ -15,7 +15,7 @@
  */
 package org.trpr.platform.batch.impl.spring;
 
-import org.trpr.platform.batch.impl.job.ha.service.ZKSyncHandler;
+import org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandler;
 
 /**
  * <code> JobRegistryBeanPostProcessor</code> is an extension of 
@@ -32,15 +32,15 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	private String jobName;
 
 	/** The zookeeper sync handler instance */
-	private ZKSyncHandler zkSyncHandler;
+	private CuratorJobSyncHandler curatorJobSyncHandler;
 
 	/** Setter methods */
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
 	}
 	
-	public void setZkSyncHandler(ZKSyncHandler zkSyncHandler) {
-		this.zkSyncHandler = zkSyncHandler;
+	public void setCuratorJobSyncHandler(CuratorJobSyncHandler curatorJobSyncHandler) {
+		this.curatorJobSyncHandler = curatorJobSyncHandler;
 	}
 	/** End Setter methods **/
 	
@@ -50,6 +50,6 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		this.zkSyncHandler.addJobInstance(jobName);		
+		this.curatorJobSyncHandler.addJobInstance(jobName);		
 	}
 }
