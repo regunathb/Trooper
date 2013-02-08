@@ -125,7 +125,7 @@ public class RabbitMQRPCClientImpl implements RpcClient {
 						// a connection for the same configuration. 
 						if (connectionHolder == null || !connectionHolder.isValid()) { 
 							connectionHolder = new RabbitConnectionHolder(rabbitMQRpcConfiguration);
-							connectionHolder.createConnection();
+							connectionHolder.createConnectionAndConsumer();
 						}
 					}
 				} catch (Exception e) {
