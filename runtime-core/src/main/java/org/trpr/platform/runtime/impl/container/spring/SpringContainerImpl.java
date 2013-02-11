@@ -124,7 +124,12 @@ public class SpringContainerImpl implements Container {
 		return this.componentContainer;
 	}
 
+	/**
+	 * Interface method implementation. Invokes the namesake method on the configured {@link ComponentContainer}
+	 * @see org.trpr.platform.runtime.spi.container.Container#publishBootstrapEvent(org.trpr.platform.model.event.PlatformEvent)
+	 */
 	public void publishBootstrapEvent(PlatformEvent bootstrapEvent) {
+		this.componentContainer.publishBootstrapEvent(bootstrapEvent);
 	}
 
 	/**
