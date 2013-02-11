@@ -15,13 +15,16 @@
  */
 package org.trpr.platform.runtime.impl.event;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.springframework.context.ApplicationEvent;
 import org.trpr.platform.core.impl.event.PlatformApplicationEvent;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.event.PlatformEventConsumer;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * The <code>BootstrapProgressMonitor</code> is an implementation of the {@link PlatformEventConsumer} interface that listens and processes 
@@ -46,6 +49,9 @@ public class BootstrapProgressMonitor implements PlatformEventConsumer {
 	/** Place holder for storing the current state of bootstrap progress*/
 	private volatile static int bootstrapState = BOOTSTRAP_IN_PROGRESS;
 	
+	/** List of PlatformEventConsumer to be notified of Bootstrap life cycle events*/
+	private List<PlatformEventConsumer> bootstrapEventListeners = new LinkedList<PlatformEventConsumer>();
+	
 	/**
 	 * Checks the runtime state and makes the calling thread wait for bootstrap to complete.
 	 */
@@ -69,6 +75,7 @@ public class BootstrapProgressMonitor implements PlatformEventConsumer {
 	 * bootstrap completion. Also updates the internal bootstrap progress state maintained by this class
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
+	@SuppressWarnings("unchecked")
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (event.getSource() instanceof PlatformEvent) {
 			PlatformEvent platformEvent = (PlatformEvent) event.getSource();
@@ -81,9 +88,29 @@ public class BootstrapProgressMonitor implements PlatformEventConsumer {
 						BootstrapProgressMonitor.bootstrapState = BootstrapProgressMonitor.BOOTSTRAP_IN_PROGRESS;
 					}
 				}
-				  	
+				// inform any registered bootstrap event listeners
+				for (PlatformEventConsumer bootstrapEventListener : this.bootstrapEventListeners) {
+					bootstrapEventListener.onApplicationEvent(event);
+				}
 			}
 		}		
+	}
+	
+	/**
+	 * Adds the specified PlatformEventConsumer for call back on Bootstrap events
+	 * @param bootstrapEventListener the PlatformEventConsumer to be called when Bootstrap events occur
+	 */
+	public void addBootstrapEventListener(PlatformEventConsumer bootstrapEventListener) {
+		this.bootstrapEventListeners.add(bootstrapEventListener);
+	}
+	
+	/**
+	 * Removes the specified PlatformEventConsumer from the list of registered Bootstrap event listeners
+	 * @param bootstrapEventListener the PlatformEventConsumer to be removed
+	 * @return true if the remove is successful, false otherwise
+	 */
+	public boolean removeBootstrapEventListener(PlatformEventConsumer bootstrapEventListener) {
+		return this.bootstrapEventListeners.remove(bootstrapEventListener);
 	}
 
 }
