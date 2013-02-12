@@ -46,6 +46,11 @@
       		<name>Srikanth PS</name>
       		<email>srikanthps@yahoo.com</email>
     	</developer>
+   		<developer>
+      		<id>devashishshankar</id>
+      		<name>Devashish Shankar</name>
+      		<email>devashish.shankar@gmail.com</email>
+    	</developer>
   	</developers>
 
 	<dependencies>
