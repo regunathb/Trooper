@@ -27,6 +27,17 @@ public interface SyncService {
 	
 	/**
 	 * Pushes a job, including sending it's configuration files, dependency files
+	 * and the final loading request to the given serverName. Also includes a retry 
+	 * count, which retries the request a specified number of times on failure
+	 * @param jobName name of the job
+	 * @param serverName server name in format IP:port
+	 * @param retryCount number of times the request should be retried on failure
+	 * @return true on success, false on failure
+	 */	
+	boolean pushJobToHostWithRetry(String jobName, String serverName, int retryCount);
+	
+	/**
+	 * Pushes a job, including sending it's configuration files, dependency files
 	 * and the final loading request to the given serverName.
 	 * @param jobName name of the job
 	 * @param serverName server name in format IP:port
@@ -39,4 +50,22 @@ public interface SyncService {
 	 * if not, pushes the missing jobs
 	 */
 	void syncAllHosts();
+	
+	/** 
+	 * Sends a request to a server to push all it's jobs to the current server
+	 * @param serverName The server name in format IP:port t which the pull request has to be sent
+	 */
+	void pullRequest(String serverName);
+
+	/**
+	 * Deploys a job to all the known job hosts
+	 * @param jobName name of the job
+	 */
+	public void deployJobToAllHosts(String jobName);
+	
+	/**
+	 * Deploys all jobs in the current server a given host
+	 * @param hostAddress in the format "IP:port"
+	 */
+	public void deployAllJobsToHost(String hostAddress);
 }

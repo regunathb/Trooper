@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,6 +38,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.common.utils.ConfigFileUtils;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
+import org.trpr.platform.batch.spi.spring.admin.SyncService;
+import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -85,7 +90,7 @@ public class JobConfigController {
 		//Load & Add JobName, XMLFileContents, Dependencies to the view
 		jobName= jobName.substring(jobName.lastIndexOf('/')+1);
 		model.addAttribute("XMLFileContents", ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName)).trim());
-		model.addAttribute("jobName", jobName);
+		model.addAttribute("jobName", ConfigFileUtils.getJobName(this.jobConfigService.getJobConfig(jobName)));
 		if(jobConfigService.getJobDependencyList(jobName)!=null) {
 			model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 		}
@@ -109,12 +114,15 @@ public class JobConfigController {
 			return "redirect:/configuration";
 		} else { //Read file to view
 			boolean invalidJobFile=false;
-			String jobName = null;
+			List<String> jobNameList = null;
 			try {
 				byte[] buffer = jobFile.getBytes();
 				String XMLFileContents = new String(buffer);
 				model.addAttribute("XMLFileContents", XMLFileContents);
-				jobName= ConfigFileUtils.getJobName(new ByteArrayResource(jobFile.getBytes()));
+				jobNameList= ConfigFileUtils.getJobName(new ByteArrayResource(jobFile.getBytes()));
+				if(jobNameList==null || jobNameList.size()==0) {
+					throw new PlatformException("Empty list");
+				}
 			} 
 			catch (UnsupportedEncodingException e) {
 				invalidJobFile=true;
@@ -122,17 +130,22 @@ public class JobConfigController {
 			catch (IOException e) {
 				invalidJobFile=true;
 			}
-			if(jobName==null || invalidJobFile) {
-				model.clear();
-				model.addAttribute("Error", "invalid jobFile. Couldn't find job's name");	
-				return "redirect:/configuration";
+			catch (PlatformException p) {
+				invalidJobFile = true;
 			}
-			if(jobService.contains(jobName)) {
-				model.clear();
-				model.addAttribute("Error", "The JobName '"+jobName+"' already exists. Please choose another name");	
-				return "redirect:/configuration";
+			for(String jobName : jobNameList) {
+				if(jobName==null || invalidJobFile) {
+					model.clear();
+					model.addAttribute("Error", "invalid jobFile. Couldn't find job's name");	
+					return "redirect:/configuration";
+				}
+				if(jobService.contains(jobName)) {
+					model.clear();
+					model.addAttribute("Error", "The JobName '"+jobName+"' already exists. Please choose another name");	
+					return "redirect:/configuration";
+				}
 			}
-			model.addAttribute("jobName", jobName);		
+			model.addAttribute("jobName", jobNameList);		
 			return "configuration/modify/jobs/job";
 		}
 	}
@@ -144,11 +157,15 @@ public class JobConfigController {
 	 * 	Saving the changes in XML File
 	 */
 	@RequestMapping(value = "configuration/modify/jobs/{jobName}", method = RequestMethod.POST)
-	public String editJob(ModelMap model, @RequestParam String jobName, 
+	public String editJob(ModelMap model, @RequestParam(value="jobName") String[] jobNames, 
 			@RequestParam(defaultValue = "") String XMLFileContents, 
 			@RequestParam(defaultValue = "0") MultipartFile jobFile, 
 			@RequestParam(defaultValue = "0") MultipartFile depFile, 
 			@RequestParam(defaultValue = "0") String identifier) throws Exception {
+		
+		List<String> jobNameList = Arrays.asList(jobNames);
+		//FOr getter methods, such as getJobdependency, any of the jobNames among the list would do
+		String jobName = jobNameList.get(0);
 		//Button 1: Upload XML
 		if(identifier.equals("Upload file")) {
 			String jobFileName = jobFile.getOriginalFilename();
@@ -174,13 +191,14 @@ public class JobConfigController {
 				if(jobConfigService.getJobDependencyList(jobName)!=null && jobConfigService.getJobDependencyList(jobName).contains(depFileName)){
 					model.addAttribute("DepFileError", "The filename is already added. Overwriting");
 				}
-				jobConfigService.addJobDependency(jobName,depFile.getOriginalFilename(),depFile.getBytes());
+				jobConfigService.addJobDependency(jobNameList,depFile.getOriginalFilename(),depFile.getBytes());
 			}
 		} else { //Button 3: Save. Overwrite the modified XML File
 			try {
 				//Set XML File
-				this.jobConfigService.setJobConfig(jobName, new ByteArrayResource(XMLFileContents.getBytes()));
-				this.jobConfigService.deployJob(jobName);
+
+				this.jobConfigService.setJobConfig(jobNameList, new ByteArrayResource(XMLFileContents.getBytes()));
+				this.jobConfigService.deployJob(jobNameList);
 			}
 			catch (Exception e) {
 				LOGGER.info("Error while deploying job",e);
@@ -193,7 +211,7 @@ public class JobConfigController {
 					model.addAttribute("LoadingError", "Unexpected error");
 				}
 				model.addAttribute("XMLFileContents", XMLFileContents.trim());
-				model.addAttribute("jobName", jobName);
+				model.addAttribute("jobName", jobNameList);
 				if(jobConfigService.getJobDependencyList(jobName)!=null) {
 					model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 				}
@@ -202,7 +220,8 @@ public class JobConfigController {
 				return "configuration/modify/jobs/job";
 			}
 			//Loading worked. Deploy to all hosts
-			this.jobConfigService.deployJobToAllHosts(jobName);
+			if(this.jobConfigService.getSyncService()!=null)
+				this.jobConfigService.getSyncService().deployJobToAllHosts(jobName);
 			//Redirect to job configuration page. Load the view details
 			model.addAttribute("SuccessMessage", "The job was successfully deployed!");
 			model.addAttribute("jobName", jobName);
@@ -216,7 +235,7 @@ public class JobConfigController {
 			return "configuration/jobs/job";
 		}
 		//Update the view
-		model.addAttribute("jobName", jobName);
+		model.addAttribute("jobName", jobNameList);
 		if(jobConfigService.getJobDependencyList(jobName)!=null) {
 			model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
 		}

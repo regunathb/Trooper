@@ -17,6 +17,8 @@ package org.trpr.platform.batch.common.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,20 +50,21 @@ public class ConfigFileUtils {
 	private static final Logger LOGGER = LogFactory.getLogger(ConfigFileUtils.class);
 
 	/**
-	 * Gets the job name from Config file
+	 * Gets the job names from Config file
 	 * @param configFile job config file or its contents as a <code> Resource </code>
-	 * @return job name, null if unable to find a job name.
+	 * @return List of job names, null if unable to find a job name.
 	 */
-	public static String getJobName(Resource configFile) {
+	public static List<String> getJobName(Resource configFile) {
 		return ConfigFileUtils.getJobName(new ByteArrayResource(ConfigFileUtils.getContents(configFile).getBytes()));
 	}
 
 	/**
-	 * Gets the job name from Config file
+	 * Gets the job names from Config file
 	 * @param configFile job config file contents as a <code> ByteArrayResource </code>
-	 * @return job name, null if unable to find a job name.
+	 * @return List of job names, null if unable to find a job name.
 	 */	
-	public static String getJobName(ByteArrayResource configFile) {
+	public static List<String> getJobName(ByteArrayResource configFile) {
+		List<String> jobNameList = new LinkedList<String>();
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
@@ -75,7 +78,7 @@ public class ConfigFileUtils {
 					//get the element
 					Element el = (Element)nl.item(i);
 					if(el.hasAttribute(ConfigFileUtils.ID_PROP)) {
-						return el.getAttribute(ConfigFileUtils.ID_PROP);
+						jobNameList.add(el.getAttribute(ConfigFileUtils.ID_PROP));
 					}
 				}
 			}	
@@ -84,7 +87,7 @@ public class ConfigFileUtils {
 			LOGGER.error("Unable to get the job name from the given Spring Batch configuration file", e);
 			throw new PlatformException(e);
 		}
-		return null;
+		return jobNameList;
 	}
 	
 	/**
