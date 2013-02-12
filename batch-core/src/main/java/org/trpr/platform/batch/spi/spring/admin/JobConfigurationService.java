@@ -26,10 +26,13 @@ import org.trpr.platform.core.PlatformException;
 /**
  * <code>JobConfigurationService</code> provides methods for job configuration such as adding, 
  * removing configuration files and dependencies. It also holds the list of running Trooper instances
- * and the list of deployed jobs in each of them (for HA mode)
+ * and the list of deployed jobs in each of them (for HA mode).
  * 
  * @author devashishshankar
  * @version 1.1, 31 Jan 2013
+ * 
+ * Change log:
+ * Allows multiple jobs to be linked to a single job store and configuration file.
  */
 public interface JobConfigurationService {	
 	
@@ -98,11 +101,11 @@ public interface JobConfigurationService {
 
 	/**
 	 * Adds a dependency to a job
-	 * @param jobName name of the job
+	 * @param jobNames List of jobNames to which the dependency has to be linked
 	 * @param destFileName name of the dependency file
 	 * @param fileContents contents of dependency file as <code>byte[]</code>
 	 */
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents);
+	public void addJobDependency(List<String> jobName, String destFileName, byte[] fileContents);
 
 	/**
 	 * Gets the dependencies associated with a job
@@ -120,22 +123,15 @@ public interface JobConfigurationService {
 
 	/**
 	 * Sets the job configuration for a job.
-	 * @param jobName name of the job
+	 * @param jobName List of job names for which config file is being set
 	 * @param jobConfigFile
 	 * @throws PlatformException in case of errors
 	 */
-	public void setJobConfig(String jobName, Resource jobConfigFile) throws PlatformException;
+	public void setJobConfig(List<String> jobName, Resource jobConfigFile) throws PlatformException;
 
 	/**
-	 * Deploy a job to current host. 
-	 * @param jobName name of the job
+	 * Deploys jobs to current host. 
+	 * @param List of jobnames for which deployement has to take place
 	 */
-	public void deployJob(String jobName);
-
-	/**
-	 * Deploys a job to all the known job hosts
-	 * @param jobName name of the job
-	 */
-	public void deployJobToAllHosts(String jobName);
-
+	public void deployJob(List<String> jobName);
 }

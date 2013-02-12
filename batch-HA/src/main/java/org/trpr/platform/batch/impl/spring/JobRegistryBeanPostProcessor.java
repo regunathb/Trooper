@@ -20,7 +20,7 @@ import org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandler;
 /**
  * <code> JobRegistryBeanPostProcessor</code> is an extension of 
  * @link {org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor}.
- * Registers jobs to the Zookeeper service. Updates hostnames in the jobConfigurationService
+ * Registers jobs to the Zookeeper service using methods from {@link CuratorJobSyncHandler}
  * 
  * @author devashishshankar
  * @version 1.0, 31 Jan, 2013

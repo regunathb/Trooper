@@ -16,13 +16,18 @@
 package org.trpr.platform.batch.impl.job.ha.service;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
+import org.trpr.platform.runtime.impl.event.BootstrapProgressMonitor;
 
 import com.netflix.curator.framework.CuratorFramework;
 
 /**
- * The <code>ZKSyncHandlerFactory</code> class is a Spring factory bean for creating the ZKSyncHandler 
- * Note that this implementation creates a single static instance of ZKSyncHandler
+ * The <code>CuratorJobSyncHandlerFactory</code> class is a Spring factory bean for creating the CuratorJobSyncHandler 
+ * Note that this implementation creates a single static instance of CuratorJobSyncHandler
  * and returns the same for subsequent calls, implying that all application
  * contexts loaded using the same class loader will share the static instance.
  * 
@@ -37,24 +42,31 @@ public class CuratorJobSyncHandlerFactory implements FactoryBean<CuratorJobSyncH
 	/** Instance of curator framework */
 	private CuratorFramework curatorFramework;
 
-	/** The static instance of the {@link ZKSyncHandler}*/
-	private static CuratorJobSyncHandler zkSyncHandler;
+	/** Bean name for {@link CuratorJobSyncHandler}*/
+	public final String SYNC_HANDLER_BEAN_NAME = "curatorJobSyncHandlerDynamicBean";
+
+	/** {@link BootstrapProgressMonitor} instance which is a constructor arg for {@link CuratorJobSyncHandler} */
+	private BootstrapProgressMonitor bootstrapMonitorBean;
 	
 	/**
 	 * Interface method implementation. 
-	 * Constructs and returns as instance of {@link ZKSyncHandler} for Trooper batch runtime.
+	 * Constructs and returns as instance of {@link CuratorJobSyncHandler} for Trooper batch runtime.
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */	
 	@Override
 	public CuratorJobSyncHandler getObject() throws Exception {
-		if(zkSyncHandler==null) {
-			CuratorJobSyncHandlerFactory.zkSyncHandler = new CuratorJobSyncHandler(jobConfigurationService, curatorFramework);
+		ApplicationContext context = SpringBatchComponentContainer.getCommonBatchBeansContext();
+		if(!context.containsBean(this.SYNC_HANDLER_BEAN_NAME)) {
+			DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) context.getAutowireCapableBeanFactory();
+			BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(CuratorJobSyncHandler.class.getName()).
+					addConstructorArgValue(jobConfigurationService).addConstructorArgValue(curatorFramework).addConstructorArgValue(bootstrapMonitorBean);
+			beanFactory.registerBeanDefinition(this.SYNC_HANDLER_BEAN_NAME, builder.getBeanDefinition());
 		}
-		return CuratorJobSyncHandlerFactory.zkSyncHandler;
+		return (CuratorJobSyncHandler) context.getBean(this.SYNC_HANDLER_BEAN_NAME);
 	}
 	
 	/**
-	 * Interface method implementation. Returns type of {@link ZKSyncHandler}
+	 * Interface method implementation. Returns type of {@link CuratorJobSyncHandler}
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
 	@Override
@@ -85,6 +97,12 @@ public class CuratorJobSyncHandlerFactory implements FactoryBean<CuratorJobSyncH
 	}
 	public void setCuratorClient(CuratorFramework curatorFramework) {
 		this.curatorFramework = curatorFramework;
+	}
+	public BootstrapProgressMonitor getBootstrapMonitorBean() {
+		return bootstrapMonitorBean;
+	}
+	public void setBootstrapMonitorBean(BootstrapProgressMonitor bootstrapMonitorBean) {
+		this.bootstrapMonitorBean = bootstrapMonitorBean;
 	}
 	/**End Getter Setter*/
 }

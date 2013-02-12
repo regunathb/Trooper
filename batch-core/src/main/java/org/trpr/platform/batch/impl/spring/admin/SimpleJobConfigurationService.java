@@ -26,9 +26,11 @@ import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.core.io.FileSystemResource;
@@ -192,7 +194,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 				this.jobHostNames.get(jobName).add(hostName);
 				LOGGER.info("Added new host: "+hostName.getAddress()+" to "+jobName);
 			}
-		} else { //New job. TODO What if new job and new host
+		} else {
 			List<JobHost> hostList = new LinkedList<JobHost>();
 			hostList.add(hostName);
 			this.jobHostNames.put(jobName, hostList);
@@ -258,40 +260,46 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see JobConfigurationService#addJobDependency(String, String, byte[])
 	 */
 	@Override
-	public void addJobDependency(String jobName, String destFileName, byte[] fileContents) {
+	public void addJobDependency(List<String> jobNames, String destFileName, byte[] fileContents) {
 		//Scan for dependencies
 		if(this.jobDependencies.isEmpty())
 			this.scanJobDependencies();
-		String destPath = this.getJobStoreURI(jobName).getPath();
-		//Upload file
-		try {
-			if(this.jobDependencies.containsKey(jobName)) {
-				if(this.jobDependencies.get(jobName).contains(destFileName)) {
-					LOGGER.info("Overwriting existing dependency file");
-				}
-			}
-			this.upload(fileContents,destPath+SimpleJobConfigurationService.LIBRARY_FOLDER+destFileName);
-		} catch (IOException e) {
-			LOGGER.error("Error uploading file: "+destFileName+" to "+destPath);
-			throw new PlatformException("Error uploading file: "+destFileName+" to "+destPath,e);
+		if(jobNames==null || jobNames.size()==0) {
+			throw new PlatformException("No job names supplied");
 		}
-		//Update the jobDependency list
-		List<String> dependencyList = null;
-		if(this.jobDependencies.containsKey(jobName)) {
-			dependencyList = this.jobDependencies.get(jobName);
-		} else {
-			dependencyList = new LinkedList<String>();
+		for(String jobName: jobNames) {
+			String destPath = this.getJobStoreURI(jobName).getPath();
+			//Upload file
+			try {
+				if(this.jobDependencies.containsKey(jobName)) {
+					if(this.jobDependencies.get(jobName).contains(destFileName)) {
+						LOGGER.info("Overwriting existing dependency file");
+					}
+				}
+				this.upload(fileContents,destPath+SimpleJobConfigurationService.LIBRARY_FOLDER+destFileName);
+			} catch (IOException e) {
+				LOGGER.error("Error uploading file: "+destFileName+" to "+destPath);
+				throw new PlatformException("Error uploading file: "+destFileName+" to "+destPath,e);
+			}
+			//Update the jobDependency list
+			List<String> dependencyList = null;
+			if(this.jobDependencies.containsKey(jobName)) {
+				dependencyList = this.jobDependencies.get(jobName);
+			} else {
+				dependencyList = new LinkedList<String>();
+				this.jobDependencies.put(jobName, dependencyList);
+			}
+			if(!dependencyList.contains(destFileName)) {
+				dependencyList.add(destFileName);
+			}
 			this.jobDependencies.put(jobName, dependencyList);
 		}
-		if(!dependencyList.contains(destFileName)) {
-			dependencyList.add(destFileName);
-		}
-		this.jobDependencies.put(jobName, dependencyList);
 	}
 
 	/**
 	 * Interface Method Implementation.
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#getJobDependencyList
+	 * TODO: Return a URI
 	 */
 	@Override
 	public List<String> getJobDependencyList(String jobName) {
@@ -319,15 +327,22 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#setJobconfig(String, byte[])
 	 */
 	@Override
-	public void setJobConfig(String jobName, Resource jobConfigFile) throws PlatformException {
+	public void setJobConfig(List<String> jobNames, Resource jobConfigFile) throws PlatformException {
 		if(this.jobXMLFile.isEmpty())
 			this.scanXMLFiles();
 		String destPath = null;
 		//Check if jobName has been changed
 		try {
-			if(!ConfigFileUtils.getJobName(jobConfigFile).equals(jobName)) {
-				throw new PlatformException("The Job Name cannot be changed. Expecting: "+jobName+" Got: "+ConfigFileUtils.getJobName(jobConfigFile));
+			//Using sets to comapare whether the two list of jobNames are equal
+			Set<String> jobNamesUserSet = new HashSet<String>();
+			Set<String> jobNamesFileSet = new HashSet<String>();
+			jobNamesUserSet.addAll(jobNames);
+			jobNamesFileSet.addAll(ConfigFileUtils.getJobName(jobConfigFile));
+			if(!jobNamesUserSet.equals(jobNamesFileSet)) {
+				throw new PlatformException("The Job Name cannot be changed. Expecting: "+jobNamesUserSet.toString()+" Got: "+jobNamesFileSet.toString());
 			}
+			//Take first jobName to check whether it is a new Job
+			String jobName = jobNames.get(0);
 			//Code for overwriting file to location
 			if(this.getJobConfigURI(jobName)==null) {  //NEW JOB
 				destPath=this.getJobStoreURI(jobName).getPath()+SimpleJobConfigurationService.SPRING_BATCH_FILE;
@@ -336,10 +351,12 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 				this.createPrevConfigFile(jobName);
 			}
 			this.upload(ConfigFileUtils.getContents(jobConfigFile).getBytes(), destPath);
-			this.jobXMLFile.put(jobName,new File(destPath).toURI());
+			for(String allJobName:jobNames) {
+				this.jobXMLFile.put(allJobName,new File(destPath).toURI());
+			}
 		} catch (IOException ioe) {
-			LOGGER.error("Error creating job configuration file for : " + jobName + " in location : " + destPath,ioe);
-			throw new PlatformException("Error creating job configuration file for : " + jobName + " in location : " + destPath, ioe);
+			LOGGER.error("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath,ioe);
+			throw new PlatformException("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath, ioe);
 		}
 	}
 
@@ -348,36 +365,28 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#deployJob(String)
 	 */
 	@Override
-	public void deployJob(String jobName) {
-		try {
-			this.jobService.getComponentContainer().loadComponent(this.getJobConfig(jobName));
-		}
-		catch(Exception e) {
-			//Loading failed. Restore previous XML File.
-			this.restorePrevConfigFile(jobName);
-			if(this.getJobConfig(jobName)!=null) {
-				this.jobService.getComponentContainer().loadComponent(this.getJobConfig(jobName));
-			}
-			throw new PlatformException(e);				
-		}
-		this.removePrevConfigFile(jobName);
-	}
-
-	/**
-	 * Interface method implementation.
-	 * @see org.trpr.platform.batch.spi.spring.admin.JobConfigurationService#deployJobToAllHosts(String)
-	 */
-	@Override
-	public void deployJobToAllHosts(String jobName) {
-		//First check if the job is an HA job
-		if(this.currentJobNames.contains(jobName)) {
-			if(this.getAllHostNames()!=null) {
-				for(JobHost host : this.getAllHostNames()) {
-					if(!host.equals(this.getCurrentHostName())) {
-						this.syncService.pushJobToHost(jobName, host.getAddress());
-					}
+	public void deployJob(List<String> jobNames) {
+		//Store in a List deployed config files. If a file has been deployed, don't deploy it again.
+		Set<URI> deployedJobConfigs = new HashSet<URI>();
+		for(String jobName:jobNames) {
+			try {
+				//Job is already deployed
+				if(deployedJobConfigs.contains(this.getJobConfig(jobName).getURI())) {
+					continue;
 				}
+				LOGGER.info("The config file is: "+this.getJobConfig(jobName).getURI());
+				this.jobService.getComponentContainer().loadComponent(this.getJobConfig(jobName));
+				deployedJobConfigs.add(this.getJobConfig(jobName).getURI());
 			}
+			catch(Exception e) {
+				//Loading failed. Restore previous XML File.
+				this.restorePrevConfigFile(jobName);
+				if(this.getJobConfig(jobName)!=null) {
+					this.jobService.getComponentContainer().loadComponent(this.getJobConfig(jobName));
+				}
+				throw new PlatformException(e);				
+			}
+			this.removePrevConfigFile(jobName);
 		}
 	}
 
@@ -470,7 +479,9 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	private void scanXMLFiles() {
 		File[] jobBeansFiles = FileLocator.findFiles(BatchFrameworkConstants.SPRING_BATCH_CONFIG);					
 		for (File jobBeansFile : jobBeansFiles) {
-			this.jobXMLFile.put(ConfigFileUtils.getJobName(new FileSystemResource(jobBeansFile)), jobBeansFile.toURI());
+			for(String jobName: ConfigFileUtils.getJobName(new FileSystemResource(jobBeansFile))) {
+				this.jobXMLFile.put(jobName, jobBeansFile.toURI());
+			}
 		}
 	}
 
