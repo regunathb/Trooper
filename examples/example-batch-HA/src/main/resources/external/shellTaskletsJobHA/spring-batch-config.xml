@@ -45,11 +45,13 @@
  	<bean id="curatorJobSyncHandler" class="org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandlerFactory">
 		<property name="jobConfigService" ref="jobConfigService" />
 		<property name="curatorClient" ref="curatorClient" />
+		<property name="bootstrapMonitorBean" ref="bootstrapMonitorBean" />
     </bean>
     
 	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.CuratorClientFactory">
 		<property name="zkConnectString" value="stage-flo-zk1.nm.flipkart.com:2181" />
-	</bean>
+	</bean>    
+	
 	<!--
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->

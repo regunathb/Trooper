@@ -15,10 +15,12 @@
  */
 package org.trpr.platform.batch.impl.spring.web;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
+import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -45,9 +48,9 @@ public class SynchronizationController {
 	private JobService jobService;
 
 	/** The URL for various actions */
-	public static final String PUSH_JOB_URL = "/sync/pushJob";
-	public static final String PUSH_DEP_URL = "/sync/pushDep";
+
 	public static final String PUSH_URL = "/sync/push/deploy";
+	public static final String PULL_URL = "/sync/pull";
 
 	/** The success message to be returned by the server */
 	public static final String SUCCESS_STRING = "success";
@@ -75,76 +78,80 @@ public class SynchronizationController {
 		}
 		return path;
 	}
-	
+
+	/**
+	 * Receives a pull request
+	 */
+	@RequestMapping(value=SynchronizationController.PULL_URL,method=RequestMethod.POST)
+	public String pullRequest(ModelMap model, @RequestParam String serverName) {
+		LOGGER.info("Received a pull request from: "+serverName.trim());
+		if(this.jobConfigService.getSyncService()!=null) {
+			this.jobConfigService.getSyncService().deployAllJobsToHost(serverName.trim());
+			model.addAttribute("Message","success");
+		}
+		return "sync/Message";
+	}
+
+
 	/**
 	 * Receiver methods start
 	 * These methods receive the job configuration files, dependency files and job loading requests.
 	 */
-	/**
-	 * Receives the Job file
-	 * @return "success" on success, else the error message. (This is returned using REST API)
-	 */
-	@RequestMapping(value="{jobName}"+SynchronizationController.PUSH_JOB_URL,method=RequestMethod.POST)
-	public String addJob(ModelMap model, @RequestParam String jobName, @RequestParam String configFile) {
-		//Job Names can have appended whitespace characters when sent through request
+	@RequestMapping(value=SynchronizationController.PUSH_URL,method=RequestMethod.POST)
+	public synchronized String jobReceiver(ModelMap model,@RequestParam String jobName, 
+			@RequestParam(value="jobConfig") MultipartFile jobConfig 
+			, @RequestParam(value="depFiles[]", required= false) MultipartFile[] depFiles) {
+
+
 		jobName=jobName.trim();
-		LOGGER.info("Adding jobName: "+jobName);
+		LOGGER.info("Push job request received for job: "+jobName);
+
+		//Upload configuration file
 		if(this.jobService.contains(jobName)) {
 			LOGGER.info("Warning: "+jobName+" already exists. Modifying old file");
 		}
 		try {
 			//Set XML File
-			this.jobConfigService.setJobConfig(jobName,new ByteArrayResource(configFile.getBytes()));
+			List<String> jobNames = new LinkedList<String>();
+			jobNames.add(jobName);
+			this.jobConfigService.setJobConfig(jobNames,new ByteArrayResource(jobConfig.getBytes()));
 			LOGGER.info("Success in deploying configuration file for: "+jobName);
 			model.addAttribute("Message","success");
 		} catch (Exception e) {
 			model.addAttribute("Message","Unexpected error");
 		}
-		return "sync/Message";
-	}
 
-	/**
-	 * Receives a single dependency file
-	 * @return "success" on success, else the error message. (This is returned using REST API)
-	 */
-	@RequestMapping(value="{jobName}"+SynchronizationController.PUSH_DEP_URL,method=RequestMethod.POST)
-	public String addDep(ModelMap model, @RequestParam String fileDescription, @RequestParam String fileName, 
-			@RequestParam MultipartFile attachment) {
-		//File description holds jobName
-		String jobName=fileDescription.trim();
-		try {
-			//Set dependencies
-			LOGGER.info("Request to deploy file: "+jobName+" "+fileName+" "+attachment.getSize());
-			this.jobConfigService.addJobDependency(jobName, fileName, attachment.getBytes());
-			LOGGER.info("Success in deploying dependency file for: "+jobName);
-			model.addAttribute("Message","success");
-		} catch (Exception e) {
-			LOGGER.error("Exception while deploying Dependency file: ",e);
-			model.addAttribute("Message","Unexpected error while deploying dependencyFile: "+fileName);
+		//Upload dependency Files
+		if(depFiles!=null && depFiles.length!=0) { //Dep files exist
+			for(MultipartFile depFile: depFiles) {
+				try {
+					//Set dependencies
+					LOGGER.info("Request to deploy file: "+jobName+" "+depFile.getOriginalFilename()+" "+depFile.getSize());
+					List<String> jobNames = new LinkedList<String>();
+					jobNames.add(jobName);
+					this.jobConfigService.addJobDependency(jobNames, depFile.getOriginalFilename(), depFile.getBytes());
+					LOGGER.info("Success in deploying dependency file for: "+jobName);
+					model.addAttribute("Message","success");
+				} catch (Exception e) {
+					LOGGER.error("Exception while deploying Dependency file: ",e);
+					model.addAttribute("Message","Unexpected error while deploying dependencyFile: "+depFile.getOriginalFilename());
+				}
+			}
 		}
-		return "sync/Message";
-	}
 
-	/**
-	 * Receives a loading request
-	 * @return "success" on success, else the error message. (This is returned using REST API)
-	 */
-	@RequestMapping(value="{jobName}"+SynchronizationController.PUSH_URL,method=RequestMethod.POST)
-	public String push(ModelMap model, @RequestParam String jobName) {
-		//jobName coming through REST API might have whitespace characters appended
-		jobName=jobName.trim();
-		LOGGER.info("Loading request for: "+jobName);
+		LOGGER.info("Deploy request");
+		//Deploy request
 		try {
-			this.jobConfigService.deployJob(jobName);
+			List<String> jobNames = new LinkedList<String>();
+			jobNames.add(jobName);
+			this.jobConfigService.deployJob(jobNames);
 			LOGGER.info("Success in deploying: "+jobName);
 			model.addAttribute("Message","success");
 		} catch (Exception e) {
 			LOGGER.error("Error while deploying job: "+jobName, e);
 			model.addAttribute("Message","Unexpected error while loading: "+jobName);
 		}
+
 		return "sync/Message";
 	}
-	/**
-	 * Receiver methods end
-	 */
 }

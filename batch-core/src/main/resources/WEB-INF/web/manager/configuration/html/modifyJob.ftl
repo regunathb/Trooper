@@ -21,10 +21,10 @@ function XMLFileSave() {
 <div id="job">
 
 	<#assign url>
-	<@spring.url relativeUrl="${servletPath}/configuration/modify/jobs/${jobName}" /> 
+	<@spring.url relativeUrl="${servletPath}/configuration/modify/jobs/${jobName[0]}" /> 
 	</#assign>
 	
-	<H1> Add/Edit Job Details :  ${jobName}</H1>
+	<H1> Add/Edit Job Details :  ${jobName[0]}</H1>
 	
 	<span id="error" style="color:red">
 		<#if XMLFileError??>
@@ -48,8 +48,11 @@ function XMLFileSave() {
 
  <input type="hidden" name="identifier" value="null" id="stateChanger"/> 
 		<ol>
-			<li> <H2> Name:  ${jobName} </H2>
-				 <input type="hidden" name="jobName" value="${jobName}" />
+			<li>
+			<#list jobName as job>
+			 <H2> Name:  ${job} </H2>
+				 <input type="hidden" name="jobName" value="${job}" />
+				</#list>
 			
 			<li> <H2> Upload Configuration File:  </H2> 
 			

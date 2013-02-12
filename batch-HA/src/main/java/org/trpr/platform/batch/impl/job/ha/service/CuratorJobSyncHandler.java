@@ -19,14 +19,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.trpr.platform.batch.common.JobHost;
 import org.trpr.platform.batch.impl.job.ha.JobInstanceDetails;
 import org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.event.PlatformEventConsumer;
 import org.trpr.platform.core.spi.logging.Logger;
+import org.trpr.platform.model.event.PlatformEvent;
+import org.trpr.platform.runtime.common.RuntimeConstants;
+import org.trpr.platform.runtime.impl.event.BootstrapProgressMonitor;
 
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.state.ConnectionState;
@@ -38,7 +44,7 @@ import com.netflix.curator.x.discovery.details.JsonInstanceSerializer;
 import com.netflix.curator.x.discovery.details.ServiceCacheListener;
 
 /**
- * <code>ZKSyncHandler </code> handles the sync with Zookeeper. It performs the folowing tasks: 
+ * <code>CuratorJobSyncHandler </code> handles the sync with Curator. It performs the following tasks: 
  * Registering a new job to Zookeeper
  * Adding a listener to Zookeeper services
  * Informing jobConfigurationService about change in services
@@ -46,7 +52,7 @@ import com.netflix.curator.x.discovery.details.ServiceCacheListener;
  * @author devashishshankar
  * @version 1.0, 7 Feb, 2013
  */
-public class CuratorJobSyncHandler {
+public class CuratorJobSyncHandler implements InitializingBean, PlatformEventConsumer {
 
 	/** Instance of trooper @link{JobConfigurationService} */
 	private JobConfigurationService jobConfigurationService;
@@ -67,18 +73,21 @@ public class CuratorJobSyncHandler {
 	private static final String ZK_DEP_PATH_PREFIX = "/Batch/Deployment";
 
 	/** The Log instance for this class */
-	private static final Logger LOGGER = LogFactory.getLogger(JobRegistryBeanPostProcessor.class);
+	private static final Logger LOGGER = LogFactory.getLogger(CuratorJobSyncHandler.class);
+
+	/** {@link BootstrapProgressMonitor} instance which is used to add a listener to Bootstrap start event */
+	private BootstrapProgressMonitor bootstrapProgressMonitor;
 
 	/** Autowired Constructor */
 	@Autowired
-	public CuratorJobSyncHandler(JobConfigurationService jobConfigurationService, CuratorFramework curatorFramework) {
+	public CuratorJobSyncHandler(JobConfigurationService jobConfigurationService, CuratorFramework curatorFramework, 
+			BootstrapProgressMonitor bootstrapProgressMonitor) {
 		this.curatorFramework= curatorFramework;
 		this.jobConfigurationService = jobConfigurationService;
 		this.syncService = new SyncServiceImpl(this.jobConfigurationService);
 		if((this.jobConfigurationService.getSyncService()==null)) {
 			this.jobConfigurationService.setSyncService(this.syncService);
 		}
-
 		JsonInstanceSerializer<JobInstanceDetails> serializer = new JsonInstanceSerializer<JobInstanceDetails>(JobInstanceDetails.class);
 		//Get serviceDiscovery
 		this.serviceDiscovery = ServiceDiscoveryBuilder.builder(JobInstanceDetails.class)
@@ -86,11 +95,11 @@ public class CuratorJobSyncHandler {
 				.basePath(ZK_DEP_PATH_PREFIX).serializer(serializer)
 				.build();
 		this.serviceCacheMap = new HashMap<String, ServiceCache<JobInstanceDetails>>();
+		this.bootstrapProgressMonitor = bootstrapProgressMonitor;
 	}
 
 	/**
-	 * This method updates the list of servers in the jobConfigurationService. 
-	 * Also calls syncservice to sync all the servers
+	 * This method updates the list of servers in the jobConfigurationService.
 	 */
 	public void updateHosts() {
 		LOGGER.info("Updating list of servers");
@@ -125,12 +134,10 @@ public class CuratorJobSyncHandler {
 		}catch (Exception e) {
 			LOGGER.error("Error while updating server list",e);
 		}
-		//Sync all servers according to the info fed in jobConfigService
-		this.syncService.syncAllHosts();
 	}
 
 	/**
-	 * Registers a job(service) to zookeeper and adds a listener to its cache change
+	 * Registers a job(service) to zookeeper (Curator) and adds a listener to its cache change
 	 * @param jobName Name of the job
 	 */
 	public void addJobInstance(String jobName) {
@@ -138,13 +145,29 @@ public class CuratorJobSyncHandler {
 		//Get current host attributes
 		JobHost currentHost = this.jobConfigurationService.getCurrentHostName();
 		try {
-			//Register current job to current server
-			this.serviceDiscovery.registerService(ServiceInstance.<JobInstanceDetails> builder()
-					.name(jobName)
-					.address(currentHost.getIP())
-					.port(currentHost.getPort())
-					.payload(new JobInstanceDetails(currentHost.getHostName()))
-					.build());
+			//First Check if job is already registered in ZooKeeper (Curator)
+			boolean isRegistered = false;
+			if(this.serviceCacheMap.containsKey(jobName)) {
+				for(ServiceInstance<JobInstanceDetails> serviceInstance: this.serviceCacheMap.get(jobName).getInstances()) {
+					if(serviceInstance.getAddress().equals(currentHost.getAddress())) {
+						if(serviceInstance.getPort()==currentHost.getPort()) {
+							//This instance has been registered
+							isRegistered = true;
+							break;
+						}
+					}
+				}
+			}
+			if(isRegistered==false) {
+				//Register current job to current server
+				this.serviceDiscovery.registerService(ServiceInstance.<JobInstanceDetails> builder()
+						.name(jobName)
+						.address(currentHost.getIP())
+						.port(currentHost.getPort())
+						.payload(new JobInstanceDetails(currentHost.getHostName()))
+						.build());
+				LOGGER.info("Registering "+jobName+" to "+currentHost.getAddress());
+			}
 			//Adding the listeners
 			if(!this.serviceCacheMap.containsKey(jobName)) { //Service cache doesn't have this job
 				ServiceCache<JobInstanceDetails> sc = this.serviceDiscovery.serviceCacheBuilder().name(jobName).build();
@@ -170,6 +193,68 @@ public class CuratorJobSyncHandler {
 		}
 		this.serviceDiscovery.close();
 		super.finalize();
+	}
+
+	/**
+	 * Method which finds the oldest running Job hosts and sends a pull request to that server
+	 */
+	private void sendPullRequests() {
+		//Pull request code
+		//Get the oldest jobHost
+		try {
+			long minTime=Long.MAX_VALUE;
+			ServiceInstance<JobInstanceDetails> minInst = null;
+			//For all services try to find the oldest host
+			for(String serviceName : this.serviceDiscovery.queryForNames()) {
+				for(ServiceInstance<JobInstanceDetails> inst :this.serviceDiscovery.queryForInstances(serviceName)) {
+					if(inst.getRegistrationTimeUTC()<minTime){
+						minInst = inst;
+						minTime = inst.getRegistrationTimeUTC();					
+					}
+				}
+			}
+			LOGGER.info("The oldest host is: "+minInst);
+			//minInst is the oldest host. send a pull request
+			if(minInst!=null) {
+				JobHost instHost = new JobHost(minInst.getPayload().getHostName(),minInst.getAddress(),minInst.getPort());
+				if(!this.jobConfigurationService.getCurrentHostName().equals(instHost)) {
+					LOGGER.info("Sending pull request to: "+minInst.getAddress()+":"+minInst.getPort());
+					this.syncService.pullRequest(minInst.getAddress()+":"+minInst.getPort());
+				}
+			}			
+		} catch (Exception e) {
+			LOGGER.error("Exception while finding the oldest host and sending the pull request",e);
+		}
+		this.syncService.syncAllHosts();
+	}
+
+	/**
+	 * Interface method implementation. Listens to ApplicationEvent
+	 * @see PlatformEventConsumer#onApplicationEvent(ApplicationEvent)
+	 */
+	@Override
+	public void onApplicationEvent(ApplicationEvent event) {
+		if (event.getSource() instanceof PlatformEvent) {
+			PlatformEvent platformEvent = (PlatformEvent) event.getSource(); //Event should be platformEvent
+			if(platformEvent.getEventType()!=null&&platformEvent.getEventType().equalsIgnoreCase(RuntimeConstants.BOOTSTRAPMONITOREDEVENT)){
+				synchronized (BootstrapProgressMonitor.class) {
+					if(platformEvent.getEventStatus() != null && platformEvent.getEventStatus().equalsIgnoreCase(RuntimeConstants.BOOTSTRAP_START_STATE)){
+						LOGGER.info("Sending pull requests");
+						this.sendPullRequests();  //This should only be called once, when server starts (during/after bootstrap)
+					}
+				}	  	
+			}
+		}		
+	}
+
+	/**
+	 * Interface method implementation. Used to add a Bootstrap Event listener. This method is called after
+	 * all the properties have been set
+	 * @see InitializingBean#afterPropertiesSet()
+	 */
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.bootstrapProgressMonitor.addBootstrapEventListener(this);
 	}
 
 	/**
