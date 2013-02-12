@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-core</artifactId>
 	<name>Batch Core</name>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<description>Trooper Batch Core</description>
 
 	<licenses>
@@ -45,6 +45,11 @@
       		<id>srikanthps</id>
       		<name>Srikanth PS</name>
       		<email>srikanthps@yahoo.com</email>
+    	</developer>
+   		<developer>
+      		<id>devashishshankar</id>
+      		<name>Devashish Shankar</name>
+      		<email>devashish.shankar@gmail.com</email>
     	</developer>
   	</developers>
 
@@ -125,7 +130,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
@@ -135,7 +140,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
