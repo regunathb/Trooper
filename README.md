@@ -37,3 +37,4 @@ Trooper is licensed under : The Apache Software License, Version 2.0. Here is a 
 
 * Shashikant Soni ([@shashiks](https://github.com/shashiks))
 * Srikanth PS ([@srikanthps](http://twitter.com/srikanthps))
+* Devashish Shankar ([@devashishshankar](https://github.com/devashishshankar))
