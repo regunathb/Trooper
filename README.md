@@ -22,7 +22,7 @@ Documentation is continuously being added to the Wiki page of Trooper (https://g
 
 ## Getting help
 
-Write directly to the project committers (listed below) until the time dev and user mailing lists are setup.
+For discussion, help regarding usage, or receiving important announcements, subscribe to Trooper mailing list: http://groups.google.com/group/trooper-users
 
 ## License
 
