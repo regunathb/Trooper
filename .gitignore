@@ -165,4 +165,4 @@ pip-log.txt
 *.class
 target
 bin
-.svn
+.svn/README.md~
