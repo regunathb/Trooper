@@ -164,11 +164,15 @@ public class SyncServiceImpl implements SyncService {
 	 */
 	@Override
 	public void deployJobToAllHosts(String jobName) {
+		LOGGER.info("Pushing "+jobName+" to all hosts");
 		//First check if the job is an HA job
 		if(this.jobConfigService.getCurrentHostJobs().contains(jobName)) {
 			if(this.jobConfigService.getAllHostNames()!=null) {
+				LOGGER.info("Getting list of hosts to push the job to..");
 				for(JobHost host : this.jobConfigService.getAllHostNames()) {
+					LOGGER.info("JobHost: "+host.getAddress());
 					if(!host.equals(this.jobConfigService.getCurrentHostName())) {
+						LOGGER.info("Pushing: "+jobName+" to "+host.getAddress());
 						if(!this.pushJobToHostWithRetry(jobName, host.getAddress(),this.maxRetryCount)) {
 							LOGGER.info("Failed to push: "+jobName+" to "+host.getAddress());
 						}

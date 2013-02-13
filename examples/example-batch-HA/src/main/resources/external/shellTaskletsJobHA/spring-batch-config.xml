@@ -39,7 +39,7 @@
 	-->
 	<bean id="shellJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="shellJobDetailBean" />
-		<property name="cronExpression" value="0 0/55 * 2 1 ?" />
+		<property name="cronExpression" value="0 0/25 * 2 1 ?" />
 	</bean>
 	
  	<bean id="curatorJobSyncHandler" class="org.trpr.platform.batch.impl.job.ha.service.CuratorJobSyncHandlerFactory">
@@ -92,4 +92,3 @@
 
 </beans>
 				
-

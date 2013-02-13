@@ -189,20 +189,21 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 	 */
 	@Override
 	public void addJobInstance(String jobName, JobHost hostName) {
+		LOGGER.info("hostName: "+hostName.getAddress()+" has job:"+jobName);
 		if(this.jobHostNames.containsKey(jobName)) { //Job is existing
 			if(!this.jobHostNames.get(jobName).contains(hostName)) {
 				this.jobHostNames.get(jobName).add(hostName);
-				LOGGER.info("Added new host: "+hostName.getAddress()+" to "+jobName);
+				//LOGGER.info("Added new host: "+hostName.getAddress()+" to "+jobName);
 			}
 		} else {
 			List<JobHost> hostList = new LinkedList<JobHost>();
 			hostList.add(hostName);
 			this.jobHostNames.put(jobName, hostList);
-			LOGGER.info("New job: "+jobName+" added to host:"+hostName);
+			//LOGGER.info("New job: "+jobName+" added to host:"+hostName);
 		}
 		if(!this.hostNames.contains(hostName)) {
 			this.hostNames.add(hostName);
-			LOGGER.info("Added to hostNames: "+hostName.getAddress());
+			//LOGGER.info("Added to hostNames: "+hostName.getAddress());
 		}
 		if(!this.currentJobNames.contains(jobName)) {
 			if(this.jobHostNames.get(jobName).contains(this.getCurrentHostName()))

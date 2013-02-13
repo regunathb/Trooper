@@ -138,20 +138,24 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 
 	/**
 	 * Registers a job(service) to zookeeper (Curator) and adds a listener to its cache change
+	 * Method is synchronized because jobConfigService is being updated (Parallel updates may lead to problems)
 	 * @param jobName Name of the job
 	 */
-	public void addJobInstance(String jobName) {
+	public synchronized void addJobInstance(String jobName) {
 		//Register the job to ZK
 		//Get current host attributes
 		JobHost currentHost = this.jobConfigurationService.getCurrentHostName();
 		try {
 			//First Check if job is already registered in ZooKeeper (Curator)
 			boolean isRegistered = false;
-			if(this.serviceCacheMap.containsKey(jobName)) {
-				for(ServiceInstance<JobInstanceDetails> serviceInstance: this.serviceCacheMap.get(jobName).getInstances()) {
-					if(serviceInstance.getAddress().equals(currentHost.getAddress())) {
+			
+			LOGGER.info("Querying zookepper to see if already there is an entry ");
+			//NOTE: This might not send cache changed in case job is redeployed on a jobHost
+			Collection<String> serviceNames = this.serviceDiscovery.queryForNames();
+			if(serviceNames.contains(jobName)) {
+				for(ServiceInstance<JobInstanceDetails> serviceInstance: this.serviceDiscovery.queryForInstances(jobName)) {
+					if(serviceInstance.getAddress().equals(currentHost.getIP())) {
 						if(serviceInstance.getPort()==currentHost.getPort()) {
-							//This instance has been registered
 							isRegistered = true;
 							break;
 						}
@@ -239,7 +243,7 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 			if(platformEvent.getEventType()!=null&&platformEvent.getEventType().equalsIgnoreCase(RuntimeConstants.BOOTSTRAPMONITOREDEVENT)){
 				synchronized (BootstrapProgressMonitor.class) {
 					if(platformEvent.getEventStatus() != null && platformEvent.getEventStatus().equalsIgnoreCase(RuntimeConstants.BOOTSTRAP_START_STATE)){
-						LOGGER.info("Sending pull requests");
+						LOGGER.info("Finding oldest host and Sending pull requests");
 						this.sendPullRequests();  //This should only be called once, when server starts (during/after bootstrap)
 					}
 				}	  	
@@ -272,7 +276,7 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 		 */
 		@Override
 		public void cacheChanged() {
-			LOGGER.info("Cache changed");
+			LOGGER.info("Curator Cache changed");
 			CuratorJobSyncHandler.this.updateHosts();
 		}
 	}

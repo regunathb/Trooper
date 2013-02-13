@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
-import org.trpr.platform.batch.spi.spring.admin.SyncService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -48,7 +47,6 @@ public class SynchronizationController {
 	private JobService jobService;
 
 	/** The URL for various actions */
-
 	public static final String PUSH_URL = "/sync/push/deploy";
 	public static final String PULL_URL = "/sync/pull";
 
@@ -92,20 +90,17 @@ public class SynchronizationController {
 		return "sync/Message";
 	}
 
-
 	/**
 	 * Receiver methods start
 	 * These methods receive the job configuration files, dependency files and job loading requests.
+	 * This method is synchronized as 2 job requests cannot be processed simultaneously
 	 */
 	@RequestMapping(value=SynchronizationController.PUSH_URL,method=RequestMethod.POST)
 	public synchronized String jobReceiver(ModelMap model,@RequestParam String jobName, 
 			@RequestParam(value="jobConfig") MultipartFile jobConfig 
 			, @RequestParam(value="depFiles[]", required= false) MultipartFile[] depFiles) {
-
-
 		jobName=jobName.trim();
 		LOGGER.info("Push job request received for job: "+jobName);
-
 		//Upload configuration file
 		if(this.jobService.contains(jobName)) {
 			LOGGER.info("Warning: "+jobName+" already exists. Modifying old file");
@@ -120,7 +115,6 @@ public class SynchronizationController {
 		} catch (Exception e) {
 			model.addAttribute("Message","Unexpected error");
 		}
-
 		//Upload dependency Files
 		if(depFiles!=null && depFiles.length!=0) { //Dep files exist
 			for(MultipartFile depFile: depFiles) {
@@ -138,7 +132,6 @@ public class SynchronizationController {
 				}
 			}
 		}
-
 		LOGGER.info("Deploy request");
 		//Deploy request
 		try {
@@ -151,7 +144,6 @@ public class SynchronizationController {
 			LOGGER.error("Error while deploying job: "+jobName, e);
 			model.addAttribute("Message","Unexpected error while loading: "+jobName);
 		}
-
 		return "sync/Message";
 	}
 }

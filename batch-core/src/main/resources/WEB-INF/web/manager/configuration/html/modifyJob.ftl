@@ -68,12 +68,21 @@ function XMLFileSave() {
 	 <input type="button" value="Save Changes" onclick="XMLFileSave()" name="save" id="save" /> 
 			<h2>Dependencies: </h2>
 			<#if dependencies?? && dependencies?size!=0>
-			<ul>
+			<#assign x = 0 />
+			<#assign y = 3 />
+			<table>
 				<#list dependencies as dependency>
-					<li /> ${dependency}
-					<br />
+					<#if x%3==0>
+						<tr>
+					</#if>
+					<td>${dependency}</td>
+					<#assign x = x+1 />
+					<#assign y = y+1 />
+					<#if (y)%3 == 0>
+						</tr>
+					</#if>
 				</#list>	
-			</ul>
+			</table>
 			<#else>
 			<span style="font-style:italic">No dependencies found.  </span>
 			
