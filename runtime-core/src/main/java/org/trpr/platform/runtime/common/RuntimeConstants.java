@@ -27,7 +27,12 @@ public abstract class RuntimeConstants {
 	 * The environment variable that might hold the path to the config file
 	 */
 	public static final String CONFIG_FILE_VAR = "PLATFORM_CONFIG";
-	
+
+	/**
+	 * The environment variable that might hold bean property values
+	 */
+	public static final String CONFIG_PROPERTIES_VAR = "PLATFORM_PROPERTIES";
+
 	/** The variable token to identify the path to the bootstrap config file */
 	public static final String CONFIG_FILE_NAME_TOKEN = "$RUNTIME_CONFIG_PATH";
 	
