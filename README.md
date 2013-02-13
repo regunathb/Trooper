@@ -13,8 +13,12 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
-| Version 1.1.0    | February 2013   |     Support for dynamic deployement of jobs, clustering      
+| Version 1.1.0    | February 2013   |     Support for dynamic deployment of jobs, clustering      
 | Version 1.0.0    | December 2012   |     First stable release      
+
+## Changelog
+
+Changelog can be viewed in CHANGELOG.md file
 
 ## Documentation and Examples
 
