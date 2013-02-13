@@ -15,7 +15,7 @@
             <list>
                 <bean id="Connector" class="org.trpr.platform.batch.impl.jetty.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
                     <property name="jobConfigService" ref="jobConfigService" />
-                    <property name="port" value="8184"/>
+                    <property name="port" value="${batch.core.jetty.admin.port}"/>
                 </bean>
             </list>
         </property>
@@ -31,7 +31,7 @@
                                     <bean class="org.trpr.platform.batch.impl.jetty.JettyWebAppContextFactory">
 										<property name="contextName" value="/"/>
 										<property name="contextPath" value="WEB-INF"/>	
-										<property name="maxFormContentSize" value="60000000"/>                                    	
+										<property name="maxFormContentSize" value="${batch.core.jetty.maxFormContentSize}"/>                                    	
                                     </bean>
                                 </list>
                             </property>
@@ -41,4 +41,9 @@
             </bean>
         </property>
     </bean>
+	<bean class="org.trpr.platform.runtime.impl.config.spring.PropertyPlaceholderConfigurer">
+		<property name="defaultPropertiesOnClasspath">
+			<value>packaged/default-batch-core-config.properties</value>
+		</property>
+	</bean>    
 </beans>
