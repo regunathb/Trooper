@@ -257,6 +257,7 @@ h4 {
  	margin:0;
  	padding:4px 6px;
  	vertical-align:top;
+ 	border-bottom: 1px
  }
  
  th.table-meta-data
@@ -466,3 +467,18 @@ h4 {
    background-image: -ms-linear-gradient(top, #6aa436 0%, #8dc059 100%);
    color: #fff;
    }
+   
+   /**
+   Dependency table style
+   */
+.dept {
+	border-collapse: separate;
+}
+tr.depr {
+	display: table-row;
+	border-color: #666;
+}
+tr.dep > td {
+  background-color: #d4ffaa;
+  width: 33%;
+}

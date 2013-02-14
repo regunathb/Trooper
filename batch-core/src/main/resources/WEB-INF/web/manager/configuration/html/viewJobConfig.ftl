@@ -44,12 +44,14 @@
 			<#if dependencies?? && dependencies?size!=0>
 			These are the dependencies found in the ${JobDirectoryName} folder: 
 				<br />
+				<br />
 			<#assign x = 0 />
 			<#assign y = 3 />
-			<table>
+			<table class='bordered-table dept '>
+			<tr></tr>
 				<#list dependencies as dependency>
 					<#if x%3==0>
-						<tr>
+						<tr class='dep depr'>
 					</#if>
 					<td>${dependency}</td>
 					<#assign x = x+1 />
@@ -58,6 +60,14 @@
 						</tr>
 					</#if>
 				</#list>	
+				<#list 1..3 as it>
+				<td></td>
+				<#assign y = y+1 />
+				<#if (y)%3 == 0>
+				</tr>
+				<#break>
+				</#if>
+				</#list>
 			</table>
 			<#else>
 			<span style="font-style:italic">No dependencies found. You can add dependencies in the Edit Menu </span>

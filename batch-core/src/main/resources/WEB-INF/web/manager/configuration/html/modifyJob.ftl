@@ -70,10 +70,11 @@ function XMLFileSave() {
 			<#if dependencies?? && dependencies?size!=0>
 			<#assign x = 0 />
 			<#assign y = 3 />
-			<table>
+						<table class='bordered-table dept'>
+			<tr></tr>
 				<#list dependencies as dependency>
 					<#if x%3==0>
-						<tr>
+						<tr class='dep depr'>
 					</#if>
 					<td>${dependency}</td>
 					<#assign x = x+1 />
@@ -82,6 +83,14 @@ function XMLFileSave() {
 						</tr>
 					</#if>
 				</#list>	
+				<#list 1..3 as it>
+				<td></td>
+				<#assign y = y+1 />
+				<#if (y)%3 == 0>
+				</tr>
+				<#break>
+				</#if>
+				</#list>
 			</table>
 			<#else>
 			<span style="font-style:italic">No dependencies found.  </span>
