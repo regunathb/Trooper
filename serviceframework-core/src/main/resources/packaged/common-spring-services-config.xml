@@ -14,9 +14,11 @@
 	<!-- This event producer bean is declared primarily for publishing Bootstrap lifecycle events -->
 	<bean id="platformEventProducer" class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
 	</bean>  	
-	<!-- This event consumer bean is declared primarily for consuming Bootstrap lifecycle events -->
-	<bean id="bootstrapMonitor" class="org.trpr.platform.runtime.impl.event.BootstrapProgressMonitor">
+	
+	<!-- This event producer bean is declared primarily for publishing service events -->
+	<bean id="serviceEventProducer" class="org.trpr.platform.servicefw.impl.event.ServiceEventProducerImpl">
 	</bean>  	
+
 	<!-- End Event Framework beans -->
 	
 	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
