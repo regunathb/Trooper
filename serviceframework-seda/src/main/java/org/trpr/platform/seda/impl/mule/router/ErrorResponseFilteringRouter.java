@@ -59,24 +59,24 @@ public class ErrorResponseFilteringRouter<T> extends AbstractOutboundRouter {
 	@SuppressWarnings("unchecked")
 	public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException {
 		MuleMessage result = null;
-		OutboundEndpoint endPoint = (OutboundEndpoint)getEndpoints().get(0);
-		ServiceResponseImpl<T> serviceResponse = (ServiceResponseImpl<T>)message.getPayload();
-		try {
-			if (serviceResponse.getStatusCode().equalsIgnoreCase(String.valueOf(ServiceFrameworkConstants.SUCCESS_STATUS_CODE))) {
-				if (endPoint.isSynchronous()) {
-					result = send(session, message, endPoint);
+		for (OutboundEndpoint endPoint : (OutboundEndpoint[])getEndpoints().toArray(new OutboundEndpoint[0])) {
+			ServiceResponseImpl<T> serviceResponse = (ServiceResponseImpl<T>)message.getPayload();
+			try {
+				if (serviceResponse.getStatusCode().equalsIgnoreCase(String.valueOf(ServiceFrameworkConstants.SUCCESS_STATUS_CODE))) {
+					if (endPoint.isSynchronous()) {
+						result = send(session, message, endPoint);
+					} else {
+						dispatch(session, message, endPoint);
+					}
 				} else {
-					dispatch(session, message, endPoint);
-		            return null;
+					// just log the fact that the router is not forwarding the message
+					LOGGER.debug("Error response not being forwarded through for service response of type : " + serviceResponse.getResponseData().getClass().getName());
 				}
-			} else {
-				// just log the fact that the router is not forwarding the message
-				LOGGER.debug("Error response not being forwarded through for service response of type : " + serviceResponse.getResponseData().getClass().getName());
-			}
-	    } catch (MuleException e) {
-	        throw new CouldNotRouteOutboundMessageException(message, endPoint, e);
-	    }
-	    return result;
+		    } catch (MuleException e) {
+		        throw new CouldNotRouteOutboundMessageException(message, endPoint, e);
+		    }			
+		}
+	    return result; // return the last successfully executed response
 	 }
 
 }
