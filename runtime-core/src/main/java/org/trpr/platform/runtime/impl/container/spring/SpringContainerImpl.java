@@ -129,7 +129,9 @@ public class SpringContainerImpl implements Container {
 	 * @see org.trpr.platform.runtime.spi.container.Container#publishBootstrapEvent(org.trpr.platform.model.event.PlatformEvent)
 	 */
 	public void publishBootstrapEvent(PlatformEvent bootstrapEvent) {
-		this.componentContainer.publishBootstrapEvent(bootstrapEvent);
+		if (this.getComponentContainer() != null) { // check if a ComponentContainer has been set and publish the bootstrap event to it
+			this.getComponentContainer().publishBootstrapEvent(bootstrapEvent);
+		}
 	}
 
 	/**
