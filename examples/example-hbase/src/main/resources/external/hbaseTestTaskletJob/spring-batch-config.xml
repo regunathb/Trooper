@@ -46,7 +46,7 @@
 		Trigger to be scheduled and executed by Quartz for
 	-->
 	<bean
-		class="org.trpr.platform.batch.impl.spring.web.SchedulerFactoryBean">
+		class="org.trpr.platform.batch.impl.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
 				<ref bean="hbaseTestJobCronTrigger" />
