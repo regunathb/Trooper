@@ -18,7 +18,7 @@ It is an umbrella project for a number of things:
 
 ## Changelog
 
-Changelog can be viewed in CHANGELOG.md file
+Changelog can be viewed in CHANGELOG.md file (https://github.com/regunathb/Trooper/blob/master/CHANGELOG.md)
 
 ## Documentation and Examples
 
