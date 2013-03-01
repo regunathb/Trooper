@@ -20,9 +20,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.springframework.core.io.ClassPathResource;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
-import org.trpr.platform.runtime.impl.config.FileLocator;
 
 /**
 *
@@ -52,7 +52,7 @@ public class PropertyPlaceholderConfigurer extends org.springframework.beans.fac
 		Properties mergedProperties = new Properties();
 		// check to see if default properties from classpath has been set
 		if (this.getDefaultPropertiesOnClasspath() != null) {
-			mergedProperties.load(new FileInputStream(FileLocator.findUniqueFile(this.getDefaultPropertiesOnClasspath())));
+			mergedProperties.load(new ClassPathResource(this.getDefaultPropertiesOnClasspath()).getInputStream());				
 			// set this as the default properties
 			super.setProperties(mergedProperties);
 		}
