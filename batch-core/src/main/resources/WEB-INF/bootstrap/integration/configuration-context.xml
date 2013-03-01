@@ -12,31 +12,4 @@
 	<channel id="job-configurations" />
 	<publish-subscribe-channel id="job-registrations" />
 
-	<logging-channel-adapter channel="job-registrations" />
-
-	<service-activator input-channel="job-configuration-files" output-channel="job-configurations">
-		<beans:bean class="org.springframework.batch.admin.integration.FileToResourceAdapter"/>
-	</service-activator>
-
-	<service-activator input-channel="job-configurations" output-channel="job-registrations">
-		<bean class="org.springframework.batch.admin.integration.JobConfigurationResourceLoader" xmlns="http://www.springframework.org/schema/beans">
-			<property name="jobLoader">
-				<bean class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
-					<property name="jobRegistry" ref="jobRegistry"/>
-				</bean>
-			</property>
-			<property name="jobService" ref="jobService" />
-		</bean>
-	</service-activator>
-
-	<service-activator input-channel="job-configuration-requests" output-channel="job-configurations">
-		<beans:bean class="org.springframework.batch.admin.integration.JobConfigurationRequestToResourceAdapter" />
-	</service-activator>
-<!--
-	<file:inbound-channel-adapter directory="${batch.job.configuration.file.dir}" channel="job-configuration-files"
-		filename-pattern=".*\.xml">
-		<poller max-messages-per-poll="1" cron="5/1 * * * * *" />
-	</file:inbound-channel-adapter> 
--->
-
 </beans:beans>

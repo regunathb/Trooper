@@ -6,7 +6,6 @@
 	<bean id="dummy" class="java.util.Date"/>
 
   	<import resource="classpath*:WEB-INF/bootstrap/manager/execution-context.xml" />
-  	<import resource="classpath*:WEB-INF/bootstrap/integration/file-context.xml" />
   	<import resource="classpath*:WEB-INF/bootstrap/integration/configuration-context.xml" />
   	<import resource="classpath*:WEB-INF/bootstrap/resources/resources-context.xml" />
  		
