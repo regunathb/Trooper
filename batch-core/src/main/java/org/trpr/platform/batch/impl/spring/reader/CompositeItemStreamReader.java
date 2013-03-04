@@ -104,8 +104,10 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 					}
 				}
 				this.countDownLatch.countDown(); // count down on the latch
-				LOGGER.debug("Returning data from local cache after partition read. Cache size : " + this.localQueue.size());
-				return this.localQueue.remove(); // return an item for processing after populating the local collection
+				if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
+					LOGGER.debug("Returning data from local cache after partition read. Cache size : " + this.localQueue.size());
+					return this.localQueue.remove(); // return an item for processing after populating the local collection
+				}
 			}
 		}
 		
