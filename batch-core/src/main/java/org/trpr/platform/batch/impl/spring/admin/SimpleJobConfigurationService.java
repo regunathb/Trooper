@@ -453,6 +453,9 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		if(prevFile.exists()) {
 			prevFile.renameTo(configFile);
 		}
+		else {
+			this.jobXMLFile.remove(jobName);
+		}
 	}
 
 	/**
