@@ -81,6 +81,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		// return data from local queue if available already
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.localQueue.isEmpty()) {
+				LOGGER.debug("Returning data from local cache. Cache size : " + this.localQueue.size());
 				return this.localQueue.remove();
 			}			
 		}
@@ -94,6 +95,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		}
 		
 		if (context != null) {
+			LOGGER.debug("Invoking batch read on partition");
 			T[] items = this.delegate.batchRead(context); // DONOT have the delegate's batchRead() inside the below synchronized block. All readers will block then
 			synchronized(this) { // include the add and remove operations in one synchronized block to avoid race conditions			
 				for (T item : items) {
@@ -102,6 +104,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 					}
 				}
 				this.countDownLatch.countDown(); // count down on the latch
+				LOGGER.debug("Returning data from local cache after partition read. Cache size : " + this.localQueue.size());
 				return this.localQueue.remove(); // return an item for processing after populating the local collection
 			}
 		}
@@ -119,10 +122,12 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		// Check again to see if any new items have been added, exit otherwise
 		synchronized(this) {
 			if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
+				LOGGER.debug("Returning data from local cache after re-check. Cache size : " + this.localQueue.size());
 				return this.localQueue.remove();
 			}	
 		}
 		
+		LOGGER.debug("No more data to read. Returning null");
 		return null;
 	}
 
