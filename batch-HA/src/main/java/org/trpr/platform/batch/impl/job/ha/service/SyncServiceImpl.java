@@ -151,7 +151,7 @@ public class SyncServiceImpl implements SyncService {
 			LOGGER.error("Error while forming multiPart request",e);
 		}	
 		String retValue = org.trpr.platform.batch.impl.job.ha.service.FileUpload.executeRequest(postRequest);
-		LOGGER.info("Server returns: "+retValue);
+		LOGGER.info("Server returns: "+retValue.trim());
 		if(retValue.trim().equalsIgnoreCase(SyncServiceImpl.SUCCESS_STRING)) {
 			return true;
 		}
