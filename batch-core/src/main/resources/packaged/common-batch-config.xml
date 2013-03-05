@@ -59,7 +59,7 @@
 	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
 	<!-- Configuring Common Batch Job Repository.  -->
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+	<bean id="jobRepository" class="org.trpr.platform.batch.impl.spring.admin.repository.MapJobRepositoryFactoryBean">
 		<property name="transactionManager" ref="transactionManager" />
 	</bean>
 
