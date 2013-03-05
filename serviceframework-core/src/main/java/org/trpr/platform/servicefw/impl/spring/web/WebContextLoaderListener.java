@@ -25,9 +25,8 @@ import org.trpr.platform.servicefw.impl.spring.SpringServicesContainer;
 /**
  * A custom {@link ContextLoaderListener} that uses the Trooper {@link SpringBatchComponentContainer#getCommonBatchBeansContext()} as the parent ApplicationContext
  * 
- * @author Regunath B
- * @version 1.0, 28/11/2012
- * 
+ * @author devashishshankar
+ * @version 1.0, 05/03/2012
  */
 public class WebContextLoaderListener extends ContextLoaderListener {
 
