@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+
+	<!-- The Jetty server beans  -->
+    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
+        <property name="connectors">
+            <list>
+                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
+           			<property name="port" value="8184"/>
+                </bean>
+            </list>
+        </property>
+       <property name="handler">
+            <bean id="handlers"
+                  class="org.mortbay.jetty.handler.HandlerCollection">
+                <property name="handlers">
+                    <list>
+                        <bean id="contexts"
+                              class="org.mortbay.jetty.handler.ContextHandlerCollection">
+                            <property name="handlers">
+                                <list>
+                                    <bean class="org.trpr.platform.servicefw.jetty.JettyWebAppContextFactory">
+										<property name="contextName" value="/"/>
+										<property name="contextPath" value="WEB-INF"/>	
+										<property name="maxFormContentSize" value="20000"/>	
+									 </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+<!-- 	<bean class="org.trpr.platform.runtime.impl.config.spring.PropertyPlaceholderConfigurer"> -->
+<!-- 		<property name="defaultPropertiesOnClasspath"> -->
+<!-- 			<value>packaged/default-batch-core-config.properties</value> -->
+<!-- 		</property> -->
+<!-- 	</bean>     -->
+</beans>
