@@ -165,6 +165,11 @@
             		<groupId>org.safehaus.jug</groupId>
             		<artifactId>jug</artifactId>
         		</exclusion>
+        		
+		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
+            		<groupId>org.springframework</groupId>
+            		<artifactId>spring-web</artifactId>
+        		</exclusion>
 		    </exclusions>				    
 		</dependency>								
 		<!-- Trooper dependencies -->

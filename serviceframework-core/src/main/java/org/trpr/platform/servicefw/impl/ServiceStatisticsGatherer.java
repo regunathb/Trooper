@@ -190,7 +190,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 	 * @return ServiceStatistics array containing one instance per service deployed locally
 	 */
 	@SuppressWarnings("rawtypes")
-	private ServiceStatistics[] getStats(boolean clearCollectedStats){
+	public ServiceStatistics[] getStats(boolean clearCollectedStats){
 		if (serviceContainer == null) { // the service container has not been set. Return an empty array of service invocation statistics
 			return new ServiceStatistics[0];
 		}

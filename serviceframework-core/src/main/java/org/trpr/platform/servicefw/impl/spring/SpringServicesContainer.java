@@ -33,6 +33,7 @@ import org.springframework.core.io.UrlResource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
 import org.trpr.platform.model.event.PlatformEvent;
+import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
@@ -55,6 +56,8 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
+
+import ch.qos.logback.classic.Logger;
 
 /**
  * The <code>SpringServicesContainer</code> class is a {@link ServiceContainer} implementation that uses Spring to manage the service implementations.
@@ -93,7 +96,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	private ServiceRegistry serviceRegistry;
 		
     /** The common batch beans context*/
-    private AbstractApplicationContext commonServiceBeansContext;    	
+    private static AbstractApplicationContext commonServiceBeansContext;    	
     
 	/**
 	 * The Spring application context that would hold all service declarations from all services
@@ -134,6 +137,11 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		for (File serviceBeansFile : serviceBeansFiles) {
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
 			// to relative path
+			fileNamesList.add(FILE_PREFIX + serviceBeansFile.getAbsolutePath());
+		}
+
+		if (RuntimeVariables.getRuntimeNature().equalsIgnoreCase(RuntimeConstants.SERVER)) {
+			File serviceBeansFile = FileLocator.findUniqueFile(ServiceFrameworkConstants.COMMON_SERVICES_SERVER_NATURE_CONFIG);
 			fileNamesList.add(FILE_PREFIX + serviceBeansFile.getAbsolutePath());
 		}
 		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
@@ -177,6 +185,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			serviceCompartment.init();
 			serviceCompartments.put(serviceKey,serviceCompartment);
 		}
+		
 	}
 	
 	/**
@@ -289,6 +298,11 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
     	throw new UnsupportedOperationException("Loading of independent services is presently not supported!");
     }
     
+    
+	public static AbstractApplicationContext getCommonServiceBeansContext() {
+		return commonServiceBeansContext;
+	}
+	
 	/**
 	 * Returns the services context.
 	 * @return the services application context

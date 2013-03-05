@@ -355,6 +355,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 			for(String allJobName:jobNames) {
 				this.jobXMLFile.put(allJobName,new File(destPath).toURI());
 			}
+			LOGGER.info("Uploaded job config to "+destPath);
 		} catch (IOException ioe) {
 			LOGGER.error("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath);
 			throw new PlatformException("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath, ioe);
