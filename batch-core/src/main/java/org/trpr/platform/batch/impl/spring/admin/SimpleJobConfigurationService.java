@@ -356,7 +356,7 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 				this.jobXMLFile.put(allJobName,new File(destPath).toURI());
 			}
 		} catch (IOException ioe) {
-			LOGGER.error("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath,ioe);
+			LOGGER.error("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath);
 			throw new PlatformException("Error creating job configuration file for : " + jobNames.toString() + " in location : " + destPath, ioe);
 		}
 	}

@@ -15,6 +15,7 @@
  */
 package org.trpr.platform.batch.impl.spring.web;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -112,8 +113,11 @@ public class SynchronizationController {
 			this.jobConfigService.setJobConfig(jobNames,new ByteArrayResource(jobConfig.getBytes()));
 			LOGGER.info("Success in deploying configuration file for: "+jobName);
 			model.addAttribute("Message","success");
-		} catch (Exception e) {
-			model.addAttribute("Message","Unexpected error");
+		}
+		catch (Exception e) {
+			model.addAttribute("Message","Error while writing the job config file");
+			LOGGER.warn("Unable to deploy the job. Please check that you have write permission. Nested exception: "+e.getMessage());
+			return "sync/Message";
 		}
 		//Upload dependency Files
 		if(depFiles!=null && depFiles.length!=0) { //Dep files exist
