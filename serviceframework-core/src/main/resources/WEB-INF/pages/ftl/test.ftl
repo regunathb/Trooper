@@ -1,12 +1,5 @@
-<%@ include file="./header.jsp"%>
+<#include "./../header.ftl"> 
 
-<%@ page import="org.trpr.platform.service.model.common.statistics.ServiceStatistics"%>
-
-<%
-
-ServiceStatistics statistics = (ServiceStatistics)request.getAttribute("serviceInfo");
-
- %>
 <script type="text/javascript">
 function jobFileUpload() {
 	
@@ -16,12 +9,12 @@ function jobFileUpload() {
 </script>
 <div id="services">
 	<h2>
-		<%out.println(statistics.getServiceName()); %>
+		${serviceInfo.serviceName}
 	</h2>
 	Please enter the details to test the service:
 
 	<form id="ServiceTestForm" name="ServiceTestForm"
-		action="/execute/services/<% out.println(statistics.getServiceName());%>" method="POST">
+		action="/execute/services/${serviceInfo.serviceName}" method="POST">
 		Service Request Class Name: &nbsp;&nbsp;&nbsp;<input type="text" name="serviceRequestClass" /> <br />
 		Service Response Class Name: <input type="text" name="serviceResponseClass" /> <br />
 		Service Request File: 
@@ -49,4 +42,4 @@ function jobFileUpload() {
 		});
 	</script>
 </div>
-<%@ include file="./footer.jsp"%>
+<#include "./../footer.ftl"> 

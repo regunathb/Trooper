@@ -13,10 +13,10 @@ http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix">
-			<value>/WEB-INF/pages/</value>
+			<value>/WEB-INF/pages/ftl/</value>
 		</property>
 		<property name="suffix">
-			<value>.jsp</value>
+			<value>.ftl</value>
 		</property>
 	</bean>
 	

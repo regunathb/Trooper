@@ -1,12 +1,4 @@
-<%@ include file="./header.jsp"%>
-
-<%@ page import="org.trpr.platform.service.model.common.statistics.ServiceStatistics" %>
-
-<%
-
-
- %>
-							
+<#include "./../header.ftl"> 
 <div id="response">
 	<h2>Response</h2>
 	
@@ -30,4 +22,4 @@
 		  }
 		});
 </script>
-<%@ include file="./footer.jsp"%>
+<#include "./../footer.ftl"> 

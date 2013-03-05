@@ -95,7 +95,7 @@ public class ServiceController {
 		//Code for executing the service
 		try { 
 			// Get the XML/JSON request in 
-			String requestContents = XMLFileContents;
+			String requestContents = XMLFileContents.trim();
 			// unmarshall XML/JSON String
 			Class requestClazz = Class.forName(serviceRequestClass);
 			// get the request getter method

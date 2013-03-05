@@ -14,7 +14,21 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	<import resource="classpath*:WEB-INF/controller-context.xml" /> 	
 	
 	<context:annotation-config />
-
+ <!-- freemarker config -->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+      <property name="templateLoaderPath" value="/WEB-INF/pages/ftl/"/>
+    </bean>
+     
+    <!-- 
+      View resolvers can also be configured with ResourceBundles or XML files. If you need
+      different view resolving based on Locale, you have to use the resource bundle resolver.
+    -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+      <property name="cache" value="true"/>
+      <property name="prefix" value=""/>
+      <property name="suffix" value=".ftl"/>
+    </bean>
+ 
 	<mvc:resources location="/, /WEB-INF/pages/resources/, classpath*:WEB-INF/pages/resources/, WEB-INF/pages/resources/" mapping="resources/**" />
 	<mvc:resources mapping="/favicon.ico" location="/WEB-INF/web/resources/images/favicon.ico" />
 	<mvc:annotation-driven />
