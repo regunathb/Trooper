@@ -42,7 +42,7 @@ Some icons from Silk icon set 1.3 by Mark James, http://www.famfamfam.com/lab/ic
 		<div id="primary-navigation">
 			<div id="primary-left">
 				<ul>
-					<li><a href="/index.do">Services Home</a></li>
+					<li><a href="/">Services Home</a></li>
 				</ul>
 			</div>
 			<div id="primary-right">

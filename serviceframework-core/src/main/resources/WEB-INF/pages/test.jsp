@@ -22,7 +22,7 @@ function jobFileUpload() {
 
 	<form id="ServiceTestForm" name="ServiceTestForm"
 		action="/execute/services/<% out.println(statistics.getServiceName());%>" method="POST">
-		Service Request Class Name: <input type="text" name="serviceRequestClass" /> <br />
+		Service Request Class Name: &nbsp;&nbsp;&nbsp;<input type="text" name="serviceRequestClass" /> <br />
 		Service Response Class Name: <input type="text" name="serviceResponseClass" /> <br />
 		Service Request File: 
 		<textarea id="XMLFileContents" name="XMLFileContents">		

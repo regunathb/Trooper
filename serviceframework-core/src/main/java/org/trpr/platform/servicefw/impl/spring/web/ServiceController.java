@@ -58,14 +58,14 @@ public class ServiceController {
 	public String getJobName(HttpServletRequest request) {
 		String path = request.getServletPath();
 		int index = path.lastIndexOf("services/") + 9;
-		if (index >= 0) {
+		if (index >= 0 && index<path.length()) {
 			path = path.substring(index);
 		}
 		return path;
 	}
 
 	/** Controller for index(homepage) */
-	@RequestMapping(value = {"/index"}, method = RequestMethod.GET)
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
 	public String jobs(ModelMap model ) {
 		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats(false);
 		model.addAttribute("serviceInfo",serviceStatisticsAsArray);
