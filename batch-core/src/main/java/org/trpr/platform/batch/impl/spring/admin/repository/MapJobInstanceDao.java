@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@
 package org.trpr.platform.batch.impl.spring.admin.repository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -33,14 +30,15 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.util.Assert;
 
 /**
- * In-memory implementation of {@link JobInstanceDao}.
+ * Trooper implementation of {@link org.springframework.batch.core.repository.dao.MapJobInstanceDao}.
+ * Has a maxJobinstance count. When the count is exceeded, removes the oldest JobInstance, including all
+ * its executions, steps and executionContexts.
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
 	private Queue<JobInstance> jobInstances = new ConcurrentLinkedQueue<JobInstance>();
 
 	private long currentId = 0;
-	
 	
 	private int maxJobInstanceCount;
 
@@ -53,30 +51,6 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	public MapJobInstanceDao(int maxExecutionCount) {
 		this.maxJobInstanceCount = maxExecutionCount;
 	}
-	
-	public MapJobExecutionDao getJobExecutionDao() {
-		return jobExecutionDao;
-	}
-
-	public void setJobExecutionDao(MapJobExecutionDao jobExecutionDao) {
-		this.jobExecutionDao = jobExecutionDao;
-	}
-
-	public MapStepExecutionDao getStepExecutionDao() {
-		return stepExecutionDao;
-	}
-
-	public void setStepExecutionDao(MapStepExecutionDao stepExecutionDao) {
-		this.stepExecutionDao = stepExecutionDao;
-	}
-
-	public MapExecutionContextDao getExecutionContextDao() {
-		return executionContextDao;
-	}
-
-	public void setExecutionContextDao(MapExecutionContextDao executionContextDao) {
-		this.executionContextDao = executionContextDao;
-	}
 
 	public void clear() {
 		jobInstances.clear();
@@ -88,6 +62,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		JobInstance jobInstance = new JobInstance(currentId++, jobParameters, jobName);
 		jobInstance.incrementVersion();
+		//Removes the older jobInstances
 		if(this.jobInstances.size()>=maxJobInstanceCount) {
 			JobInstance toRemove = this.jobInstances.remove();
 			List<JobExecution> executions = this.jobExecutionDao.findJobExecutions(toRemove);
@@ -155,5 +130,28 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 		return jobExecution.getJobInstance();
 	}
+	
+	public MapJobExecutionDao getJobExecutionDao() {
+		return jobExecutionDao;
+	}
 
+	public void setJobExecutionDao(MapJobExecutionDao jobExecutionDao) {
+		this.jobExecutionDao = jobExecutionDao;
+	}
+
+	public MapStepExecutionDao getStepExecutionDao() {
+		return stepExecutionDao;
+	}
+
+	public void setStepExecutionDao(MapStepExecutionDao stepExecutionDao) {
+		this.stepExecutionDao = stepExecutionDao;
+	}
+
+	public MapExecutionContextDao getExecutionContextDao() {
+		return executionContextDao;
+	}
+
+	public void setExecutionContextDao(MapExecutionContextDao executionContextDao) {
+		this.executionContextDao = executionContextDao;
+	}
 }

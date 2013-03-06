@@ -26,13 +26,14 @@ import org.springframework.batch.core.repository.dao.ExecutionContextStringSeria
 import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.beans.factory.InitializingBean;
 
 /**
- * In-memory implementation of {@link ExecutionContextDao} backed by maps.
+ * Trooper Implementation of {@link org.springframework.batch.core.repository.dao.MapExecutionContextDao}.
+ * Added an ability to remove execution contexts and optimized the deep copy by using 
+ * {@link XStreamExecutionContextStringSerializer}
  * 
- * @author Robert Kasanicky
- * @author Dave Syer
+ * @author devashishshankar
+ * @version 1.0, 6th March, 2013
  */
 public class MapExecutionContextDao implements ExecutionContextDao{
 
@@ -77,7 +78,11 @@ public class MapExecutionContextDao implements ExecutionContextDao{
 			contextsByStepExecutionId.put(stepExecution.getId(), copy(executionContext));
 		}
 	}
-	
+
+	/**
+	 * Removes all the executionContexts for given stepExecution
+	 * @param jobExecution
+	 */
 	public void removeExecutionContext(StepExecution stepExecution) {
 		contextsByStepExecutionId.remove(stepExecution.getId());
 		
@@ -94,6 +99,11 @@ public class MapExecutionContextDao implements ExecutionContextDao{
 		}
 	}
 
+	/**
+	 * Removes all the executionContexts for given jobExecution (Including all the stepExecutions
+	 * related to the jobExecution)
+	 * @param jobExecution
+	 */
 	public void removeExecutionContext(JobExecution jobExecution) {
 		contextsByJobExecutionId.remove(jobExecution.getId());
 		//No point storing StepExecutionCOntext if jobexecutioncontext have been deleted

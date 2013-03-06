@@ -37,7 +37,8 @@ import org.springframework.util.Assert;
 
 /**
  * Trooper implementation of {@link org.springframework.batch.core.repository.dao.MapJobExecutionDao}
- * Faster implementation that doesn't rely on serialisation for deep copy. 
+ * Faster implementation that doesn't rely on serialisation for deep copy. Added an ability to remove 
+ * JobExecutions
  * 
  * @author devashishshankar
  * @version 1.0, 5th March, 2013

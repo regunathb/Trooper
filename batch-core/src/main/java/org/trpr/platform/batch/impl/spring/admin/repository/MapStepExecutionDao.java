@@ -36,7 +36,8 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * A modification of @see {org.springframework.batch.core.repository.dao.MapStepExecutionDao}, to improve 
- * efficiency by not doing a full serialization and deserialization while copying.
+ * efficiency by not doing a full serialization and deserialization while copying. Also added method to 
+ * remove StepExecutions
  * 
  * @author devashishshankar
  * @version 1.0, 5th March, 2013
