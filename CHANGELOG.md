@@ -1,3 +1,13 @@
+## 1.2.0 (March 6, 2013)
+- **New features**
+  - Server mode for serviceframework, that can be used to view metrics and test the services
+  - Custom property configurer, that can be used to configure bean properties
+  - Optimization of Trooper admin (batch server mode), making it much faster when number of executions are high
+  - Added ability to limit the number of jobInstances for which data has to be stored in memory (by Trooper Admin)
+  - Minor bugfixings
+  - Added ability to ignore errors, if job sync doesn't happen due to permissions error (HA mode)
+<br />
+
 ## 1.1.0 (February 12, 2013)
 - **New features in Batch profile:**
   - Cron expression and next fire time visible on jobs page

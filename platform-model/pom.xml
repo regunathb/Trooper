@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-model</artifactId>
 	<name>Platform Model</name>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Platform Model</description>
 	
 	<licenses>

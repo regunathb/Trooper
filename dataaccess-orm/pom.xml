@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>dataaccess-orm</artifactId>
 	<name>Data Access ORM</name>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Data Access ORM project</description>
 
 	<licenses>
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>				
 	</dependencies>
 	

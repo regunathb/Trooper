@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-model</artifactId>
 	<name>Batch Model</name>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Batch Model</description>
 
 	<licenses>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
@@ -98,7 +98,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>platform-model</artifactId>
-			                                <version>1.0.0</version>
+			                                <version>1.2.0</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>

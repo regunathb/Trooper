@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-models</artifactId>
 	<name>Example Models</name>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Example Models</description>
 
 	<licenses>
@@ -58,14 +58,14 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>service-model</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
@@ -105,7 +105,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>platform-model</artifactId>
-			                                <version>1.0.0</version>
+			                                <version>1.2.0</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
@@ -124,7 +124,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>service-model</artifactId>
-			                                <version>1.0.0</version>
+			                                <version>1.2.0</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
