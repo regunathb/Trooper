@@ -7,7 +7,7 @@
 	<artifactId>trooper-full</artifactId>
 	<name>Trooper Full Build</name>
 	<packaging>pom</packaging>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 
 	<modules>
 		<module>mule-transport-rabbitmq</module>

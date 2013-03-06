@@ -192,9 +192,9 @@ public class JobConfigController {
 				jobConfigService.addJobDependency(jobNameList,depFile.getOriginalFilename(),depFile.getBytes());
 			}
 		} else { //Button 3: Save. Overwrite the modified XML File
+			LOGGER.info("Request to deploy jobConfig file for: "+jobNameList);
 			try {
 				//Set XML File
-
 				this.jobConfigService.setJobConfig(jobNameList, new ByteArrayResource(XMLFileContents.getBytes()));
 				this.jobConfigService.deployJob(jobNameList);
 			}

@@ -30,7 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * DAO implementations. Based on {@link org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean} 
  * Modified to include {@link MapStepExecutionDao}, {@link MapJobInstanceDao}, {@link MapJobExecutionDao}, 
  * {@link MapExecutionContextDao} which don't do a deep copy of steps, making this implementation faster. 
- * (The rest of the implementation is the same)
+ * Also this implementation has an ability to limit the number of JobInstances being stored.
  * 
  * @author devashishshankar
  * @version 1.0, 5th March, 2013
@@ -44,6 +44,10 @@ public class MapJobRepositoryFactoryBean extends org.springframework.batch.core.
 	private MapStepExecutionDao stepExecutionDao;
 
 	private MapExecutionContextDao executionContextDao;
+
+	private static int DEFAULT_MAX_COUNT = 2000;
+
+	private int maxJobInstanceCount = DEFAULT_MAX_COUNT;
 
 	/**
 	 * Create a new instance with a {@link ResourcelessTransactionManager}.
@@ -61,6 +65,54 @@ public class MapJobRepositoryFactoryBean extends org.springframework.batch.core.
 		setTransactionManager(transactionManager);
 	}
 
+	/**
+	 * Convenience method to clear all the map daos globally, removing all
+	 * entities.
+	 */
+	public void clear() {
+		jobInstanceDao.clear();
+		jobExecutionDao.clear();
+		stepExecutionDao.clear();
+		executionContextDao.clear();
+	}
+
+	@Override
+	protected JobExecutionDao createJobExecutionDao() throws Exception {
+		jobExecutionDao = new MapJobExecutionDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setJobExecutionDao(this.jobExecutionDao);
+		}
+		return jobExecutionDao;
+	}
+
+	@Override
+	protected JobInstanceDao createJobInstanceDao() throws Exception {
+		jobInstanceDao = new MapJobInstanceDao(this.maxJobInstanceCount);
+		this.jobInstanceDao.setExecutionContextDao(executionContextDao);
+		this.jobInstanceDao.setStepExecutionDao(stepExecutionDao);
+		this.jobInstanceDao.setJobExecutionDao(this.jobExecutionDao);
+		return jobInstanceDao;
+	}
+
+	@Override
+	protected StepExecutionDao createStepExecutionDao() throws Exception {
+		stepExecutionDao = new MapStepExecutionDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setStepExecutionDao(stepExecutionDao);
+		}
+		return stepExecutionDao;
+	}
+
+	@Override
+	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+		executionContextDao = new MapExecutionContextDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setExecutionContextDao(executionContextDao);
+		}
+		return executionContextDao;
+	}
+
+	/** Getter/Setter methods **/
 	public JobExecutionDao getJobExecutionDao() {
 		return jobExecutionDao;
 	}
@@ -77,38 +129,11 @@ public class MapJobRepositoryFactoryBean extends org.springframework.batch.core.
 		return executionContextDao;
 	}
 
-	/**
-	 * Convenience method to clear all the map daos globally, removing all
-	 * entities.
-	 */
-	public void clear() {
-		jobInstanceDao.clear();
-		jobExecutionDao.clear();
-		stepExecutionDao.clear();
-		executionContextDao.clear();
+	public int getMaxCount() {
+		return maxJobInstanceCount;
 	}
 
-	@Override
-	protected JobExecutionDao createJobExecutionDao() throws Exception {
-		jobExecutionDao = new MapJobExecutionDao();
-		return jobExecutionDao;
-	}
-
-	@Override
-	protected JobInstanceDao createJobInstanceDao() throws Exception {
-		jobInstanceDao = new MapJobInstanceDao();
-		return jobInstanceDao;
-	}
-
-	@Override
-	protected StepExecutionDao createStepExecutionDao() throws Exception {
-		stepExecutionDao = new MapStepExecutionDao();
-		return stepExecutionDao;
-	}
-
-	@Override
-	protected ExecutionContextDao createExecutionContextDao() throws Exception {
-		executionContextDao = new MapExecutionContextDao();
-		return executionContextDao;
+	public void setMaxCount(int maxCount) {
+		this.maxJobInstanceCount = maxCount;
 	}
 }

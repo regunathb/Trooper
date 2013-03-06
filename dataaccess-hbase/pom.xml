@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>dataaccess-hbase</artifactId>
 	<name>Data Access HBase</name>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Data Access HBase project</description>
 
 	<licenses>
@@ -94,17 +94,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-integration</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 	</dependencies>
 

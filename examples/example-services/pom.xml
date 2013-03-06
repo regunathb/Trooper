@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-services</artifactId>
 	<name>Example Services</name>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 	<description>Trooper Example Services</description>
 
 	<licenses>
@@ -88,37 +88,37 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>service-model</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-task</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-core</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-models</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0</version>
 		</dependency>				
 	</dependencies>
 	

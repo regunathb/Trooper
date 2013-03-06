@@ -37,7 +37,8 @@ import org.springframework.util.Assert;
 
 /**
  * Trooper implementation of {@link org.springframework.batch.core.repository.dao.MapJobExecutionDao}
- * Faster implementation that doesn't rely on serialisation for deep copy. 
+ * Faster implementation that doesn't rely on serialisation for deep copy. Added an ability to remove 
+ * JobExecutions
  * 
  * @author devashishshankar
  * @version 1.0, 5th March, 2013
@@ -48,11 +49,16 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	private final ConcurrentMap<Long, JobExecution> executionsById = new ConcurrentHashMap<Long, JobExecution>();
 
 	private final AtomicLong currentId = new AtomicLong(0L);
-
+	
 	public void clear() {
 		executionsById.clear();
 	}
 
+	/** Method for adding a new Execution to the DAO **/
+	private void addNewExecution(Long ID, JobExecution jobExecution) {
+		executionsById.put(ID, jobExecution);
+	}
+	
 	/**
 	 * Returns a copy of {@link JobExecution}, by adding new Objects for every field(no references are passed)
 	 * 
@@ -94,7 +100,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Long newId = currentId.getAndIncrement();
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();
-		executionsById.put(newId, copy(jobExecution));
+		this.addNewExecution(newId, copy(jobExecution));
 	}
 
 	@Override
@@ -138,7 +144,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 						+ persistedExecution.getVersion());
 			}
 			jobExecution.incrementVersion();
-			executionsById.put(id, copy(jobExecution));
+			this.addNewExecution(id, copy(jobExecution));
 		}
 	}
 
@@ -197,4 +203,13 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			jobExecution.setVersion(saved.getVersion());
 		}
 	}
+
+	/**
+	 * Method removes an execution from the DAO
+	 * @param ID ID of the execution to be deleted
+	 */
+	public void removeExecution(Long ID) {
+		executionsById.remove(ID);
+	}
+	
 }
