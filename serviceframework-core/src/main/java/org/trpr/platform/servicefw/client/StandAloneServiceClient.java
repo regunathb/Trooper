@@ -15,6 +15,7 @@
  */
 package org.trpr.platform.servicefw.client;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -164,7 +165,7 @@ public class StandAloneServiceClient {
 	 * @throws PlatformException throw while writing service response in temp directory
 	 */
 	private static void writeResponseinBrowser(String serviceName, String responseXML, boolean isXML) throws PlatformException {
-		String serviceResponseFilePath = System.getProperty("java.io.tmpdir") + serviceName 
+		String serviceResponseFilePath = System.getProperty("java.io.tmpdir") + File.pathSeparator +serviceName 
 		                                 + (isXML ? SERVICE_RESPONSE_XML_FILE_SUFFIX : SERVICE_RESPONSE_JSON_FILE_SUFFIX);
 		try {
 			// write response XML into temp directory
