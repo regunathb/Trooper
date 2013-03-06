@@ -105,13 +105,15 @@ public class MapStepExecutionDao extends org.springframework.batch.core.reposito
 			}
 		});
 	}
-
+	
 	@Override
 	public void saveStepExecution(StepExecution stepExecution) {
 
 		Assert.isTrue(stepExecution.getId() == null);
 		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
+		
+		Long jobExecutionID = stepExecution.getJobExecutionId();
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
@@ -131,6 +133,11 @@ public class MapStepExecutionDao extends org.springframework.batch.core.reposito
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution.getJobExecutionId());
+		
+		//If the job execution data doesn't exist, can't update	
+		if(!executionsByJobExecutionId.containsKey(stepExecution.getJobExecutionId())) {
+			return;
+		}
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
@@ -178,5 +185,20 @@ public class MapStepExecutionDao extends org.springframework.batch.core.reposito
 			copy.add(copy(exec));
 		}
 		jobExecution.addStepExecutions(copy);
+	}
+
+	/**
+	 * Removes all the stepExecutions from the DAO
+	 * @param jobExecution JobExecution whose StepExecutions have to be deleted
+	 */
+	public void removeStepExecutions(JobExecution jobExecution) {
+		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
+		if (executions == null || executions.isEmpty()) {
+			return;
+		}
+		for(StepExecution step: executions.values()) {
+			executionsByStepExecutionId.remove(step.getId());
+		}
+		executionsByJobExecutionId.remove(jobExecution.getId());
 	}
 }

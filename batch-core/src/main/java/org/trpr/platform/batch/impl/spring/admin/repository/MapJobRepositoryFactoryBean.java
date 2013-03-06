@@ -45,6 +45,10 @@ public class MapJobRepositoryFactoryBean extends org.springframework.batch.core.
 
 	private MapExecutionContextDao executionContextDao;
 
+	private static int DEFAULT_MAX_COUNT = 2000;
+
+	private int maxJobInstanceCount = DEFAULT_MAX_COUNT;
+
 	/**
 	 * Create a new instance with a {@link ResourcelessTransactionManager}.
 	 */
@@ -91,24 +95,45 @@ public class MapJobRepositoryFactoryBean extends org.springframework.batch.core.
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		jobExecutionDao = new MapJobExecutionDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setJobExecutionDao(this.jobExecutionDao);
+		}
 		return jobExecutionDao;
 	}
 
 	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
-		jobInstanceDao = new MapJobInstanceDao();
+		jobInstanceDao = new MapJobInstanceDao(this.maxJobInstanceCount);
+
+		this.jobInstanceDao.setExecutionContextDao(executionContextDao);
+		this.jobInstanceDao.setStepExecutionDao(stepExecutionDao);
+		this.jobInstanceDao.setJobExecutionDao(this.jobExecutionDao);
 		return jobInstanceDao;
 	}
 
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		stepExecutionDao = new MapStepExecutionDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setStepExecutionDao(stepExecutionDao);
+		}
 		return stepExecutionDao;
 	}
 
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		executionContextDao = new MapExecutionContextDao();
+		if(this.jobInstanceDao!=null) {
+			this.jobInstanceDao.setExecutionContextDao(executionContextDao);
+		}
 		return executionContextDao;
+	}
+
+	public int getMaxCount() {
+		return maxJobInstanceCount;
+	}
+
+	public void setMaxCount(int maxCount) {
+		this.maxJobInstanceCount = maxCount;
 	}
 }
