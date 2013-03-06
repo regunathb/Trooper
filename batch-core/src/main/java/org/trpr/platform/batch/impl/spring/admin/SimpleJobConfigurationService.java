@@ -453,6 +453,8 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		File prevFile = new File(this.getJobStoreURI(jobName).getPath()+SimpleJobConfigurationService.SPRING_BATCH_PREV);
 		if(prevFile.exists()) {
 			prevFile.renameTo(configFile);
+		} else {
+			this.jobXMLFile.remove(jobName);
 		}
 		else {
 			this.jobXMLFile.remove(jobName);

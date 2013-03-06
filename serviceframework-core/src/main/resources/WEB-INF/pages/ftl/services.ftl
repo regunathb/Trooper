@@ -6,16 +6,16 @@
 							<tr>
 								<th>Name</th>
 								<th>Version</th>
-								<th>Startup Time Stamp</th>
-								<th>Last Called Timestamp</th>
-								<th>Active Request Count</th>
 								<th>Total Request Count</th>
+								<th>Success request count</th>
+								<th>Faliure request count</th>
 								<th>Average response time</th>
 								<th>Minimum response time</th>
 								<th>Maximum Response time</th>
 								<th>Last Service Response time</th>
-								<th>Error request count</th>
-								<th>Success request count</th>
+								<th>Active Request Count</th>
+								<th>Startup Time Stamp</th>
+								<th>Last Called Timestamp</th>
 							</tr>
 							<#list serviceInfo as statistics >
 							<tr class="name-sublevel1-even">
@@ -29,23 +29,18 @@
 								<#else>
 								<td> NA </td>
 								</#if>
-								<#if statistics.startupTimeStamp??>
-								<td>${statistics.startupTimeStamp.getTime()?datetime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
-								<#if statistics.lastCalledTimestamp??>
-								<td> ${statistics.lastCalledTimestamp.getTime()?datetime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
-								<#if statistics.activeRequestsCount??>
-								<td> ${statistics.activeRequestsCount }</td>
-								<#else>
-								<td> NA </td>
-								</#if>
 								<#if statistics.totalRequestsCount??>
 								<td> ${statistics.totalRequestsCount}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.successRequestsCount??>
+								<td> ${statistics.successRequestsCount}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.errorRequestsCount??>
+								<td> ${statistics.errorRequestsCount}</td>
 								<#else>
 								<td> NA </td>
 								</#if>
@@ -69,16 +64,22 @@
 								<#else>
 								<td> NA </td>
 								</#if>
-								<#if statistics.errorRequestsCount??>
-								<td> ${statistics.errorRequestsCount}</td>
+								<#if statistics.activeRequestsCount??>
+								<td> ${statistics.activeRequestsCount }</td>
 								<#else>
 								<td> NA </td>
 								</#if>
-								<#if statistics.successRequestsCount??>
-								<td> ${statistics.successRequestsCount}</td>
+								<#if statistics.startupTimeStamp??>
+								<td>${statistics.startupTimeStamp.getTime()?datetime}</td>
 								<#else>
 								<td> NA </td>
 								</#if>
+								<#if statistics.lastCalledTimestamp??>
+								<td> ${statistics.lastCalledTimestamp.getTime()?datetime}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								
 							</tr>
 							</#list>
 						</table>
