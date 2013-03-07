@@ -10,4 +10,8 @@
 		<property name="serviceStatisticsGatherer" ref = "serviceStatisticsGatherer"></property>
 	</bean>
 	
+	
+	<bean class="org.trpr.platform.servicefw.impl.spring.web.HomeController">
+	</bean>
+	
 </beans>
