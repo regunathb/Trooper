@@ -25,8 +25,16 @@
 						<td><a href="${job_url}">${job.name}</a></td>
 						<td><@spring.messageText code="${job.name}.description" text="No description"/></td>
 						<td>${job.executionCount}</td>
-						<td>${job.cronExpression}</td>
-						<td>${job.nextFireTime}</td> 
+						<#if job.cronExpression?? >
+							<td>${job.cronExpression}</td> 
+						<#else>
+							<td>Not set</td> 
+						</#if>
+						<#if job.nextFireTime?? >
+							<td>${job.nextFireTime}</td> 
+						<#else>
+							<td>Not set</td> 
+						</#if>
 						<#if job.hostNames?? && job.hostNames?size!=0 >
 						<td>
 							<#list job.hostNames as host>

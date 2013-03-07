@@ -46,6 +46,8 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 	/** Trooper Services used by this class */
 	private JobService jobService;
 	private JobConfigurationService jobConfigurationService;
+	
+	public static final String NOT_FOUND = "not found";
 
 	/**
 	 * Autowired default constructor
@@ -84,6 +86,9 @@ public class JobController extends org.springframework.batch.admin.web.JobContro
 			boolean launchable = jobService.isLaunchable(name);
 			boolean incrementable = jobService.isIncrementable(name);
 			String cronExp = jobService.getCronExpression(name);
+			if(cronExp==null) {
+				cronExp = JobController.NOT_FOUND;
+			}
 			Date nextFireDate = jobService.getNextFireDate(name);
 			JobInfo jobInfo = new JobInfo(name, count, null, launchable, incrementable,cronExp,nextFireDate);
 			//Getting Host attributes from jobConfigService

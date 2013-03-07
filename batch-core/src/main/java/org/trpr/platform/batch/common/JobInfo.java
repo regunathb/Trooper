@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.trpr.platform.batch.impl.spring.web.JobController;
+
 /**
  * The <code>JobInfo</code> class is an extension of {@link JobInfo} that stores extra information about 
  * trigger, such as cronexpression, next fire time, hostnames, etc.
@@ -74,6 +76,8 @@ public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 	}	
 
 	public String getnextFireTime() {
+		if(this.nextFireTime==null) 
+			return JobController.NOT_FOUND;
 		return DATE_FORMAT.format(this.nextFireTime);
 	}
 	/** End getter/setter methods */
