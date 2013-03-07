@@ -16,7 +16,6 @@
 			<tr class="${rowClass}">
 				<#assign key>${resource.url}</#assign>
 				<#assign code>${resource.method}${resource.url}</#assign>
-				<#assign base_url><@spring.url relativeUrl="${servletPath}${key}"/></#assign>
 				<#if key?contains("job") || key?contains("execution") >
 					<td><#if !key?contains("{") && !key?contains("**") && resource.method=="GET"><a href="${base_url}">${key}</a><#else>${key}</#if></td>
 					<td>${resource.method}</td>

@@ -11,7 +11,7 @@
 	</bean>
 	
 	
-	<bean class="org.trpr.platform.servicefw.impl.spring.web.HomeController">
-	</bean>
+<!-- 	<bean class="org.trpr.platform.servicefw.impl.spring.web.HomeController"> -->
+<!-- 	</bean> -->
 	
 </beans>

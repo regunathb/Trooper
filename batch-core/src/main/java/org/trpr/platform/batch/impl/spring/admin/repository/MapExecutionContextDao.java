@@ -120,6 +120,8 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	}
 
 	private ExecutionContext copy(ExecutionContext original) {
+		if(original==null)
+			return null;
 		Map<String, Object> m = new HashMap<String, Object>();
 		for (java.util.Map.Entry<String, Object> me : original.entrySet()) {
 			m.put(me.getKey(), me.getValue());

@@ -65,7 +65,7 @@ public class ServiceController {
 	}
 
 	/** Controller for index(homepage) */
-	@RequestMapping(value = {"/services"}, method = RequestMethod.GET)
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
 	public String jobs(ModelMap model ) {
 		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats(false);
 		model.addAttribute("serviceInfo",serviceStatisticsAsArray);
