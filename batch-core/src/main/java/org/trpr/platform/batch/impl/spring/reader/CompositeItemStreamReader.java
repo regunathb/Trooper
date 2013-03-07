@@ -16,8 +16,8 @@
 
 package org.trpr.platform.batch.impl.spring.reader;
 
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -53,10 +53,10 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	private BatchItemStreamReader<T> delegate;
 	
 	/** The local list containing data items*/
-	private Queue<T> localQueue = new LinkedList<T>(); 
+	private Queue<T> localQueue = new ConcurrentLinkedQueue<T>(); 
 	
 	/** The Collection of ExecutionContext instances that determines data to be read */
-	private Queue<ExecutionContext> contextList = new LinkedList<ExecutionContext>();	
+	private Queue<ExecutionContext> contextList = new ConcurrentLinkedQueue<ExecutionContext>();	
 	
 	/** The CountDownLatch to keep track of ExecutionContext instances that are processed*/
 	private CountDownLatch countDownLatch;
@@ -82,7 +82,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.localQueue.isEmpty()) {
 				LOGGER.debug("Returning data from local cache. Cache size : " + this.localQueue.size());
-				return this.localQueue.remove();
+				return this.localQueue.poll();
 			}			
 		}
 		
@@ -90,7 +90,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		// else, check to see if any of the ExecutionContext(s) exist for processing
 		synchronized(this) { // include the check for empty and remove in one synchronized block to avoid race conditions
 			if (!this.contextList.isEmpty()) {
-				context = this.contextList.remove();
+				context = this.contextList.poll();
 			}
 		}
 		
@@ -106,7 +106,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 				this.countDownLatch.countDown(); // count down on the latch
 				if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
 					LOGGER.debug("Returning data from local cache after partition read. Cache size : " + this.localQueue.size());
-					return this.localQueue.remove(); // return an item for processing after populating the local collection
+					return this.localQueue.poll(); // return an item for processing after populating the local collection
 				}
 			}
 		}
@@ -125,7 +125,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 		synchronized(this) {
 			if (!this.localQueue.isEmpty()) { // include the check for empty and remove in one synchronized block to avoid race conditions
 				LOGGER.debug("Returning data from local cache after re-check. Cache size : " + this.localQueue.size());
-				return this.localQueue.remove();
+				return this.localQueue.poll();
 			}	
 		}
 		
@@ -155,7 +155,7 @@ public class CompositeItemStreamReader<T> implements BatchItemStreamReader<T>, I
 	 * @see org.springframework.batch.item.ItemStream#open(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) throws ItemStreamException {
-		LOGGER.info("Called open for a partition");
+		LOGGER.debug("Called open for a partition");
 		this.contextList.add(context);
 		if (this.countDownLatch == null || this.countDownLatch.getCount() == 0) { // create a CountDownLatch if variable instance is null or the previous one has counted down to zero
 			this.countDownLatch = new CountDownLatch(context.getInt(SimpleRangePartitioner.TOTAL_PARTITIIONS, 1)); // initialize the CountDownLatch to the partition size
