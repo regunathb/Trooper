@@ -456,9 +456,6 @@ public class SimpleJobConfigurationService implements JobConfigurationService {
 		} else {
 			this.jobXMLFile.remove(jobName);
 		}
-		else {
-			this.jobXMLFile.remove(jobName);
-		}
 	}
 
 	/**
