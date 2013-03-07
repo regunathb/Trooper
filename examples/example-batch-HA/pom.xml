@@ -55,7 +55,7 @@
 
 	<properties>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-		<org.springframework.batch.version>2.1.1.RELEASE</org.springframework.batch.version>
+		<org.springframework.batch.version>2.1.9.RELEASE</org.springframework.batch.version>
 	</properties>
 	
 	<dependencyManagement>
