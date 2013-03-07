@@ -57,8 +57,6 @@ import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
 
-import ch.qos.logback.classic.Logger;
-
 /**
  * The <code>SpringServicesContainer</code> class is a {@link ServiceContainer} implementation that uses Spring to manage the service implementations.
  * This container locates and loads all service definitions contained in files named by the value of ServiceFrameworkConstants.SPRING_SERVICES_CONFIG. 
@@ -128,7 +126,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			}
 		}
 		
-		this.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG},
+		SpringServicesContainer.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG},
 				defaultCtxFactory.getCommonBeansContext());	
 		
 		// load the service beans and set the commons bean context as the parent
@@ -140,19 +138,21 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 			fileNamesList.add(FILE_PREFIX + serviceBeansFile.getAbsolutePath());
 		}
 
+		// Load additional if runtime nature is "server". This context is the new common beans context
 		if (RuntimeVariables.getRuntimeNature().equalsIgnoreCase(RuntimeConstants.SERVER)) {
-			File serviceBeansFile = FileLocator.findUniqueFile(ServiceFrameworkConstants.COMMON_SERVICES_SERVER_NATURE_CONFIG);
-			fileNamesList.add(FILE_PREFIX + serviceBeansFile.getAbsolutePath());
+			SpringServicesContainer.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SERVICES_SERVER_NATURE_CONFIG},
+					SpringServicesContainer.commonServiceBeansContext);
 		}
+		
 		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
-				this.commonServiceBeansContext);		
+				SpringServicesContainer.commonServiceBeansContext);		
 		
 		// now initialize context, statistics gatherer and registry
-		this.serviceContext = (ServiceContext)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_CONTEXT_BEAN);
+		this.serviceContext = (ServiceContext)SpringServicesContainer.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_CONTEXT_BEAN);
 		this.serviceContext.setServiceContainer(this);
-		((ServiceStatisticsGatherer)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_STATISTICS_BEAN)).setServiceContainer(this);
+		((ServiceStatisticsGatherer)SpringServicesContainer.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_STATISTICS_BEAN)).setServiceContainer(this);
 		
-		this.serviceRegistry = (ServiceRegistry)this.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_REGISTRY_BEAN);
+		this.serviceRegistry = (ServiceRegistry)SpringServicesContainer.commonServiceBeansContext.getBean(SpringServicesContainer.SERVICE_REGISTRY_BEAN);
 		
 		// Set this ServiceContainer and ServiceRegistry on the BrokerFactory TODO : Need a better way of doing this
 		BrokerFactory.setServiceContainer(this);
