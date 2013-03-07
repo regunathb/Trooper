@@ -54,7 +54,6 @@
   	</developers>
 
 	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<org.mule.version>2.2.1</org.mule.version>		
 	</properties>
 
@@ -81,97 +80,10 @@
 	<dependencies>	
 		<!-- Third party dependencies -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 		  	<artifactId>slf4j-api</artifactId>
 		  	<version>1.6.4</version>
-		</dependency>		
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.mule</groupId>
-		    <artifactId>mule-core</artifactId>
-		    <version>${org.mule.version}</version>
-		    <exclusions>
-	        	<exclusion> <!-- Remove Log4j as it conflicts with slf4j 1.6.4 -->
-		      	  <groupId>org.slf4j</groupId> 
-		          <artifactId>slf4j-log4j12</artifactId>
-		        </exclusion>
-	        	<exclusion> <!-- Remove JCL bridge as it conflicts with slf4j 1.6.4 -->
-		      	  <groupId>org.slf4j</groupId> 
-		          <artifactId>jcl104-over-slf4j</artifactId>
-		        </exclusion>
-		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
-            		<groupId>org.safehaus.jug</groupId>
-            		<artifactId>jug</artifactId>
-        		</exclusion>		        
-		    </exclusions>		    
-		</dependency>
-		<dependency>
-		    <groupId>org.mule.modules</groupId>
-		    <artifactId>mule-module-spring-config</artifactId>
-		    <version>${org.mule.version}</version>
-		    <exclusions>
-		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
-            		<groupId>org.safehaus.jug</groupId>
-            		<artifactId>jug</artifactId>
-        		</exclusion>
-		    </exclusions>				    
-		</dependency>
-		<dependency>
-		    <groupId>org.mule.modules</groupId>
-		    <artifactId>commonretrypolicies</artifactId>
-		    <version>${org.mule.version}</version>
-		    <exclusions>
-		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
-            		<groupId>org.safehaus.jug</groupId>
-            		<artifactId>jug</artifactId>
-        		</exclusion>
-		    </exclusions>				    
-		</dependency>		
-		<dependency>
-		    <groupId>org.mule.transports</groupId>
-		    <artifactId>mule-transport-rabbitmq</artifactId>
-		    <version>${org.mule.version}</version>
-		</dependency>		
-		<dependency>
-		    <groupId>org.mule.modules</groupId>
-		    <artifactId>mule-module-spring-extras</artifactId>
-		    <version>${org.mule.version}</version>
-		    <exclusions>
-		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
-            		<groupId>org.safehaus.jug</groupId>
-            		<artifactId>jug</artifactId>
-        		</exclusion>
-        		
-		        <exclusion> <!-- Remove Jug as it is no longer available in JBoss repo -->
-            		<groupId>org.springframework</groupId>
-            		<artifactId>spring-web</artifactId>
-        		</exclusion>
-		    </exclusions>				    
-		</dependency>								
+		</dependency>														
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>

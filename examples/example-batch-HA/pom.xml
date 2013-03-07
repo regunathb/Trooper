@@ -53,10 +53,6 @@
     	</developer>
   	</developers>
 
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-		<org.springframework.batch.version>2.1.9.RELEASE</org.springframework.batch.version>
-	</properties>
 	
 	<dependencyManagement>
 	    <dependencies>
@@ -81,46 +77,10 @@
 	<dependencies>	
 		<!-- Third party dependencies -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-core</artifactId>
-			<version>${org.springframework.batch.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 		  	<artifactId>slf4j-api</artifactId>
 		  	<version>1.6.4</version>
-		</dependency>	
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.8.0</version>
-		    <exclusions>
-	        	<exclusion> <!-- Remove Log4j as it conflicts with slf4j 1.6.4 -->
-		      	  <groupId>org.slf4j</groupId> 
-		          <artifactId>slf4j-log4j12</artifactId>
-		        </exclusion>
-		    </exclusions>		 			
-		</dependency>						
+		</dependency>							
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
