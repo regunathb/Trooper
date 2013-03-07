@@ -35,7 +35,7 @@
 	-->
 	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
-		<property name="cronExpression" value="0/50 5 5 * * ?" />
+		<property name="cronExpression" value="0/30 10 * * * ?" />
 	</bean>
 
 	<!--

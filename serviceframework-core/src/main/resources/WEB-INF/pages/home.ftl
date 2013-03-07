@@ -16,11 +16,9 @@
 			<tr class="${rowClass}">
 				<#assign key>${resource.url}</#assign>
 				<#assign code>${resource.method}${resource.url}</#assign>
-				<#if key?contains("job") || key?contains("execution") >
-					<td><#if !key?contains("{") && !key?contains("**") && resource.method=="GET"><a href="${base_url}">${key}</a><#else>${key}</#if></td>
+					<td><#if !key?contains("{") && !key?contains("**") && resource.method=="GET"><a href="${key}">${key}</a><#else>${key}</#if></td>
 					<td>${resource.method}</td>
-					<td><@spring.messageText code=code text=resource.description!""/></td>
-				</#if>
+					<td>${resource.description}</td>
 			</tr>
 		</#list>
 	</table>

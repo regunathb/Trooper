@@ -16,7 +16,7 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	<context:annotation-config />
  <!-- freemarker config -->
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-      <property name="templateLoaderPath" value="/WEB-INF/pages/ftl/"/>
+      <property name="templateLoaderPath" value="/WEB-INF/pages/"/>
     </bean>
      
     <!-- 
