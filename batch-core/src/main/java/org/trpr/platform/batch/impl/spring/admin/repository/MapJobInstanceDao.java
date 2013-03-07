@@ -26,8 +26,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.util.Assert;
+import org.trpr.platform.batch.impl.spring.admin.SimpleJobConfigurationService;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 
 /**
  * Trooper implementation of {@link org.springframework.batch.core.repository.dao.MapJobInstanceDao}.
@@ -47,6 +51,9 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	private MapStepExecutionDao stepExecutionDao;
 
 	private MapExecutionContextDao executionContextDao;
+
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(MapJobInstanceDao.class);
 	
 	public MapJobInstanceDao(int maxExecutionCount) {
 		this.maxJobInstanceCount = maxExecutionCount;
@@ -65,11 +72,12 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		//Removes the older jobInstances
 		if(this.jobInstances.size()>=maxJobInstanceCount) {
 			JobInstance toRemove = this.jobInstances.remove();
+			LOGGER.info("Removing jobInstance: "+toRemove.toString());
 			List<JobExecution> executions = this.jobExecutionDao.findJobExecutions(toRemove);
 			for(JobExecution execution : executions) {
 				//Remove job executions
+				LOGGER.info("Removing JobExecution: "+execution.toString());
 				this.jobExecutionDao.removeExecution(execution.getId());
-				//Remove step executions
 				this.stepExecutionDao.removeStepExecutions(execution);
 				//Remove execution contexts
 				this.executionContextDao.removeExecutionContext(execution);

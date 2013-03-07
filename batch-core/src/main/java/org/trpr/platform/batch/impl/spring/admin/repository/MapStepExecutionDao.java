@@ -33,6 +33,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 
 /**
  * A modification of @see {org.springframework.batch.core.repository.dao.MapStepExecutionDao}, to improve 
@@ -50,6 +52,9 @@ public class MapStepExecutionDao extends org.springframework.batch.core.reposito
 
 	private AtomicLong currentId = new AtomicLong();
 
+	/** Logger instance for this class*/
+	private static final Logger LOGGER = LogFactory.getLogger(MapStepExecutionDao.class);
+	
 	public void clear() {
 		executionsByJobExecutionId.clear();
 		executionsByStepExecutionId.clear();
@@ -198,6 +203,7 @@ public class MapStepExecutionDao extends org.springframework.batch.core.reposito
 			return;
 		}
 		for(StepExecution step: executions.values()) {
+			LOGGER.info("Removing stepExecution: "+step);
 			executionsByStepExecutionId.remove(step.getId());
 		}
 		executionsByJobExecutionId.remove(jobExecution.getId());

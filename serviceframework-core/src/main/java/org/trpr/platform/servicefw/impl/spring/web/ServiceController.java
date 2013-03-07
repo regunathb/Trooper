@@ -65,10 +65,13 @@ public class ServiceController {
 	}
 
 	/** Controller for index(homepage) */
-	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
-	public String jobs(ModelMap model ) {
+	@RequestMapping(value = {"/services"}, method = RequestMethod.GET)
+	public String jobs(ModelMap model, HttpServletRequest request) {
 		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats(false);
 		model.addAttribute("serviceInfo",serviceStatisticsAsArray);
+		if(request.getServletPath().endsWith(".json")) {
+			return "services-json";
+		}
 		return "services";
 	}
 	
