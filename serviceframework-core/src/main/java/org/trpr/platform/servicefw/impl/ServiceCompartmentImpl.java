@@ -263,7 +263,6 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	protected ServiceResponse invokeService(Service<T,S> service, ServiceRequest<T> request) {
 		ServiceResponse serviceResponse = null;
-		System.out.println("here!!!");
 		final TimerContext context = responseTimer.time();
 		try {
 			serviceResponse = service.processRequest(request);
