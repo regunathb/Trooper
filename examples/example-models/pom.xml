@@ -6,7 +6,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-models</artifactId>
 	<name>Example Models</name>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 	<description>Trooper Example Models</description>
 
 	<licenses>
@@ -58,14 +58,14 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>service-model</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
@@ -105,7 +105,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>platform-model</artifactId>
-			                                <version>1.2.0</version>
+			                                <version>${org.trpr.version}</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
@@ -124,7 +124,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>service-model</artifactId>
-			                                <version>1.2.0</version>
+			                                <version>${org.trpr.version}</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
@@ -167,14 +167,14 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>						
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
+				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<archive>
 						<manifest>

@@ -15,6 +15,8 @@
  */
 package org.trpr.platform.servicefw.impl;
 
+import java.util.concurrent.TimeUnit;
+
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -31,6 +33,10 @@ import org.trpr.platform.servicefw.spi.ServiceInfo;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
+
 /**
  * The <code>ServiceCompartmentImpl</code> class is an implementation of the {@link ServiceCompartment} interface. 
  * 
@@ -40,7 +46,7 @@ import org.trpr.platform.servicefw.spi.ServiceResponse;
  */
 @SuppressWarnings("rawtypes")
 public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends PlatformServiceResponse> implements ServiceCompartment {
-
+		
 	/** The log for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(ServiceCompartmentImpl.class);
 
@@ -93,6 +99,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 * ServiceCompartment
 	 */
 	protected ServiceInfo serviceInfo = null;
+
+	private Timer responseTimer;
 	
 	/**
 	 * Constructor for this class
@@ -100,6 +108,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	public ServiceCompartmentImpl(ServiceInfo serviceInfo) {
 		this.serviceInfo = serviceInfo;
+		this.responseTimer = Metrics.newTimer(Service.class, "response:"+serviceInfo.getServiceKey().toString(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -254,6 +263,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	protected ServiceResponse invokeService(Service<T,S> service, ServiceRequest<T> request) {
 		ServiceResponse serviceResponse = null;
+		System.out.println("here!!!");
+		final TimerContext context = responseTimer.time();
 		try {
 			serviceResponse = service.processRequest(request);
 		} catch (Exception e) {
@@ -261,6 +272,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 			// catch and return a ServiceResponse for all kinds of exceptions
 			// that might arise when invoking a remote service
 			return constructServiceResponseFromException(e);
+		} finally {
+			context.stop();
 		}
 		return serviceResponse;
 	}

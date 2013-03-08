@@ -2,11 +2,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
-	<modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>	
+	<parent>
+		<artifactId>org.trpr</artifactId>
+		<groupId>trooper</groupId>
+		<version>1.0.0</version>
+		<relativePath>../pom.xml</relativePath>	
+	</parent>
+		
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-task</artifactId>
 	<name>Platform Task</name>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 	<description>Trooper Task Framework project</description>
 
 	<licenses>
@@ -53,48 +60,24 @@
     	</developer>
   	</developers>
 
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
-
-	<dependencies>	
+	<dependencies>
+		<!-- Trooper dependencies -->
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-core</artifactId>
+			<version>${org.trpr.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-model</artifactId>
+			<version>${org.trpr.version}</version>
+		</dependency>					
 		<!-- Third party dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-		  	<artifactId>slf4j-api</artifactId>
-		  	<version>1.6.4</version>
-		</dependency>
 		<dependency>
 			<groupId>org.mvel</groupId>
 			<artifactId>mvel2</artifactId>
 			<version>2.0.18</version>
 		</dependency>						
-		<!-- Trooper dependencies -->
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-core</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-model</artifactId>
-			<version>1.2.0</version>
-		</dependency>				
 	</dependencies>	
 	
 	<build>
@@ -112,7 +95,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
+				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -129,8 +112,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>			
 		</plugins>		

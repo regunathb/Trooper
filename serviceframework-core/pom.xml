@@ -5,7 +5,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>serviceframework-core</artifactId>
 	<name>Service Framework Core</name>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 	<description>Trooper Service Framework Core</description>
 
 	<licenses>
@@ -121,37 +121,41 @@
 			<artifactId>freemarker</artifactId>
 			<version>2.3.14</version>
 		</dependency>
-
+	    <dependency>
+	        <groupId>com.yammer.metrics</groupId>
+	        <artifactId>metrics-core</artifactId>
+	        <version>2.2.0</version>
+	    </dependency>
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>service-model</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-task</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-integration</artifactId>
-			<version>1.2.0</version>
+			<version>${org.trpr.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -170,7 +174,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
+				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -187,8 +191,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>
