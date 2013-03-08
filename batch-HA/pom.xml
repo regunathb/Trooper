@@ -59,9 +59,6 @@
     	</developer>
   	</developers>
 
-	<properties>
-		<org.springframework.batch.version>2.1.9.RELEASE</org.springframework.batch.version>
-	</properties>
 
 	<dependencyManagement>
 	    <dependencies>
