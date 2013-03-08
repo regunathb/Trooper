@@ -8,7 +8,6 @@
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
 		<version>1.0.0</version>
-		<relativePath>../pom.xml</relativePath>		
 	</parent>
 
 	<groupId>org.trpr</groupId>
