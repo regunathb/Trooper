@@ -3,10 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<artifactId>org.trpr</artifactId>
+		<groupId>trooper</groupId>
+		<version>1.0.0</version>
+	</parent>
+		
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-core</artifactId>
 	<name>Platform Core</name>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 	<description>Trooper Platform Core</description>
 
 	<licenses>
@@ -53,11 +60,13 @@
     	</developer>
   	</developers>
 
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
-
 	<dependencies>	
+		<!-- Trooper dependencies -->
+		<dependency>
+			<groupId>org.trpr</groupId>
+			<artifactId>platform-model</artifactId>
+			<version>1.2.0</version>
+		</dependency>					
 		<!-- Third party dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -114,12 +123,6 @@
 			<artifactId>bcprov-ext-jdk16</artifactId>
 			<version>1.45</version>
 		</dependency>						
-		<!-- Trooper dependencies -->
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-model</artifactId>
-			<version>1.2.0</version>
-		</dependency>				
 	</dependencies>
 	
 	<build>

@@ -52,7 +52,7 @@ public class SedaClient {
 			final int count = i;
 			threads[i] = new Thread() {
 				public void run() {
-					for (int j = 0; j < 11; j++) {
+					for (int j = 0; j < 5; j++) {
 						Earthling e = new Earthling();
 						e.setFirstName("Mr");
 						e.setLastName("Trooper" + count + j);

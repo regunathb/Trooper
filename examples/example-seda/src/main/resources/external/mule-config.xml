@@ -16,6 +16,7 @@
 	 
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoInputEndpoint" address="amqp://myexchange:direct/?queue=echoInput"/>
+	<!--  <endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoInputEndpoint1" address="amqp://myexchange:direct/?queue=echoInput1"/> -->
 	
 	<custom-transformer name="EarthlingToGreetingServiceRequest" class="org.trpr.example.seda.greeting.mule.transformer.EarthlingToGreetingServiceRequestTransformer"/>
 	<custom-transformer name="ServiceResponseToEchoServiceRequest" class="org.trpr.example.seda.echo.mule.transformer.GreetingSerResToEchoSerReqTransformer"/>
@@ -40,12 +41,14 @@
 				<!-- Service Responses that contain error status are filtered out by this router -->
 				<custom-outbound-router class="org.trpr.platform.seda.impl.mule.router.ErrorResponseFilteringRouter">
 					<outbound-endpoint ref="EchoInputEndpoint"/>					
+					<!-- <outbound-endpoint ref="EchoInputEndpoint1"/>	-->				
 				</custom-outbound-router>
 			</outbound>
 		</service>
 		<service name="EchoMuleService">
 			<inbound>
 				<inbound-endpoint ref="EchoInputEndpoint" transformer-refs="ServiceResponseToEchoServiceRequest"/>
+				<!--  <inbound-endpoint ref="EchoInputEndpoint1" transformer-refs="ServiceResponseToEchoServiceRequest"/> -->
 			</inbound>
 			<pooled-component>
 		        <method-entry-point-resolver>

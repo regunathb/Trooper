@@ -3,11 +3,17 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	
+	<parent>
+		<artifactId>org.trpr</artifactId>
+		<groupId>trooper</groupId>
+		<version>1.0.0</version>
+	</parent>
+	
 	<groupId>org.trpr</groupId>
 	<artifactId>trooper-examples-batch</artifactId>
 	<name>Trooper Batch Examples</name>
 	<packaging>pom</packaging>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 
 	<modules>		
 		<module>../platform-core</module>
@@ -18,10 +24,10 @@
 		<module>../batch-model</module>
 		<module>../batch-core</module>
 		<module>../service-model</module>
-	        <module>./example-batch</module>
-                <module>./example-models</module>
+	    <module>./example-batch</module>
+        <module>./example-models</module>
 		<module>./example-hbase</module>
-                <module>../dataaccess-hbase</module>
+        <module>../dataaccess-hbase</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			

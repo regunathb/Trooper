@@ -3,14 +3,20 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	
+	<parent>
+		<artifactId>org.trpr</artifactId>
+		<groupId>trooper</groupId>
+		<version>1.0.0</version>
+	</parent>
+	
 	<groupId>org.trpr</groupId>
 	<artifactId>trooper-examples</artifactId>
 	<name>Trooper Seda Examples</name>
 	<packaging>pom</packaging>
-	<version>1.2.0</version>
+	<version>${org.trpr.version}</version>
 
 	<modules>		
-	        <module>../mule-transport-rabbitmq</module>
+	    <module>../mule-transport-rabbitmq</module>
 		<module>../platform-model</module>
 		<module>../platform-core</module>
 		<module>../platform-integration</module>
@@ -21,7 +27,7 @@
 		<module>../serviceframework-seda</module>
 		<module>example-models</module>
 		<module>example-services</module>
-                <module>example-seda</module>
+        <module>example-seda</module>
 		<module>../integration-rabbitmq</module>		
 	</modules>
 			
