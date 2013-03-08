@@ -9,6 +9,50 @@
 	<packaging>pom</packaging>
 	<version>1.0.0</version>
 
+	<licenses>
+    	<license>
+      		<name>The Apache Software License, Version 2.0</name>
+      		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      		<distribution>repo</distribution>
+    	</license>
+  	</licenses>
+ 
+	<distributionManagement>
+    	<repository>
+      		<id>clojars</id>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
+    	</repository>
+  	</distributionManagement> 
+  	
+  	<scm>
+    	<url>https://github.com/regunathb/Trooper</url>
+    	<connection>https://github.com/regunathb/Trooper.git</connection>
+  	</scm>
+  
+    <developers>
+   		<developer>
+      		<id>regunathb</id>
+      		<name>Regunath B</name>
+      		<email>regunathb@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>shashiks</id>
+      		<name>Shashikant S</name>
+      		<email>soni.shashikant@gmail.com</email>
+    	</developer>
+   		<developer>
+      		<id>srikanthps</id>
+      		<name>Srikanth PS</name>
+      		<email>srikanthps@yahoo.com</email>
+    	</developer>
+   		<developer>
+      		<id>devashishshankar</id>
+      		<name>Devashish Shankar</name>
+      		<email>devashish.shankar@gmail.com</email>
+    	</developer>
+  	</developers>
+
 	<properties>
 		<org.trpr.version>1.2.1</org.trpr.version>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -28,8 +72,8 @@
 		<module>batch-model</module>
 		<module>batch-core</module>
 		<module>service-model</module>
-	    	<module>serviceframework-core</module>
-       		<module>serviceframework-seda</module>
+	    <module>serviceframework-core</module>
+       	<module>serviceframework-seda</module>
 		<module>integration-rabbitmq</module>	
 		<module>dataaccess-hbase</module>		
 	</modules>
