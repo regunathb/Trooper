@@ -18,7 +18,6 @@ package org.trpr.platform.batch.spi.quartz;
 import java.util.Date;
 
 import org.quartz.Scheduler;
-import org.quartz.Trigger;
 
 /**
  * An interface to hold information about the JobScheduler and trigger.

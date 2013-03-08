@@ -26,7 +26,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.springframework.batch.core.job.flow.FlowJob;
-import org.trpr.platform.batch.impl.spring.web.JobConfigController;
 import org.trpr.platform.batch.spi.quartz.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -43,12 +42,12 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	
 	/**
 	 * A Map holding the Trigger information related to the job. The key is the jobName 
-	 * and the value is org.quartz.Trigger
+	 * and the value is org.quartz.Scheduler
 	 */
 	private Map<String, Scheduler> jobScheculer;
 	
 	/** Logger instance for this class*/
-	private static final Logger LOGGER = LogFactory.getLogger(JobConfigController.class);
+	private static final Logger LOGGER = LogFactory.getLogger(SimpleScheduleRepository.class);
 	
 	/**
 	 * Default constructor. Initializes jobTrigger Map as a new HashMap

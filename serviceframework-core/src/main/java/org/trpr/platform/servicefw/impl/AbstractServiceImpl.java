@@ -19,7 +19,6 @@ package org.trpr.platform.servicefw.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import org.trpr.platform.service.model.common.error.BusinessEntityErrorDetail;
 import org.trpr.platform.service.model.common.error.ErrorDetail.ErrorBlock;
