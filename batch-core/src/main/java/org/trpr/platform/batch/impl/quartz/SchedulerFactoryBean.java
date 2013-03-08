@@ -60,7 +60,7 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 		      JobDataMap jdm = jd.getJobDataMap();
 		      FlowJob fj = (FlowJob)jdm.get("jobName");
 		      //Injecting into SimpleScheduleRepository
-			  rep.addTrigger(fj.getName(), jobName, triggers[0]);
+		      rep.addScheduler(fj.getName(), sch);
 			}
 	    }
 	}

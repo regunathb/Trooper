@@ -17,6 +17,7 @@ package org.trpr.platform.batch.spi.quartz;
 
 import java.util.Date;
 
+import org.quartz.Scheduler;
 import org.quartz.Trigger;
 
 /**
@@ -48,9 +49,10 @@ public interface ScheduleRepository {
 	public boolean doesJobExists(String jobName);
 	
 	/**
-	 * Injector function to inject the Trigger information related to the job in the repository
+	 * Injector function to inject the Scheduler containing Trigger information related to 
+	 * the job in the repository
 	 * @param jobName Name of the job
-	 * @param trigger Quartz trigger related to the job
+	 * @param scheduler Quartz scheduler related to the job
 	 */
-	public void addTrigger(String jobName, String jobBeanName, Trigger trigger);
+	public void addScheduler(String jobName, Scheduler scheduler);
 }
