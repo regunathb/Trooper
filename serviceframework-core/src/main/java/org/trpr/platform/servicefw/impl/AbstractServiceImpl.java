@@ -40,9 +40,6 @@ import org.trpr.platform.spi.task.Task;
 import org.trpr.platform.spi.task.TaskContext;
 import org.trpr.platform.spi.task.TaskManager;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-
 /**
  * <code>AbstractServiceImpl<code> is an implementation of the {@link Service} interface that provides common behavior for all services that implement service
  * functionality in {@link Task}. Use the simpler {@link SimpleAbstractServiceImpl} for services that do not intend to distribute execution as tasks.
