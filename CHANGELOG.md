@@ -1,4 +1,4 @@
-## 1.2.0 (March 6, 2013)
+## 1.2.1 (March 6, 2013)
 - **New features**
   - Server mode for serviceframework, that can be used to view metrics and test the services
   - Custom property configurer, that can be used to configure bean properties
