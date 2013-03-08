@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>	
+
 	<parent>
-		<artifactId>org.trpr</artifactId>
-		<groupId>trooper</groupId>
+		<groupId>org.trpr</groupId>
+		<artifactId>trooper</artifactId>
 		<version>1.0.0</version>
-		<relativePath>../pom.xml</relativePath>	
 	</parent>
-		
+
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-task</artifactId>
 	<name>Platform Task</name>
@@ -110,7 +110,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>

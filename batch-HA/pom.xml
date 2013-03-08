@@ -3,6 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.trpr</groupId>
+		<artifactId>trooper</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-ha</artifactId>
 	<name>Batch High Availability</name>
@@ -54,7 +60,6 @@
   	</developers>
 
 	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<org.springframework.batch.version>2.1.9.RELEASE</org.springframework.batch.version>
 	</properties>
 
@@ -78,38 +83,14 @@
 	    </dependencies>
 	</dependencyManagement>
 	
-	<dependencies>	
-		<!-- Third party dependencies -->
+	<dependencies>							
+		<!-- Trooper dependencies -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-core</artifactId>
-			<version>${org.springframework.batch.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-		    <artifactId>spring-batch-admin-manager</artifactId>
-		    <version>1.2.1.RELEASE</version>
+			<groupId>org.trpr</groupId>
+			<artifactId>batch-core</artifactId>
+			<version>${org.trpr.version}</version>
 		</dependency>		
+		<!-- Third party dependencies -->	
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
@@ -124,17 +105,6 @@
 			<groupId>org.slf4j</groupId>
 		  	<artifactId>slf4j-api</artifactId>
 		  	<version>1.6.4</version>
-		</dependency>	
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.8.0</version>
-		    <exclusions>
-	        	<exclusion> <!-- Remove Log4j as it conflicts with slf4j 1.6.4 -->
-		      	  <groupId>org.slf4j</groupId> 
-		          <artifactId>slf4j-log4j12</artifactId>
-		        </exclusion>
-		    </exclusions>		 
 		</dependency>
 		<dependency>
 			<groupId>com.netflix.curator</groupId>
@@ -145,33 +115,7 @@
 		    <groupId>com.netflix.curator</groupId>
 		    <artifactId>curator-x-discovery</artifactId>
 		    <version>1.2.6</version>
-		</dependency>						
-		<!-- Trooper dependencies -->
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-model</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>runtime-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>batch-model</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>batch-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>				
+		</dependency>		
 	</dependencies>
 	
 	<build>
@@ -204,7 +148,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>

@@ -3,6 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.trpr</groupId>
+		<artifactId>trooper</artifactId>
+		<version>1.0.0</version>
+	</parent>
 	<groupId>org.trpr</groupId>
 	<artifactId>example-hbase</artifactId>
 	<name>Example HBase</name>
@@ -73,42 +78,11 @@
 	    </dependencies>
 	</dependencyManagement>
 	
-	<dependencies>	
-		<!-- Third party dependencies -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-		  	<artifactId>slf4j-api</artifactId>
-		  	<version>1.6.4</version>
-		</dependency>							
+	<dependencies>					
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
-			<artifactId>platform-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-model</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>runtime-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>batch-model</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>${org.trpr.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.trpr</groupId>
-			<artifactId>platform-integration</artifactId>
 			<version>${org.trpr.version}</version>
 		</dependency>
 		<dependency>
@@ -148,7 +122,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>

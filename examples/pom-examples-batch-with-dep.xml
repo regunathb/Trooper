@@ -2,13 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	
 	<parent>
-		<artifactId>org.trpr</artifactId>
-		<groupId>trooper</groupId>
+		<groupId>org.trpr</groupId>
+		<artifactId>trooper</artifactId>
 		<version>1.0.0</version>
-	</parent>
-	
+	</parent>	
 	<groupId>org.trpr</groupId>
 	<artifactId>trooper-examples-batch</artifactId>
 	<name>Trooper Batch Examples</name>

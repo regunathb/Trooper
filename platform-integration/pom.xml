@@ -3,6 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.trpr</groupId>
+		<artifactId>trooper</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-integration</artifactId>
 	<name>Platform Integration</name>
@@ -53,64 +59,7 @@
     	</developer>
   	</developers>
 
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
-
-	<dependencies>	
-		<!-- Third party dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-oxm</artifactId>
-			<version>${org.springframework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-		  	<artifactId>slf4j-api</artifactId>
-		  	<version>1.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>			
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		  <groupId>org.slf4j</groupId>
-		  <artifactId>jcl-over-slf4j</artifactId>
-		  <version>1.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.json-lib</groupId>
-			<artifactId>json-lib</artifactId>
-			<classifier>jdk15</classifier>
-			<version>2.4</version>
-		</dependency>
- 		<dependency>
-      		<groupId>javax.mail</groupId>
-      		<artifactId>javax.mail-api</artifactId>
-      		<version>1.4.4</version>
-    	</dependency>
- 		<dependency>
-      		<groupId>javax.mail</groupId>
-      		<artifactId>mail</artifactId>
-      		<version>1.4.4</version>
-    	</dependency>    									
+	<dependencies>	    									
 		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
@@ -126,7 +75,30 @@
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-task</artifactId>
 			<version>${org.trpr.version}</version>
-		</dependency>				
+		</dependency>			
+		<!-- Third party dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>			
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<classifier>jdk15</classifier>
+			<version>2.4</version>
+		</dependency>
+ 		<dependency>
+      		<groupId>javax.mail</groupId>
+      		<artifactId>javax.mail-api</artifactId>
+      		<version>1.4.4</version>
+    	</dependency>
 	</dependencies>
 		
 	<build>
@@ -159,7 +131,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>

@@ -28,8 +28,8 @@
 		<module>batch-model</module>
 		<module>batch-core</module>
 		<module>service-model</module>
-	    <module>serviceframework-core</module>
-        <module>serviceframework-seda</module>
+	    	<module>serviceframework-core</module>
+       		<module>serviceframework-seda</module>
 		<module>integration-rabbitmq</module>	
 		<module>dataaccess-hbase</module>		
 	</modules>
