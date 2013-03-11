@@ -50,6 +50,8 @@ org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcesso
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		if(this.curatorJobSyncHandler==null)
+			return;
 		this.curatorJobSyncHandler.addJobInstance(jobName);		
 	}
 }
