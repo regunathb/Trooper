@@ -20,10 +20,8 @@
 	</bean>  	
 
 	<!-- End Event Framework beans -->	
-	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer">
-	<property name="mbeanServer" ref="mbeanServer" />
-	</bean>
-	
+	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer" />
+		
 	<bean id="serviceContext" class="org.trpr.platform.servicefw.ServiceContext">
 		<property name="taskManager" ref="taskManager" />
 	</bean>

@@ -71,7 +71,7 @@
 		<module>runtime-core</module>
 		<module>batch-model</module>
 		<module>batch-core</module>
-		<module>batch-ha</module>
+		<module>batch-HA</module>
 		<module>service-model</module>
 	    <module>serviceframework-core</module>
        	<module>serviceframework-seda</module>

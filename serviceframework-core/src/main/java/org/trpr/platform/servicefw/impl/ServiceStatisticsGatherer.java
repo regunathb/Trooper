@@ -58,7 +58,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 	public static final int ACTIVE_REQUEST_COUNT_ATTR_INDEX = 3;
 	public static final int ERROR_REQUEST_COUNT_ATTR_INDEX = 4;
 	public static final int RESPONSE_TIME_ATTR_INDEX = 5;
-	public static final int LAST_SERVICE_TIME_ATTR_INDEX = 12;
+	public static final int LAST_SERVICE_TIME_ATTR_INDEX = 6;
 
 	/** Attribute names assigned to the Metrics */
 	private static final String[] ATTRIBUTE_NAMES = {
@@ -68,14 +68,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 		"activeRequestsCount",          //Counter
 		"errorRequestsCount",           //Counter
 		"responseTime",                 //Timer
-		"responseTime",                 //Timer
-		"responseTime",                 //Timer
-		"responseTime",                 //Timer
-		"responseTime",                 //Timer
-		"responseTime",                 //Timer
-		"responseTime",                 //Timer
 		"lastServiceRequestResponseTime",//Gauge
-		"responseTime",                 //Timer
 	};
 
 	/** Seperator for Attribute name and Service name in JMX */
@@ -100,14 +93,12 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 		if (serviceContainer == null) { // the service container has not been set. Return an empty array of service invocation statistics
 			return new ServiceStatistics[0];
 		}
-
-		MetricsRegistry mr = Metrics.defaultRegistry();
-		Map<MetricName, Metric> metricsMap = mr.allMetrics();
-
+		MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
+		Map<MetricName, Metric> metricsMap = metricsRegistry.allMetrics();
 		ServiceKey[] serviceKeys = serviceContainer.getAllLocalServices();
 		ServiceStatistics[] servicesStatistics = new ServiceStatistics[serviceKeys.length];
-
 		for (int i=0; i<serviceKeys.length; i++) {
+			//Get Metrics from registry
 			Gauge startupTime = (Gauge) metricsMap.get(new MetricName(ServiceCompartmentImpl.class,
 					getMetricName(STARTUP_TIME_ATTR_INDEX, serviceKeys[i].toString())));
 			Gauge lastUsageTime = (Gauge) metricsMap.get(new MetricName(ServiceCompartmentImpl.class,
@@ -122,7 +113,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 					getMetricName(ERROR_REQUEST_COUNT_ATTR_INDEX, serviceKeys[i].toString())));
 			Timer responseTimes = (Timer) metricsMap.get(new MetricName(ServiceCompartmentImpl.class,
 					getMetricName(RESPONSE_TIME_ATTR_INDEX, serviceKeys[i].toString())));
-
+			//Populate Metrics to serviceStatistics
 			servicesStatistics[i] = new ServiceStatistics();
 			servicesStatistics[i].setServiceName(serviceKeys[i].getName());
 			servicesStatistics[i].setServiceVersion(serviceKeys[i].getVersion());
