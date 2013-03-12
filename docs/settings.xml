@@ -11,13 +11,13 @@
           </snapshots>
           <id>fk-central</id>
           <name>libs-release</name>
-          <url>http://artifactory.nm.flipkart.com:8081/artifactory/libs-release</url>
+          <url>http://artifactory:8081/artifactory/libs-release</url>
         </repository>
         <repository>
           <snapshots />
           <id>snapshots</id>
           <name>libs-snapshot</name>
-          <url>http://artifactory.nm.flipkart.com:8081/artifactory/libs-snapshot</url>
+          <url>http://artifactory:8081/artifactory/libs-snapshot</url>
         </repository>
       </repositories>
       <pluginRepositories>
@@ -27,13 +27,13 @@
           </snapshots>
           <id>fk-central</id>
           <name>plugins-release</name>
-          <url>http://artifactory.nm.flipkart.com:8081/artifactory/plugins-release</url>
+          <url>http://artifactory:8081/artifactory/plugins-release</url>
         </pluginRepository>
         <pluginRepository>
           <snapshots />
           <id>snapshots</id>
           <name>plugins-snapshot</name>
-          <url>http://artifactory.nm.flipkart.com:8081/artifactory/plugins-snapshot</url>
+          <url>http://artifactory:8081/artifactory/plugins-snapshot</url>
         </pluginRepository>
       </pluginRepositories>
       <id>artifactory</id>
@@ -72,8 +72,13 @@
             <id>cloudera-hadoop</id>
             <name>Cloudera Hadoop repo</name>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-        </repository>                   
-        <repository>
+        </repository>
+    	<repository>
+      		<id>clojars</id>
+      		<name>Clojars repository</name>
+      		<url>https://clojars.org/repo</url>
+    	</repository>                                                  
+        <repository>        
           <id>maven-public-repository-group</id>
           <name>Public Maven Repository Group</name>
           <url>http://repo1.maven.org/maven/mule/dependencies/maven2/</url>
