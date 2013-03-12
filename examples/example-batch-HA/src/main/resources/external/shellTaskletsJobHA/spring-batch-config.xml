@@ -49,7 +49,7 @@
     </bean>
     
 	<bean id="curatorClient" class="org.trpr.platform.batch.impl.spring.CuratorClientFactory">
-		<property name="zkConnectString" value="stage-flo-zk1.nm.flipkart.com:2181" />
+		<property name="zkConnectString" value="localhost:2181" />
 	</bean>    
 	
 	<!--
