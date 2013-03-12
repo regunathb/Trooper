@@ -97,11 +97,6 @@
 			<artifactId>metrics-core</artifactId>
 			<version>2.2.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.ryantenney.metrics</groupId>
-			<artifactId>metrics-spring</artifactId>
-			<version>2.1.4</version>
-		</dependency>
 		<!--jsp support for jetty, add the 2 following -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
