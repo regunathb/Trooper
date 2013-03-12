@@ -41,6 +41,12 @@ public interface ServiceRequest<T> extends Serializable {
 	public String getServiceVersion();
 	
 	/**
+	 * Set the version of the service for this request.
+	 * @param serviceVersion
+	 */
+	public void setServiceVersion(String serviceVersion);
+	 
+	/**
 	 * Gets the request body data aka paylod for the request
 	 * @return the request data
 	 */

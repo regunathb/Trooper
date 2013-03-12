@@ -18,10 +18,15 @@
 			   <xs:element name="lastCalledTimestamp"  type="xs:dateTime" minOccurs="0"/>
 			   <xs:element name="activeRequestsCount"  type="xs:long" minOccurs="0"/>
 			   <xs:element name="totalRequestsCount"  type="xs:long" minOccurs="0"/>
-			   <xs:element name="averageResponseTime"  type="xs:long" minOccurs="0"/> 
-			   <xs:element name="minimumResponseTime"  type="xs:long" minOccurs="0"/>
-			   <xs:element name="maximumResponseTime"  type="xs:long" minOccurs="0"/>
-			   <xs:element name="lastServiceRequestResponseTime"  type="xs:long" minOccurs="0"/>
+			   <xs:element name="p50ResponseTime"  type="xs:double" minOccurs="0"/> 
+			   <xs:element name="p75ResponseTime"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="p99ResponseTime"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="p999ResponseTime"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="meanResponseTime"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="oneMinRate"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="fiveMinRate"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="fifteenMinRate"  type="xs:double" minOccurs="0"/>
+			   <xs:element name="lastServiceRequestResponseTime"  type="xs:double" minOccurs="0"/>
 			   <xs:element name="errorRequestsCount"  type="xs:long" minOccurs="0"/>
 			   <xs:element name="successRequestsCount"  type="xs:long" minOccurs="0"/> 	   			   
   			</xs:sequence>

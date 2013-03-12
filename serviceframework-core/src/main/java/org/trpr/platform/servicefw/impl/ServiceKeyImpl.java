@@ -34,7 +34,7 @@ public class ServiceKeyImpl implements ServiceKey, Serializable {
 	private static final long serialVersionUID = 4130555022337001738L;
 	
 	/** The separator char i.e '_' between service name and its version*/
-	private static final String SERVICE_VERSION_SEPARATOR= "_";	
+	public static final String SERVICE_VERSION_SEPARATOR= "_";	
 	
 	/** Name part of the this ServiceKey */
 	private String name;

@@ -9,11 +9,14 @@
 								"Total Request Count": "${statistics.totalRequestsCount}",
 								"Success request count": "${statistics.successRequestsCount}",
 								"Faliure request count": "${statistics.errorRequestsCount}",
-								"Average response time": "${statistics.averageResponseTime}",
-								"Minimum response time": "${statistics.minimumResponseTime}",
-								"Maximum Response time": "${statistics.maximumResponseTime}",
-								"Last Service Response time": "${statistics.lastServiceRequestResponseTime}",
 								"Active Request Count": "${statistics.activeRequestsCount }",
+								"P50ResponseTime": "${statistics.p50ResponseTime}",
+								"P75ResponseTime": "${statistics.p75ResponseTime}",
+								"P99ResponseTime": "${statistics.p99ResponseTime}",
+								"P999ResponseTime": "${statistics.p999ResponseTime}",
+								"oneMinRate": "${statistics.oneMinRate}",
+								"fiveMinRate": "${statistics.fiveMinRate}",
+								"fifteenMinRate": "${statistics.fifteenMinRate}",
 								"Startup Time Stamp": "${statistics.startupTimeStamp.getTime()?datetime}",
 								<#if statistics.lastCalledTimestamp??>
 								"Last Called Timestamp": "${statistics.lastCalledTimestamp.getTime()?datetime}"

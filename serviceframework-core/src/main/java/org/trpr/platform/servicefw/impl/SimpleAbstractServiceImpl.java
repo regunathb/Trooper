@@ -19,6 +19,7 @@ package org.trpr.platform.servicefw.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import org.trpr.platform.service.model.common.event.ServiceAlert;
 import org.trpr.platform.service.model.common.event.ServiceEvent;
@@ -30,6 +31,9 @@ import org.trpr.platform.servicefw.spi.Header;
 import org.trpr.platform.servicefw.spi.Service;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
 
 /**
  * <code>SimpleAbstractServiceImpl<code> is an implementation of the {@link Service} interface that provides common behavior for all services that require 
@@ -48,7 +52,10 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 	
 	/** The ServiceContext to use for all interactions with the ServiceContainer*/
 	@SuppressWarnings("rawtypes")
-	private ServiceContext serviceContext;		
+	private ServiceContext serviceContext;	
+
+	/** The {@link Timer} object for this service, which publishes the response time metrics */
+	private Timer responses = null;
 	
 	/** Getter/Setter methods */
 	@SuppressWarnings("rawtypes")
@@ -72,7 +79,11 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 		if (request == null) {
 			throw new ServiceException("The Service Request may not be null");
 		}
-		
+		if(this.responses==null) {
+			this.responses = Metrics.newTimer(AbstractServiceImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX]
+					+ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
+		}
 		// add the service request time-stamp as a header
 		Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};
 		((ServiceRequestImpl<T>)request).addHeaders(headers);

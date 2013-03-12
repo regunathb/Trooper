@@ -5,30 +5,43 @@
 						<h2>Services Registered</h2>
 						<table title="Services Names" class="bordered-table">
 							<tr>
-								<th>Name</th>
-								<th>Version</th>
-								<th>Total Request Count</th>
-								<th>Success request count</th>
-								<th>Faliure request count</th>
-								<th>Average response time</th>
-								<th>Minimum response time</th>
-								<th>Maximum Response time</th>
-								<th>Last Service Response time</th>
-								<th>Active Request Count</th>
-								<th>Startup Time Stamp</th>
-								<th>Last Called Timestamp</th>
+								<th style="border-right: 1px solid #b8c885" rowspan="2">Name</th>
+								<th style="border-right: 1px solid #b8c885" rowspan="2">Version</th>
+								<th style="border-right: 1px solid #b8c885" colspan="4">Counts</th>
+								<th style="border-right: 1px solid #b8c885" colspan="5">Response Time (ms)</th>
+								<th style="border-right: 1px solid #b8c885" colspan="3">Rate (Requests/sec)</th>
+								<th style="border-right: 1px solid #b8c885" colspan="2">TimeStamps</th>
+						
+							</tr>
+							<tr>
+							<th>Total</th>
+								<th>Success</th>
+								<th>Faliure</th> 
+								<th style="border-right: 1px solid #b8c885">Active</th>
+								
+								<th>p50</th>
+								<th>p75</th>
+								<th>p99</th>
+								<th>p99.9</th>
+								<th style="border-right: 1px solid #b8c885">mean</th> 
+
+								<th>1 min</th>
+								<th>5 min</th>
+								<th>15 min</th>
+								<th>Startup</th>
+								<th style="border-right: 1px solid #b8c885">Last Called</th>
 							</tr>
 							<#list serviceInfo as statistics >
 							<tr class="name-sublevel1-even">
-								<td>
+								<td style="border-right: 1px solid #b8c885">
 									<a href="/test/services/${statistics.serviceName}">
 									${statistics.serviceName}
 									</a>
 								</td>
 								<#if statistics.serviceVersion??>
-								<td>${statistics.serviceVersion}</td>
+								<td style="border-right: 1px solid #b8c885">${statistics.serviceVersion}</td>
 								<#else>
-								<td> NA </td>
+								<td style="border-right: 1px solid #b8c885"> NA </td>
 								</#if>
 								<#if statistics.totalRequestsCount??>
 								<td> ${statistics.totalRequestsCount}</td>
@@ -45,30 +58,52 @@
 								<#else>
 								<td> NA </td>
 								</#if>
-								<#if statistics.averageResponseTime??>
-								<td> ${statistics.averageResponseTime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
-								<#if statistics.minimumResponseTime??>
-								<td> ${statistics.minimumResponseTime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
-								<#if statistics.maximumResponseTime??>
-								<td> ${statistics.maximumResponseTime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
-								<#if statistics.lastServiceRequestResponseTime??>
-								<td> ${statistics.lastServiceRequestResponseTime}</td>
-								<#else>
-								<td> NA </td>
-								</#if>
+								
 								<#if statistics.activeRequestsCount??>
-								<td> ${statistics.activeRequestsCount }</td>
+								<td style="border-right: 1px solid #b8c885"> ${statistics.activeRequestsCount }</td>
+								<#else>
+								<td style="border-right: 1px solid #b8c885"> NA </td>
+								</#if>
+								
+								<#if statistics.p50ResponseTime??>
+								<td> ${statistics.p50ResponseTime}</td>
 								<#else>
 								<td> NA </td>
+								</#if>
+								<#if statistics.p75ResponseTime??>
+								<td> ${statistics.p75ResponseTime}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.p99ResponseTime??>
+								<td> ${statistics.p99ResponseTime}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.p999ResponseTime??>
+								<td> ${statistics.p999ResponseTime}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.meanResponseTime??>
+								<td style="border-right: 1px solid #b8c885"> ${statistics.meanResponseTime}</td>
+								<#else>
+								<td style="border-right: 1px solid #b8c885"> NA </td>
+								</#if>
+								<#if statistics.oneMinRate??>
+								<td> ${statistics.oneMinRate}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.fiveMinRate??>
+								<td> ${statistics.fiveMinRate}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.fifteenMinRate??>
+								<td style="border-right: 1px solid #b8c885"> ${statistics.fifteenMinRate}</td>
+								<#else>
+								<td style="border-right: 1px solid #b8c885"> NA </td>
 								</#if>
 								<#if statistics.startupTimeStamp??>
 								<td>${statistics.startupTimeStamp.getTime()?datetime}</td>

@@ -64,21 +64,23 @@ public class ServiceController {
 		return path;
 	}
 
-	/** Controller for index(homepage) */
+	/** 
+	 * Controller for index(homepage) 
+	 */
 	@RequestMapping(value = {"/services"}, method = RequestMethod.GET)
 	public String jobs(ModelMap model, HttpServletRequest request) {
-		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats(false);
+		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
 		model.addAttribute("serviceInfo",serviceStatisticsAsArray);
 		if(request.getServletPath().endsWith(".json")) {
 			return "services-json";
 		}
 		return "services";
 	}
-	
+
 	/** Controller for Test page */
 	@RequestMapping(value = {"/test/services/{serviceName}"}, method = RequestMethod.GET)
 	public String test(ModelMap model, @ModelAttribute("services") String serviceName) {
-		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats(false);
+		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
 		for(ServiceStatistics statistics:serviceStatisticsAsArray) {
 			if(statistics.getServiceName().equalsIgnoreCase(serviceName)) {
 				model.addAttribute("serviceInfo",statistics);
@@ -90,9 +92,9 @@ public class ServiceController {
 	/** Controller which gets the Service details, runs the service and displays the output */
 	@RequestMapping(value = {"/execute/services/{serviceName}"}, method = RequestMethod.POST)
 	public String execute_service(ModelMap model, @ModelAttribute("services") String serviceName,
-				@RequestParam(required=true) String serviceRequestClass, 
-				@RequestParam(required=true) String serviceResponseClass, 
-				@RequestParam(required=true) String XMLFileContents) {
+			@RequestParam(required=true) String serviceRequestClass, 
+			@RequestParam(required=true) String serviceResponseClass, 
+			@RequestParam(required=true) String XMLFileContents) {
 
 		ServiceResponse<? extends PlatformServiceResponse> serviceResponse = null;
 		//Code for executing the service
@@ -117,7 +119,7 @@ public class ServiceController {
 			serviceResponse = new BrokerFactory().getBroker(new ServiceKeyImpl(serviceName, platformServiceRequest.getVersion())).invokeService(serviceRequest);
 			Object responseContentsObject = null;
 			responseContentsObject = Class.forName(serviceResponseClass).newInstance(); 
-			
+
 			// get the request getter method
 			Class responseClazz = Class.forName(serviceResponseClass);
 			Method[] responseMethods = responseClazz.getDeclaredMethods();
@@ -130,7 +132,7 @@ public class ServiceController {
 			}
 			// set the PlatformServiceResponse on the response XML object
 			responseSetterMethod.invoke(responseContentsObject, serviceResponse.getResponseData());
-		    // Marshall java object
+			// Marshall java object
 			String responseContents = new XMLTranscoderImpl().marshal(responseContentsObject);
 			// write response in web browser
 			model.addAttribute("response", responseContents);
@@ -139,7 +141,7 @@ public class ServiceController {
 		}
 		return "response";
 	}
-	
+
 	/** Getter Setter methods */
 	public ServiceStatisticsGatherer getServiceStatisticsGatherer() {
 		return serviceStatisticsGatherer;
@@ -147,5 +149,5 @@ public class ServiceController {
 
 	public void setServiceStatisticsGatherer(ServiceStatisticsGatherer serviceStatisticsGatherer) {
 		this.serviceStatisticsGatherer = serviceStatisticsGatherer;
-	}	
+	}
 }

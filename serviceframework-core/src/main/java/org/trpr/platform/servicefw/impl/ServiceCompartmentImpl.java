@@ -31,12 +31,16 @@ import org.trpr.platform.servicefw.spi.ServiceInfo;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Gauge;
+
 /**
  * The <code>ServiceCompartmentImpl</code> class is an implementation of the {@link ServiceCompartment} interface. 
  * 
  * @see ServiceCompartment
- * @author Regunath B
- * @version 1.0, 16/08/2012
+ * @author Regunath B, devashishshankar
+ * @version 1.1, 11/03/2013
  */
 @SuppressWarnings("rawtypes")
 public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends PlatformServiceResponse> implements ServiceCompartment {
@@ -51,33 +55,22 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 * The timestamp when this service compartment was created
 	 */
 	private long startupTimeStamp = System.currentTimeMillis();
-
-	/**
-	 * Stores total requests processed.
-	 */
-	private long totalUsageCount = 0;
-
-	/**
-	 * Stores active request count.
-	 */
-	private long currentUsageCount = 0;
-
+	
 	/**
 	 * Stores timeStamp when Service is last used.
 	 */
 	private long lastUsageTimeStamp = INVALID_STATISTICS_VALUE;
 	
 	/**
-	 * The cumulative response time
+	 * Stores total requests processed.
 	 */
-	private long cumulativeResponseTime = 0;
-	
+	private final Counter totalUsageCount;
+
 	/**
-	 * Minimum and maximum response times
+	 * Stores active request count.
 	 */
-	private long minimumResponseTime = INVALID_STATISTICS_VALUE;
-	private long maximumResponseTime = INVALID_STATISTICS_VALUE;
-	
+	private final Counter currentUsageCount;
+
 	/**
 	 * The last serviced request's response time
 	 */
@@ -86,7 +79,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	/**
 	 * Counts of service requests that failed - either due to validations or underlying exceptions
 	 */
-	private long errorRequestsCounts = 0;
+	private final Counter errorRequestCount;
 	
 	/**
 	 * The ServiceInfo that describes the Service routed through this
@@ -94,13 +87,41 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	protected ServiceInfo serviceInfo = null;
 
-	
 	/**
 	 * Constructor for this class
 	 * @param serviceInfo the ServiceInfo of the Service that this compartment is expected to handle
 	 */
 	public ServiceCompartmentImpl(ServiceInfo serviceInfo) {
-		this.serviceInfo = serviceInfo;
+		this.serviceInfo = serviceInfo; 
+		//Initialize the counters
+		this.totalUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.TOTAL_REQUEST_COUNT_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
+		this.currentUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.ACTIVE_REQUEST_COUNT_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
+		this.errorRequestCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.ERROR_REQUEST_COUNT_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
+		//Initialize the Gauges
+		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.STARTUP_TIME_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		    @Override
+		    public Long value() {
+		        return startupTimeStamp;
+		    }
+		});
+		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.LAST_CALLED_TIME_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		    @Override
+		    public Long value() {
+		        return lastUsageTimeStamp;
+		    }
+		});
+		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.LAST_SERVICE_TIME_ATTR_INDEX]+
+				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		    @Override
+		    public Long value() {
+		        return lastServiceRequestResponseTime;
+		    }
+		});
 	}
 
 	/**
@@ -134,86 +155,6 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	}
 
 	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getStartupTimeStamp()
-	 */
-	public long getStartupTimeStamp() {
-		return this.startupTimeStamp;
-	}
-	
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getLastCalledTimestamp()
-	 */
-	public long getLastCalledTimestamp() {
-		return lastUsageTimeStamp;
-	}
-
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getActiveRequests()
-	 */
-	public long getActiveRequestsCount() {
-		return currentUsageCount;
-	}
-
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getTotalRequests()
-	 */
-	public long getTotalRequestsCount() {
-		return totalUsageCount;
-	}
-	
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getAverageResponseTime()
-	 */
-	public long getAverageResponseTime() {
-		return (this.getTotalRequestsCount() > 0 ? (this.cumulativeResponseTime / this.getTotalRequestsCount()) : 0);
-	}
-	
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getMinimumResponseTime()
-	 */
-	public long getMinimumResponseTime() {
-		return this.minimumResponseTime;
-	}
-
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getMaximumResponseTime()
-	 */
-	public long getMaximumResponseTime() {
-		return this.maximumResponseTime;
-	}
-
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getLastServiceRequestResponseTime()
-	 */
-	public long getLastServiceRequestResponseTime() {
-		return this.lastServiceRequestResponseTime;
-	}
-	
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getErrorRequestsCount()
-	 */
-	public long getErrorRequestsCount() {
-		return this.errorRequestsCounts;
-	}
-	
-	/**
-	 * Interface method implementation
-	 * @see ServiceCompartment#getSuccessRequestsCount()
-	 */
-	public long getSuccessRequestsCount() {
-		return this.getTotalRequestsCount() - this.errorRequestsCounts;
-	}
-	
-	/**
 	 * Interface method implementation. Simply increments current execution counter
 	 * @see ServiceCompartment#notifyServiceExecutionStart(ServiceRequest)
 	 */
@@ -231,16 +172,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 		// This class is not thread safe as a consequence and the instance variables need to be modified inside a synchronized block
 		synchronized(this) {
 			this.lastServiceRequestResponseTime = executionEndTime - executionStartTime;
-			if (this.lastServiceRequestResponseTime < this.minimumResponseTime ||
-				this.minimumResponseTime == INVALID_STATISTICS_VALUE) {
-				this.minimumResponseTime = this.lastServiceRequestResponseTime;
-			}
-			if (this.lastServiceRequestResponseTime > this.maximumResponseTime) {
-				this.maximumResponseTime = this.lastServiceRequestResponseTime;
-			}
-			this.cumulativeResponseTime += this.lastServiceRequestResponseTime;
 			if (String.valueOf(ServiceFrameworkConstants.FAILURE_STATUS_CODE).equalsIgnoreCase(((ServiceResponseImpl)response).getStatusCode())) {
-				this.errorRequestsCounts += 1;
+				this.errorRequestCount.inc();
 			}
 		}		
 	}
@@ -255,6 +188,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	protected ServiceResponse invokeService(Service<T,S> service, ServiceRequest<T> request) {
 		ServiceResponse serviceResponse = null;
+		request.setServiceVersion(this.serviceInfo.getServiceKey().getVersion());
 		try {
 			serviceResponse = service.processRequest(request);
 		} catch (Exception e) {
@@ -273,8 +207,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	private synchronized void incrementUsageCounter() {
 		lastUsageTimeStamp = System.currentTimeMillis();
-		++currentUsageCount;
-		++totalUsageCount;
+		currentUsageCount.inc();
+		totalUsageCount.inc();
 	}
 
 	/**
@@ -284,8 +218,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	private synchronized void decrementUsageCounter() {
 		// decrement only if use count is greater than zero. It might have been set to zero if #resetServiceStatistics() is called
-		if (currentUsageCount > 0) {
-			--currentUsageCount;
+		if (currentUsageCount.count() > 0) {
+			currentUsageCount.dec();
 		}
 	}
 

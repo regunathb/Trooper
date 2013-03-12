@@ -24,15 +24,10 @@
 	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
 		 Needed to export the "serviceStatisticsGatherer" as a JMX MBean   
 	-->
-	<bean id="serviceStatisticsExporter" parent="mbeansExporter">	
-	<property name="beans">
-	    <map>
-		<entry key="bean:name=serviceStatisticsGatherer" value-ref="serviceStatisticsGatherer"/>
-            </map>
-        </property>
-	</bean>
+
 	
 	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer">
+	<property name="mbeanServer" ref="mbeanServer" />
 	</bean>
 	
 	<bean id="serviceContext" class="org.trpr.platform.servicefw.ServiceContext">

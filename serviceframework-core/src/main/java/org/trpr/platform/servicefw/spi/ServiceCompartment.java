@@ -21,16 +21,18 @@ import org.trpr.platform.service.model.common.platformservicerequest.PlatformSer
 import org.trpr.platform.service.model.common.platformserviceresponse.PlatformServiceResponse;
 import org.trpr.platform.servicefw.common.ServiceException;
 
+import com.yammer.metrics.Metrics;
+
 /**
 *
 * The <code>ServiceCompartment</code> is a section of the container. Every container has 
 * one or more compartments.  There is one compartment per service.
 * It holds information about the service instance such as the last time it was called,
-* the number of requests processed e.t.c.
-* This compartment also acts as the conduit for service invocation by the Broker.
+* the number of requests processed e.t.c. Using {@link Metrics}, this class publishes the statistics
+* directly to JMX Mbeans server
 * 
-* @author  Regunath B
-* @version 1.0, 13/08/2012
+* @author  Regunath B, devashishshankar
+* @version 1.1, 11/03/2013
 */
 public interface ServiceCompartment<T extends PlatformServiceRequest, S extends PlatformServiceResponse> {
 	
@@ -64,70 +66,7 @@ public interface ServiceCompartment<T extends PlatformServiceRequest, S extends 
 	 * @return Service information
 	 */
 	public ServiceInfo getServiceInfo();
-	
-	/**
-	 * Gets the timestamp of when this service compartment was created. Useful to determine uptime of this service compartment.
-	 * @return millsecond timestamp of the creation of this service compartment
-	 */
-	public long getStartupTimeStamp();
-	
-	/**
-	 * Gets the timestamp of when the service was last called or zero
-	 * if the service has never been called before.
-	 * @return millsecond timestamp of last call
-	 */
-	public long getLastCalledTimestamp();
-	
-	/**
-	 * Gets the number of requests active currently 
-	 * @return number of active requests
-	 */
-	public long getActiveRequestsCount();
-
-	/**
-	 * Gets the total number of requests serviced via this compartment
-	 * @return the total number of requests processed
-	 */
-	public long getTotalRequestsCount();	
-	
-	/**
-	 * Gets the average response time for service requests invoked against the associated service
-	 * @return average response time in milliseconds 
-	 */
-	public long getAverageResponseTime();
-	
-	/**
-	 * Gets the minimum response time among all requests executed against the associated service
-	 * @return minimum response time in milliseconds
-	 */
-	public long getMinimumResponseTime();
-	
-	/**
-	 * Gets the maximum response time among all requests executed against the associated service
-	 * @return maximum response time in milliseconds
-	 */
-	public long getMaximumResponseTime();
-	
-	/**
-	 * Gets the response time of the last executed service request of associated service. Could be either success or failure as the case may be.
-	 * Service failures due to exceptions or errors and validation or business logic errors in the service implementation are treated the same while
-	 * determining the last executed service request. 
-	 * @return last executed service request's response time in milliseconds
-	 */
-	public long getLastServiceRequestResponseTime();
-	
-	/**
-	 * Gets the count of service requests that failed
-	 * @return the failed service requests count 
-	 */
-	public long getErrorRequestsCount();
-	
-	/**
-	 * Gets the count of service requests that succeeded
-	 * @return the success service requests count 
-	 */
-	public long getSuccessRequestsCount();
-	
+		
 	/**
 	 * Initializes this ServiceCompartment.
 	 * Load all necessary info for ServiceCompartment.   

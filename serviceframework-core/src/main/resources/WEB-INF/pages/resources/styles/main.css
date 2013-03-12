@@ -251,12 +251,13 @@ h4 {
  	background-image: url(../images/table-header-background.png);
     background-repeat: no-repeat;
 	background-size:100% 100%;
+	text-align:center;
  }
  
  td
  {
  	margin:0;
- 	padding:4px 6px;
+ 	padding:8px 8px;
  	vertical-align:top;
  	border-bottom: 1px
  }
