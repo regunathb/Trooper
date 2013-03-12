@@ -7,7 +7,7 @@
 		<artifactId>trooper</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	
+
 	<groupId>org.trpr</groupId>
 	<artifactId>serviceframework-core</artifactId>
 	<name>Service Framework Core</name>
@@ -58,8 +58,8 @@
 		</developer>
 	</developers>
 
-	<dependencies>		
-	<!-- Trooper dependencies -->
+	<dependencies>
+		<!-- Trooper dependencies -->
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
@@ -90,6 +90,12 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.26</version>
+		</dependency>
+		<!-- CodaHale Metrics -->
+		<dependency>
+			<groupId>com.yammer.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>2.2.0</version>
 		</dependency>
 		<!--jsp support for jetty, add the 2 following -->
 		<dependency>
