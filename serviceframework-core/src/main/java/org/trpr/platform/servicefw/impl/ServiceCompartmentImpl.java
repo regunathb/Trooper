@@ -94,29 +94,31 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	public ServiceCompartmentImpl(ServiceInfo serviceInfo) {
 		this.serviceInfo = serviceInfo; 
 		//Initialize the counters
-		this.totalUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.TOTAL_REQUEST_COUNT_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
-		this.currentUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.ACTIVE_REQUEST_COUNT_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
-		this.errorRequestCount = Metrics.newCounter(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.ERROR_REQUEST_COUNT_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey());
+		this.totalUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, 
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.TOTAL_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
+		this.currentUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class,
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ACTIVE_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
+		this.errorRequestCount = Metrics.newCounter(ServiceCompartmentImpl.class, 
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
 		//Initialize the Gauges
-		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.STARTUP_TIME_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		Metrics.newGauge(ServiceCompartmentImpl.class, 
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.STARTUP_TIME_ATTR_INDEX, serviceInfo.getServiceKey().toString()),
+				new Gauge<Long>() {
 		    @Override
 		    public Long value() {
 		        return startupTimeStamp;
 		    }
 		});
-		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.LAST_CALLED_TIME_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		Metrics.newGauge(ServiceCompartmentImpl.class, 
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.LAST_CALLED_TIME_ATTR_INDEX, serviceInfo.getServiceKey().toString())
+				, new Gauge<Long>() {
 		    @Override
 		    public Long value() {
 		        return lastUsageTimeStamp;
 		    }
 		});
-		Metrics.newGauge(ServiceCompartmentImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.LAST_SERVICE_TIME_ATTR_INDEX]+
-				ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+serviceInfo.getServiceKey(), new Gauge<Long>() {
+		Metrics.newGauge(ServiceCompartmentImpl.class, 
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.LAST_SERVICE_TIME_ATTR_INDEX, serviceInfo.getServiceKey().toString()), new Gauge<Long>() {
 		    @Override
 		    public Long value() {
 		        return lastServiceRequestResponseTime;

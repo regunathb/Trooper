@@ -72,7 +72,7 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 	 * Interface method implementation. 
 	 * @see Service#processRequest(ServiceRequest)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public ServiceResponse<S> processRequest(ServiceRequest<T> request) throws ServiceException {
 		
@@ -80,9 +80,9 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 			throw new ServiceException("The Service Request may not be null");
 		}
 		if(this.responses==null) {
-			this.responses = Metrics.newTimer(AbstractServiceImpl.class, ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX]
-					+ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP+request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-
+			this.responses = Metrics.newTimer(ServiceCompartmentImpl.class, 
+					ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX, request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion()),
+					TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		}
 		// add the service request time-stamp as a header
 		Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};

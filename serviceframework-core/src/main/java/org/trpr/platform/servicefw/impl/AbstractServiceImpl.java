@@ -146,10 +146,9 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 			throw new ServiceException("The Service Request may not be null");
 		}
 		if(this.responses==null) {
-			this.responses = Metrics.newTimer(AbstractServiceImpl.class, 
-					ServiceStatisticsGatherer.ATTRIBUTE_NAMES[ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX]+ServiceStatisticsGatherer.SERVICE_NAME_ATTRIBUTE_SEP
-					+request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-
+			this.responses = Metrics.newTimer(ServiceCompartmentImpl.class, 
+					ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX, request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion()),
+					TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		}
 		//Create a timer context, to time this request
 		final TimerContext context = responses.time();

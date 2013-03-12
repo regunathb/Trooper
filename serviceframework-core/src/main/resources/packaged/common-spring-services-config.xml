@@ -19,13 +19,7 @@
 	<bean id="serviceEventProducer" class="org.trpr.platform.servicefw.impl.event.ServiceEventProducerImpl">
 	</bean>  	
 
-	<!-- End Event Framework beans -->
-	
-	<!-- Create the MBeansExporter bean using the parent defined in common-spring-beans.xml. 
-		 Needed to export the "serviceStatisticsGatherer" as a JMX MBean   
-	-->
-
-	
+	<!-- End Event Framework beans -->	
 	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer">
 	<property name="mbeanServer" ref="mbeanServer" />
 	</bean>
@@ -39,5 +33,4 @@
 
 	<bean id="serviceRegistry" class="org.trpr.platform.servicefw.ServiceRegistry">
 	</bean>
-
 </beans>
