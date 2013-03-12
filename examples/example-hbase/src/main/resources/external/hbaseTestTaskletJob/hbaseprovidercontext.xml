@@ -20,9 +20,9 @@
 		-->
 		<property name="hbaseConfigProps">
 			<props>
-				<prop key="hbase.rootdir">hdfs://stage-pf4.nm.flipkart.com:8020/hbase</prop>
+				<prop key="hbase.rootdir">hdfs://localhost:8020/hbase</prop>
 				<prop key="hbase.master.port">60000</prop>
-				<prop key="hbase.zookeeper.quorum">stage-pf4.nm.flipkart.com:2181</prop>
+				<prop key="hbase.zookeeper.quorum">localhost:2181</prop>
 				<prop key="hbase.client.write.buffer">2097152</prop>
 			</props>
 		</property>
