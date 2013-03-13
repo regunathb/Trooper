@@ -149,6 +149,9 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 		return servicesStatistics;
 	}
 	
+	/** 
+	 * Returns the ServiceStatistics map with ServiceKey(toString) as key, for all services deployed locally
+	 */
 	public Map<String, ServiceStatistics> getStatsAsMap() {
 		ServiceStatistics[] serviceStatistics = this.getStats();
 		Map<String, ServiceStatistics> serviceStatisticsMap = new HashMap<String, ServiceStatistics>();
