@@ -14,9 +14,9 @@
 	</bean>	
 	
 	<bean id="metricsRulesListener" class="org.trpr.platform.servicefw.impl.notifier.MetricsListenerImpl">
-		<property name="metricsNotifiers">
+		<property name="metricsEvaluators">
 			<list>
-				<bean class="org.trpr.platform.servicefw.impl.notifier.MetricsNotifierImpl">
+				<bean class="org.trpr.platform.servicefw.impl.notifier.MetricsEvaluatorImpl">
 					<property name="rules">
 						<list>
 							<value>greetingService_1.0.p50ResponseTime &gt; 30</value>

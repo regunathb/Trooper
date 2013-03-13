@@ -18,18 +18,18 @@ package org.trpr.platform.servicefw.spi.notifier;
 import java.util.List;
 
 /**
- * <code>MetricsNotifier</code> takes a set of rules and a notification receiver (@link{MetricsEventReceiver}). It has
+ * <code>MetricsEvaluator</code> takes a set of rules and a notification receiver (@link{MetricsEventReceiver}). It has
  * methods to check rules and notify the receiver. 
  * 
  * @author devashishshankar
  * @version 1.0, 13th March, 2013
  */
-public interface MetricsNotifier {
+public interface MetricsEvaluator {
 
 	/** Method for checking the rules and notifying the notification Receiver. */
 	public void checkRules();
 	
-	/** Sets the rules for this MetricsNotifier */
+	/** Sets the rules for this MetricsEvaluator */
 	public void setRules(List<String> rules);
 	
 	/** Sets the notification receiver class */
