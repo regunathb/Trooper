@@ -112,8 +112,8 @@ public class MetricsNotifierImpl implements MetricsNotifier {
 			}
 			if(ruleServiceName == null) { //No existing service found in rule
 				LOGGER.warn("The rule: '"+rule+"' contains no currently deployed service");
-				LOGGER.warn("The deployed services are: ");
-				LOGGER.warn(statisticsMap.keySet().toString());
+				LOGGER.debug("The deployed services are: ");
+				LOGGER.debug(statisticsMap.keySet().toString());
 				continue;
 			}
 			ServiceStatistics currentStatistics = statisticsMap.get(ruleServiceName);  //Statistics to be sent back to reciever

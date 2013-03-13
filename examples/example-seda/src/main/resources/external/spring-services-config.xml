@@ -26,8 +26,10 @@
 							<value>greetingService_1.1.totalRequestsCount &lt; 20</value>
 						</list>
 					</property>
-					<property name="notificationReceiver">
+					<property name="notificationReceivers">
+					<list>
 						<bean class="org.trpr.platform.servicefw.impl.notifier.SimpleMetricsEventReceiver" />
+					</list>
 					</property>
 					<property name="serviceStatisticsGatherer" ref = "serviceStatisticsGatherer" />
 				</bean>
