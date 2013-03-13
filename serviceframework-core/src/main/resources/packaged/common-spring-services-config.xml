@@ -3,32 +3,38 @@
 <beans>
 
 	<!-- Start Event Framework beans -->
-	<!-- 
-		Note that there can only be one bean by name "applicationEventMulticaster" as per Spring design.
-		It is recommended to use the PlatformEventMulticaster and ServiceEventProducerImpl, and an implementation of ServiceEventConsumer.
-		A more basic ApplicationEventMulticaster with no support for subscriptions may be defined as below:
-		
-	 	<bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">
-		</bean>		 	
-	 -->
-	<!-- This event producer bean is declared primarily for publishing Bootstrap lifecycle events -->
-	<bean id="platformEventProducer" class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
-	</bean>  	
-	
-	<!-- This event producer bean is declared primarily for publishing service events -->
-	<bean id="serviceEventProducer" class="org.trpr.platform.servicefw.impl.event.ServiceEventProducerImpl">
-	</bean>  	
+	<!-- Note that there can only be one bean by name "applicationEventMulticaster" 
+		as per Spring design. It is recommended to use the PlatformEventMulticaster 
+		and ServiceEventProducerImpl, and an implementation of ServiceEventConsumer. 
+		A more basic ApplicationEventMulticaster with no support for subscriptions 
+		may be defined as below: <bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster"> 
+		</bean> -->
+	<!-- This event producer bean is declared primarily for publishing Bootstrap 
+		lifecycle events -->
+	<bean id="platformEventProducer"
+		class="org.trpr.platform.core.impl.event.PlatformEventProducerImpl">
+	</bean>
 
-	<!-- End Event Framework beans -->	
-	<bean id="serviceStatisticsGatherer" class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer" />
-		
+	<!-- This event producer bean is declared primarily for publishing service 
+		events -->
+	<bean id="serviceEventProducer"
+		class="org.trpr.platform.servicefw.impl.event.ServiceEventProducerImpl">
+	</bean>
+
+	<!-- End Event Framework beans -->
+	<bean id="serviceStatisticsGatherer"
+		class="org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer" />
+
 	<bean id="serviceContext" class="org.trpr.platform.servicefw.ServiceContext">
 		<property name="taskManager" ref="taskManager" />
 	</bean>
 
 	<bean id="taskManager" class="org.trpr.platform.impl.task.SimpleTaskManager">
-	</bean>	
+	</bean>
 
 	<bean id="serviceRegistry" class="org.trpr.platform.servicefw.ServiceRegistry">
 	</bean>
+
+	<bean id="metricsTimer" class="org.springframework.scheduling.concurrent.ConcurrentTaskScheduler" />
+	
 </beans>

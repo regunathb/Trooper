@@ -16,6 +16,7 @@
 package org.trpr.platform.servicefw.impl;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.trpr.platform.core.spi.management.jmx.AppInstanceAwareMBean;
@@ -146,6 +147,15 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 					-servicesStatistics[i].getErrorRequestsCount());
 		}
 		return servicesStatistics;
+	}
+	
+	public Map<String, ServiceStatistics> getStatsAsMap() {
+		ServiceStatistics[] serviceStatistics = this.getStats();
+		Map<String, ServiceStatistics> serviceStatisticsMap = new HashMap<String, ServiceStatistics>();
+		for(ServiceStatistics serviceStatistic : serviceStatistics) {
+			serviceStatisticsMap.put(serviceStatistic.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+serviceStatistic.getServiceVersion(), serviceStatistic);
+		}
+		return serviceStatisticsMap;
 	}
 
 	/** Helper method that generates name of a metric given its attributeID and service name */

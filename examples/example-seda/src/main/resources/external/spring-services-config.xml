@@ -12,6 +12,30 @@
 		<property name="taskManager" ref="taskManager" />
 		<property name="serviceContext" ref="serviceContext" />
 	</bean>	
+	
+	<bean id="metricsRulesListener" class="org.trpr.platform.servicefw.impl.notifier.MetricsListenerImpl">
+		<property name="metricsNotifiers">
+			<list>
+				<bean class="org.trpr.platform.servicefw.impl.notifier.MetricsNotifierImpl">
+					<property name="rules">
+						<list>
+							<value>greetingService_1.0.p50ResponseTime &gt; 30</value>
+							<value>greetingService_1.0.p50ResponseTime &lt; 30</value>
+							<value>greetingService_1.0.activeRequestsCount != null</value>
+							<value>greetingService_1.0.totalRequestsCount &gt; 20</value>
+							<value>greetingService_1.1.totalRequestsCount &lt; 20</value>
+						</list>
+					</property>
+					<property name="notificationReceiver">
+						<bean class="org.trpr.platform.servicefw.impl.notifier.SimpleMetricsEventReceiver" />
+					</property>
+					<property name="serviceStatisticsGatherer" ref = "serviceStatisticsGatherer" />
+				</bean>
+			</list>
+		</property>
+		<property name="timer" ref="metricsTimer" />
+		<property name="delay" value="100000" />
+	</bean>
 
 	<!--  Commented (to minimize dependency when running samples) set of example beans for check-pointing using AOP and RDBMS persistence provider -->
 	
