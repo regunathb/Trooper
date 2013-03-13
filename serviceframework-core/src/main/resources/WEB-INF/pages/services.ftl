@@ -27,7 +27,8 @@
 
 								<th>1 min</th>
 								<th>5 min</th>
-								<th>15 min</th>
+								<th style="border-right: 1px solid #b8c885">15 min</th>
+								
 								<th>Startup</th>
 								<th style="border-right: 1px solid #b8c885">Last Called</th>
 							</tr>

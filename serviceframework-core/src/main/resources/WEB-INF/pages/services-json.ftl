@@ -6,22 +6,50 @@
     <#list serviceInfo as statistics >
     		"${statistics.serviceName}": {
 								"Version": "${statistics.serviceVersion}",
-								"Total Request Count": "${statistics.totalRequestsCount}",
-								"Success request count": "${statistics.successRequestsCount}",
-								"Faliure request count": "${statistics.errorRequestsCount}",
-								"Active Request Count": "${statistics.activeRequestsCount }",
+								"TotalRequestCount": "${statistics.totalRequestsCount}",
+								"SuccessRequestCount": "${statistics.successRequestsCount}",
+								"FailureRequestCount": "${statistics.errorRequestsCount}",
+								"ActiveRequestCount": "${statistics.activeRequestsCount }",
+								<#if statistics.p50ResponseTime??>
 								"P50ResponseTime": "${statistics.p50ResponseTime}",
-								"P75ResponseTime": "${statistics.p75ResponseTime}",
-								"P99ResponseTime": "${statistics.p99ResponseTime}",
-								"P999ResponseTime": "${statistics.p999ResponseTime}",
-								"oneMinRate": "${statistics.oneMinRate}",
-								"fiveMinRate": "${statistics.fiveMinRate}",
-								"fifteenMinRate": "${statistics.fifteenMinRate}",
-								"Startup Time Stamp": "${statistics.startupTimeStamp.getTime()?datetime}",
-								<#if statistics.lastCalledTimestamp??>
-								"Last Called Timestamp": "${statistics.lastCalledTimestamp.getTime()?datetime}"
 								<#else>
-								"Last Called Timestamp": NA
+								"P50ResponseTime": NA
+								</#if>
+								<#if statistics.p75ResponseTime??>
+								"P75ResponseTime": "${statistics.p75ResponseTime}",
+								<#else>
+								"P75ResponseTime": NA
+								</#if>
+								<#if statistics.p99ResponseTime??>
+								"P99ResponseTime": "${statistics.p99ResponseTime}",
+								<#else>
+								"P99ResponseTime": NA
+								</#if>
+								<#if statistics.p999ResponseTime??>
+								"P999ResponseTime": "${statistics.p999ResponseTime}",
+								<#else>
+								"P999ResponseTime": NA
+								</#if>
+								<#if statistics.oneMinRate??>
+								"OneMinuteRate": "${statistics.oneMinRate}",
+								<#else>
+								"OneMinuteRate": NA
+								</#if>
+								<#if statistics.fiveMinRate??>
+								"FiveMinuteRate": "${statistics.fiveMinRate}",
+								<#else>
+								"FiveMinuteRate": NA
+								</#if>
+								<#if statistics.fifteenMinRate??>
+								"FifteenMinuteRate": "${statistics.fifteenMinRate}",
+								<#else>
+								"FifteenMinuteRate": NA
+								</#if>
+								"StartupTimeStamp": "${statistics.startupTimeStamp.getTime()?datetime}",
+								<#if statistics.lastCalledTimestamp??>
+								"LastCalledTimestamp": "${statistics.lastCalledTimestamp.getTime()?datetime}"
+								<#else>
+								"LastCalledTimestamp": NA
 								</#if>
 			}
 	</#list>
