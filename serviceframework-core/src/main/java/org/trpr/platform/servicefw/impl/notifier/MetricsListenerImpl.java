@@ -18,20 +18,20 @@ package org.trpr.platform.servicefw.impl.notifier;
 import java.util.List;
 
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.trpr.platform.servicefw.spi.notifier.MetricsNotifier;
+import org.trpr.platform.servicefw.spi.notifier.MetricsEvaluator;
 import org.trpr.platform.servicefw.spi.notifier.MetricsListener;
 
 /**
  * Implementation of {@link MetricsListener}. Uses {@link ConcurrentTaskScheduler} to
- * call {@link MetricsNotifier} at specified time intervals
+ * call {@link MetricsEvaluator} at specified time intervals
  * 
  * @author devashishshankar
  * @version 1.0, 13th March, 2013
  */
 public class MetricsListenerImpl implements MetricsListener {
 
-	/** The list of metricsNotifiers for this class */
-	private List<MetricsNotifier> metricsNotifiers;
+	/** The list of metricsEvaluators for this class */
+	private List<MetricsEvaluator> metricsEvaluators;
 	
 	/** The timer instance for this class */
 	private ConcurrentTaskScheduler timer;
@@ -45,19 +45,19 @@ public class MetricsListenerImpl implements MetricsListener {
 	/** Interface method implementation. @see MetricsListener#run() */
 	@Override
 	public void run() {
-		for(MetricsNotifier metricsNotifier : this.metricsNotifiers) {
-			metricsNotifier.checkRules();
+		for(MetricsEvaluator metricsEvaluator : this.metricsEvaluators) {
+			metricsEvaluator.checkRules();
 		}
 	}
 	
 	/** Getter/Setter methods */	
 	@Override
-	public void setMetricsNotifiers(List<MetricsNotifier> metricsNotifiers) {
-		this.metricsNotifiers = metricsNotifiers;
+	public void setMetricsEvaluators(List<MetricsEvaluator> metricsEvaluators) {
+		this.metricsEvaluators = metricsEvaluators;
 		
 	}
-	public List<MetricsNotifier> getMetricsNotifiers() {
-		return this.metricsNotifiers;
+	public List<MetricsEvaluator> getMetricsEvaluators() {
+		return this.metricsEvaluators;
 	}
 	@Override
 	public void setTimer(ConcurrentTaskScheduler timer) {

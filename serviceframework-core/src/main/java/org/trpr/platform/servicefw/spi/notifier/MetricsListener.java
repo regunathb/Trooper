@@ -20,7 +20,7 @@ import java.util.List;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 /**
- * <code>MetricsListener</code> is a class that takes a list of {@link MetricsNotifier} 
+ * <code>MetricsListener</code> is a class that takes a list of {@link MetricsEvaluator} 
  * and calls their notifiers at specified intervals.
  * 
  * @author devashishshankar
@@ -28,12 +28,12 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
  */
 public interface MetricsListener extends Runnable {
 	
-	/** Interface method implementation. This method checks the rules in all MetricsNotifiers */
+	/** Interface method implementation. This method checks the rules in all MetricsEvaluators */
 	@Override
 	public void run();
 	
-	/** Sets the list of {@link MetricsNotifier} objects */
-	public void setMetricsNotifiers(List <MetricsNotifier> metricsNotifiers);
+	/** Sets the list of {@link MetricsEvaluator} objects */
+	public void setMetricsEvaluators(List <MetricsEvaluator> metricsEvaluators);
 	
 	/** The task scheduler to be used by this class */
 	public void setTimer(ConcurrentTaskScheduler timer);

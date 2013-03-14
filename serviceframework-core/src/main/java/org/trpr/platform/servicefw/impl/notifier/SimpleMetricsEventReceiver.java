@@ -35,7 +35,7 @@ public class SimpleMetricsEventReceiver implements MetricsEventReceiver {
 	 * Interface method implementation. Method called when a rule fails
 	 */
 	@Override
-	public void handleEvent(String rule, ServiceStatistics serviceStatistics) {
+	public void handleMetricsEvent(String rule, ServiceStatistics serviceStatistics) {
 		LOGGER.info("RULE event received for Rule: "+rule+":"+serviceStatistics);
 	}
 }

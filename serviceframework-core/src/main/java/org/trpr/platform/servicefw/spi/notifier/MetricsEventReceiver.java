@@ -31,5 +31,5 @@ public interface MetricsEventReceiver {
 	 * @param rule String rule which has succeeded
 	 * @param serviceStatistics the statistics pertaining to the rule
 	 */
-	public void handleEvent(String rule, ServiceStatistics serviceStatistics);
+	public void handleMetricsEvent(String rule, ServiceStatistics serviceStatistics);
 }

@@ -29,10 +29,10 @@ import org.trpr.platform.impl.validation.ExpressionBasedValidator;
 import org.trpr.platform.service.model.common.statistics.ServiceStatistics;
 import org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer;
 import org.trpr.platform.servicefw.spi.notifier.MetricsEventReceiver;
-import org.trpr.platform.servicefw.spi.notifier.MetricsNotifier;
+import org.trpr.platform.servicefw.spi.notifier.MetricsEvaluator;
 
 /**
- * <code>MetricsNotifierImpl</code> is an implementation of  {@link MetricsNotifier}
+ * <code>MetricsEvaluatorImpl</code> is an implementation of  {@link MetricsEvaluator}
  * MVEL based rules are used in this implementation.({@link http://mvel.codehaus.org/})
  * It gathers the Service metrics from {@link ServiceStatisticsGatherer} and checks for
  * mvel rules on the returned map.
@@ -43,7 +43,7 @@ import org.trpr.platform.servicefw.spi.notifier.MetricsNotifier;
  * @author devashishshankar
  * @version 1.0, 13th March, 2013 
  */
-public class MetricsNotifierImpl implements MetricsNotifier {
+public class MetricsEvaluatorImpl implements MetricsEvaluator {
 
 	/** The list of rules being checked by this instance */
 	private List<String> rules;
@@ -64,19 +64,19 @@ public class MetricsNotifierImpl implements MetricsNotifier {
 	public static final String PERIOD_REPLACEMENT = "_";
 	
 	/** Logger instance for this class*/
-	private static final Logger LOGGER = LogFactory.getLogger(MetricsNotifierImpl.class);
+	private static final Logger LOGGER = LogFactory.getLogger(MetricsEvaluatorImpl.class);
 	
 	/** Default rule to be sent to receiver if none of the rules is found */
 	private static final String DEFAULT_RULE = "No rule found";
 
 	/** Default Constructor */
-	public MetricsNotifierImpl() {
+	public MetricsEvaluatorImpl() {
 		this.expressionBasedValidator = new ExpressionBasedValidator("rule failed");
 		this.serviceStatisticsGatherer = new ServiceStatisticsGatherer();
 	}
 
 	/**
-	 * Interface method Implementation. @see MetricsNotifier#checkRules()
+	 * Interface method Implementation. @see MetricsEvaluator#checkRules()
 	 */
 	@Override
 	public void checkRules() {
@@ -88,7 +88,7 @@ public class MetricsNotifierImpl implements MetricsNotifier {
 			for(ServiceStatistics serviceStatistics: statisticsMap.values()) {
 				if(this.receivers!=null) {
 					for(MetricsEventReceiver receiver: this.receivers) {
-						receiver.handleEvent(DEFAULT_RULE, serviceStatistics);
+						receiver.handleMetricsEvent(DEFAULT_RULE, serviceStatistics);
 					}
 				}
 			}
@@ -123,7 +123,7 @@ public class MetricsNotifierImpl implements MetricsNotifier {
 				if(mvelResult==true) { //Rule is true
 					if(this.receivers!=null) {
 						for(MetricsEventReceiver receiver: this.receivers) {
-							receiver.handleEvent(rule, currentStatistics);
+							receiver.handleMetricsEvent(rule, currentStatistics);
 						}
 					}
 				}
