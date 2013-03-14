@@ -1,3 +1,11 @@
+## 1.2.2 (March 14, 2013)
+- **New features**
+  - CodaHale metrics integration for better Metrics gathering. New metrics include: P50,P75,P99,P99.9 Response Times, 1-min, 5-min, 15-min rate, etc.
+  - Added Notification support for metrics. Users can now define custom rules about the metrics and get notifications when any of the rule matches
+  - Ability to turn off sync in HA mode
+  - Minor bugfixing: Next fire time not updated in Batch profile [FIXED]
+<br />
+
 ## 1.2.1 (March 6, 2013)
 - **New features**
   - Server mode for serviceframework, that can be used to view metrics and test the services
