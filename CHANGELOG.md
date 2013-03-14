@@ -5,6 +5,10 @@
   - Ability to turn off sync in HA mode
   - Minor bugfixing: Next fire time not updated in Batch profile [FIXED]
 <br />
+- **Docs changes:**  
+  - https://github.com/regunathb/Trooper/wiki/Writing-Services-in-Trooper [Info on how to use the Metrics Notifications]
+  - https://github.com/regunathb/Trooper/wiki/Trooper-Services-Web-Console [Added images to show the new console]
+<br />
 
 ## 1.2.1 (March 6, 2013)
 - **New features**
