@@ -17,10 +17,8 @@ package org.trpr.platform.batch.impl.spring;
 
 import java.io.File;
 
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * The <code>BatchConfigInfo</code> class is a structure that holds job configuration information and the ApplicationContext for the job
