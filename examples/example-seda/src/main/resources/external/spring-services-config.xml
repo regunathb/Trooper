@@ -13,13 +13,13 @@
 		<property name="serviceContext" ref="serviceContext" />
 	</bean>	
 	
-	<bean id="metricsRulesListener" class="org.trpr.platform.servicefw.impl.notifier.MetricsListenerImpl">
+	<bean id="metricsListener" class="org.trpr.platform.servicefw.impl.notifier.MetricsListenerImpl">
 		<property name="metricsEvaluators">
 			<list>
 				<bean class="org.trpr.platform.servicefw.impl.notifier.MetricsEvaluatorImpl">
 					<property name="rules">
 						<list>
-							<value>greetingService_1.0.p50ResponseTime &gt; 30</value>
+							<value>greetingService_1.0.p50ResponseTime &lt; 30 &amp;&amp; greetingService_1.0.p99ResponseTime &gt; 30 </value>
 							<value>greetingService_1.0.p50ResponseTime &lt; 30</value>
 							<value>greetingService_1.0.activeRequestsCount != null</value>
 							<value>greetingService_1.0.totalRequestsCount &gt; 20</value>
