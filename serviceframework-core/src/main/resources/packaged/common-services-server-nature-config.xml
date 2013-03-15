@@ -10,27 +10,27 @@
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
 	<!-- The Jetty server beans  -->
-    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
+    <bean id="jettyServer" class="org.eclipse.jetty.server.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
         <property name="connectors">
             <list>
-                <bean id="Connector" class="org.mortbay.jetty.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
-           			<property name="port" value="8184"/>
+                <bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
+           			<property name="port" value="${services.core.jetty.admin.port}"/>
                 </bean>
             </list>
         </property>
        <property name="handler">
             <bean id="handlers"
-                  class="org.mortbay.jetty.handler.HandlerCollection">
+                  class="org.eclipse.jetty.server.handler.HandlerCollection">
                 <property name="handlers">
                     <list>
                         <bean id="contexts"
-                              class="org.mortbay.jetty.handler.ContextHandlerCollection">
+                              class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
                             <property name="handlers">
                                 <list>
                                     <bean class="org.trpr.platform.servicefw.jetty.JettyWebAppContextFactory">
 										<property name="contextName" value="/"/>
 										<property name="contextPath" value="WEB-INF"/>	
-										<property name="maxFormContentSize" value="20000"/>	
+										<property name="maxFormContentSize" value="${services.core.jetty.maxFormContentSize}"/>	
 									 </bean>
                                 </list>
                             </property>
@@ -40,9 +40,9 @@
             </bean>
         </property>
     </bean>
-<!-- 	<bean class="org.trpr.platform.runtime.impl.config.spring.PropertyPlaceholderConfigurer"> -->
-<!-- 		<property name="defaultPropertiesOnClasspath"> -->
-<!-- 			<value>packaged/default-batch-core-config.properties</value> -->
-<!-- 		</property> -->
-<!-- 	</bean>     -->
+	<bean class="org.trpr.platform.runtime.impl.config.spring.PropertyPlaceholderConfigurer">
+		<property name="defaultPropertiesOnClasspath">
+			<value>packaged/default-services-core-config.properties</value>
+		</property>
+	</bean>    
 </beans>
