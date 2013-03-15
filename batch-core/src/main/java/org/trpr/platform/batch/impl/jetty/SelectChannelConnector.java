@@ -24,8 +24,7 @@ import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
  * @author devashishshankar
  * @version 1.0, 31 Jan, 2013
  */
-public class SelectChannelConnector extends
-		org.mortbay.jetty.nio.SelectChannelConnector {
+public class SelectChannelConnector extends org.eclipse.jetty.server.nio.SelectChannelConnector {
 	
 	/** Instance of {@link JobConfigurationService} */
 	private JobConfigurationService jobConfigurationService;

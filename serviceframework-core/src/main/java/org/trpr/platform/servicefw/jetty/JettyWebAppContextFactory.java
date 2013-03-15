@@ -18,7 +18,7 @@ package org.trpr.platform.servicefw.jetty;
 
 import java.io.File;
 
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 

@@ -10,7 +10,7 @@
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
 	<!-- The Jetty server beans  -->
-    <bean id="jettyServer" class="org.mortbay.jetty.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
+    <bean id="jettyServer" class="org.eclipse.jetty.server.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
         <property name="connectors">
             <list>
                 <bean id="Connector" class="org.trpr.platform.batch.impl.jetty.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
@@ -21,11 +21,11 @@
         </property>
        <property name="handler">
             <bean id="handlers"
-                  class="org.mortbay.jetty.handler.HandlerCollection">
+                  class="org.eclipse.jetty.server.handler.HandlerCollection">
                 <property name="handlers">
                     <list>
                         <bean id="contexts"
-                              class="org.mortbay.jetty.handler.ContextHandlerCollection">
+                              class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
                             <property name="handlers">
                                 <list>
                                     <bean class="org.trpr.platform.batch.impl.jetty.JettyWebAppContextFactory">
