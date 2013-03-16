@@ -11,6 +11,13 @@
 
 	<!-- The Jetty server beans  -->
     <bean id="jettyServer" class="org.eclipse.jetty.server.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
+		<property name="threadPool">  
+		     <bean id="ThreadPool" class="org.eclipse.jetty.util.thread.QueuedThreadPool" destroy-method="stop"> <!-- Specify the destroy-method here to close the thread pool-->
+		     	<property name="name" value="Jetty-Listener"/>
+		        <property name="minThreads" value="2"/>
+		        <property name="maxThreads" value="5"/>
+		     </bean>
+		</property>   
         <property name="connectors">
             <list>
                 <bean id="Connector" class="org.trpr.platform.batch.impl.jetty.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
