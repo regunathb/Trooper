@@ -141,15 +141,13 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 			return;
 		}
 		
-		if (RuntimeConstants.STANDALONE.equals(RuntimeVariables.getRuntimeNature())) { 
-			// Add a shutdown hook
-			Runtime.getRuntime().addShutdownHook(new BootstrapShutdownThread(this));
-			
-			// Start up the background thread which will keep the JVM alive when #stop() is called on this Bootstrap via a management console/interface
-			Thread backgroundThread = new Thread(this);
-			backgroundThread.setName(RuntimeConstants.BOOTSTRAP_BACKGROUND_THREADNAME);
-			backgroundThread.start();
-		}
+		// Add a shutdown hook
+		Runtime.getRuntime().addShutdownHook(new BootstrapShutdownThread(this));
+		
+		// Start up the background thread which will keep the JVM alive when #stop() is called on this Bootstrap via a management console/interface
+		Thread backgroundThread = new Thread(this);
+		backgroundThread.setName(RuntimeConstants.BOOTSTRAP_BACKGROUND_THREADNAME);
+		backgroundThread.start();
 	}
 
 	/**
