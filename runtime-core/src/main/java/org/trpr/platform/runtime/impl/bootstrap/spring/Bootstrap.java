@@ -277,11 +277,17 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	 */
 	public void stop() throws Exception {
 		System.out.println("** Trooper runtime Stopping....**");
-		// publish an event that this Bootstrap is stopping
-		publishBootstrapEvent("** Stopping Trooper runtime **", RuntimeConstants.BOOTSTRAP_STOP_STATE);		
-		runtimeVariables.clear();
-		this.container.destroy();
-		this.containerContext.destroy();
+		if (this.container != null) {
+			// publish an event that this Bootstrap is stopping
+			publishBootstrapEvent("** Stopping Trooper runtime **", RuntimeConstants.BOOTSTRAP_STOP_STATE);		
+			runtimeVariables.clear();
+			this.container.destroy();
+			this.container = null;
+		}
+		if (this.containerContext != null) {
+			this.containerContext.destroy();
+			this.containerContext = null;
+		}
 		System.out.println("** Trooper runtime stopped! **");
 	}
 	
