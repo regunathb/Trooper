@@ -36,6 +36,7 @@
 		        </method-entry-point-resolver>
 				<!-- This bean is defined in spring-services-config.xml of this project -->
 				<spring-object bean="greetingService_1.0" />
+				<pooling-profile maxActive="8"/>
 			</pooled-component>
 			<outbound>
 				<!-- Service Responses that contain error status are filtered out by this router -->
@@ -44,6 +45,7 @@
 					<!-- <outbound-endpoint ref="EchoInputEndpoint1"/>	-->				
 				</custom-outbound-router>
 			</outbound>
+			<threading-profile maxThreadsActive="8" maxThreadsIdle="5"/>
 		</service>
 		<service name="EchoMuleService">
 			<inbound>
@@ -73,6 +75,8 @@
                 <spring:property name="retryLimit" value="100" />
             </spring:bean>
         </spring:property>
+    	<receiver-threading-profile maxThreadsActive="8" maxThreadsIdle="5"/>
+    	<dispatcher-threading-profile maxThreadsActive="8" maxThreadsIdle="5"/>
         <custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
             <spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
         </custom-exception-strategy>
