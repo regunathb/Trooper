@@ -36,6 +36,6 @@ public class SimpleMetricsEventReceiver implements MetricsEventReceiver {
 	 */
 	@Override
 	public void handleMetricsEvent(String rule, ServiceStatistics serviceStatistics) {
-		LOGGER.info("RULE event received for Rule: "+rule+":"+serviceStatistics);
+		LOGGER.debug("RULE event received for Rule: "+rule+":"+serviceStatistics);
 	}
 }
