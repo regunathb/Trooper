@@ -139,6 +139,7 @@
 					</archive>
 					<includes>
 						<include>packaged/**/*</include>
+						<include>WEB-INF/**/*</include>
 						<include>org/**/*</include>
 					</includes>
 				</configuration>
