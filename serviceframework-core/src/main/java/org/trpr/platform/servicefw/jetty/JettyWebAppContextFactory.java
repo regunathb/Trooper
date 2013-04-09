@@ -67,7 +67,7 @@ public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 		String path = null;
 		File[] files = FileLocator.findDirectories(this.getContextPath(), null);
 		for (File file : files) {
-			// we need only WEB-INF from batch-core project and none else even by mistake
+			// we need only WEB-INF from serviceframework-core project and none else even by mistake
 			String fileToString = file.toString();
 			if (fileToString.contains("serviceframework-core")) {
 				path = fileToString;

@@ -23,7 +23,7 @@
 							<value>greetingService_1.0.p50ResponseTime &lt; 30</value>
 							<value>greetingService_1.0.activeRequestsCount != null</value>
 							<value>greetingService_1.0.totalRequestsCount &gt; 20</value>
-							<value>greetingService_1.1.totalRequestsCount &lt; 20</value>
+							<!-- <value>greetingService_1.1.totalRequestsCount &lt; 20</value> -->
 						</list>
 					</property>
 					<property name="notificationReceivers">

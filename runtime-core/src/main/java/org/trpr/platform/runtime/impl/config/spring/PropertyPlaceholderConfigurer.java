@@ -17,12 +17,14 @@ package org.trpr.platform.runtime.impl.config.spring;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
 import org.springframework.core.io.ClassPathResource;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
+import org.trpr.platform.runtime.impl.config.FileLocator;
 
 /**
 *
@@ -31,7 +33,8 @@ import org.trpr.platform.runtime.common.RuntimeVariables;
 * <pre>
 * 	1. Check if default properties have been set using {@link PropertyPlaceholderConfigurer#setDefaultPropertiesOnClasspath(String)}
 * 	2. Check if a properties file path(s) has been set on this class via the PropertyPlaceholderConfigurer methods
-* 	3. Check {@link RuntimeVariables} for a runtime variable by name {@link RuntimeConstants#CONFIG_PROPERTIES_VAR} that points to a .properties file to load
+* 	3. Check if a properties file path has been set on this class using the Trooper config location i.e. file on config locations recognized by Trooper runtime
+* 	4. Check {@link RuntimeVariables} for a runtime variable by name {@link RuntimeConstants#CONFIG_PROPERTIES_VAR} that points to a .properties file to load
 * <pre>
 * 
 * The override behavior is therefore defined by the last loaded location - in this case,  RuntimeConstants#CONFIG_PROPERTIES_VAR would take precedence over all else.
@@ -43,6 +46,9 @@ public class PropertyPlaceholderConfigurer extends org.springframework.beans.fac
 	
 	/** The default properties location on the classpath */
 	private String defaultPropertiesOnClasspath;
+	
+	/** Properties file on Trooper config location(s)*/
+	private String propertiesOnConfigPath;
 
 	/**
 	 * Overriden super class method. Creates merged properties following the loading order described in the class summary
@@ -58,6 +64,12 @@ public class PropertyPlaceholderConfigurer extends org.springframework.beans.fac
 		}
 		// get merged properties from all specified locations on super type
 		mergedProperties = super.mergeProperties();
+		// check if there is a properties path specified on the Trooper config paths
+		if (this.getPropertiesOnConfigPath() != null) {
+			FileReader fileReader = new FileReader(FileLocator.findUniqueFile(this.getPropertiesOnConfigPath()));
+			mergedProperties.load(fileReader);
+			fileReader.close();
+		}
 		// check to see if there is an override via RuntimeVariables
 		String runtimePropertiesPath = RuntimeVariables.getVariable(RuntimeConstants.CONFIG_PROPERTIES_VAR);
 		if (runtimePropertiesPath != null) {
@@ -72,6 +84,12 @@ public class PropertyPlaceholderConfigurer extends org.springframework.beans.fac
 	}
 	public void setDefaultPropertiesOnClasspath(String defaultPropertiesOnClasspath) {
 		this.defaultPropertiesOnClasspath = defaultPropertiesOnClasspath;
+	}
+	public String getPropertiesOnConfigPath() {
+		return this.propertiesOnConfigPath;
+	}
+	public void setPropertiesOnConfigPath(String propertiesOnConfigPath) {
+		this.propertiesOnConfigPath = propertiesOnConfigPath;
 	}
 	
 }

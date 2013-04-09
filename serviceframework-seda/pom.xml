@@ -120,6 +120,11 @@
             		<groupId>org.safehaus.jug</groupId>
             		<artifactId>jug</artifactId>
         		</exclusion>
+        		<!-- Remove Spring related dependencies as they bring in older versions -->        		
+		        <exclusion>
+        			<groupId>org.springframework</groupId>
+              		<artifactId>spring-context</artifactId>
+        		</exclusion>        		        		
 		    </exclusions>				    
 		</dependency>
 		<dependency>
@@ -147,6 +152,7 @@
             		<groupId>org.safehaus.jug</groupId>
             		<artifactId>jug</artifactId>
         		</exclusion>
+        		<!-- Remove Spring related dependencies as they bring in older versions -->
 		        <exclusion>
             		<groupId>org.springframework</groupId>
             		<artifactId>spring-web</artifactId>
@@ -155,6 +161,10 @@
             		<groupId>org.springframework</groupId>
             		<artifactId>spring-webmvc</artifactId>
         		</exclusion>
+		        <exclusion>
+        			<groupId>org.springframework</groupId>
+              		<artifactId>spring-context</artifactId>
+        		</exclusion>        		
 		    </exclusions>				    
 		</dependency>								
 	</dependencies>
