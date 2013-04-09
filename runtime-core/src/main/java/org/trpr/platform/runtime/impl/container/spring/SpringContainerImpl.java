@@ -283,7 +283,7 @@ public class SpringContainerImpl implements Container {
 					// must be available to the context class loader for this dynamic loading to succeed
 					BootstrapExtension be = (BootstrapExtension) Class.forName(className,true,Thread.currentThread().getContextClassLoader()).newInstance();
 					be.setName(beInfo.getBeName());
-					
+					be.setProperties(beInfo.getBeProperties());
 					LOGGER.info("Initializing Bootstrap extension .... "+ beInfo.getBeName());
 					// add all dependency Bootstrap extensions that have been loaded already
 					for (String dependencyBEInfo : beInfo.getDependenciesList()) {
