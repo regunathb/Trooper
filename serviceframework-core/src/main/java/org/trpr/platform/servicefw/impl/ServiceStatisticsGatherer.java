@@ -147,8 +147,8 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 				servicesStatistics[i].setOneMinRate((Double) responseTimes.oneMinuteRate());
 				servicesStatistics[i].setFiveMinRate((Double) responseTimes.fiveMinuteRate());
 				servicesStatistics[i].setFifteenMinRate((Double) responseTimes.fifteenMinuteRate());
-				servicesStatistics[i].setOneMinErrorRate((Double) errorRequestRate.fifteenMinuteRate());
-				servicesStatistics[i].setFiveMinErrorRate((Double) errorRequestRate.fifteenMinuteRate());
+				servicesStatistics[i].setOneMinErrorRate((Double) errorRequestRate.oneMinuteRate());
+				servicesStatistics[i].setFiveMinErrorRate((Double) errorRequestRate.fiveMinuteRate());
 				servicesStatistics[i].setFifteenMinErrorRate((Double) errorRequestRate.fifteenMinuteRate());
 				
 			}

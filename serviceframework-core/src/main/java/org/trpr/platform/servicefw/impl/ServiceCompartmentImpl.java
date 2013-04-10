@@ -106,7 +106,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 		this.errorRequestCount = Metrics.newCounter(ServiceCompartmentImpl.class, 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
 		this.errorRequestRate = Metrics.newMeter(ServiceCompartmentImpl.class,
-				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_RATE_ATTR_INDEX, serviceInfo.getServiceKey().toString()),"errorRequests",TimeUnit.MINUTES);
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_RATE_ATTR_INDEX, serviceInfo.getServiceKey().toString()),"errorRequests",TimeUnit.SECONDS);
 		//Initialize the Gauges
 		Metrics.newGauge(ServiceCompartmentImpl.class, 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.STARTUP_TIME_ATTR_INDEX, serviceInfo.getServiceKey().toString()),
