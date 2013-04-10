@@ -15,6 +15,8 @@
  */
 package org.trpr.platform.servicefw.impl;
 
+import java.util.concurrent.TimeUnit;
+
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -34,6 +36,7 @@ import org.trpr.platform.servicefw.spi.ServiceResponse;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.Meter;
 
 /**
  * The <code>ServiceCompartmentImpl</code> class is an implementation of the {@link ServiceCompartment} interface. 
@@ -87,6 +90,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 */
 	protected ServiceInfo serviceInfo = null;
 
+	private Meter errorRequestRate;
+
 	/**
 	 * Constructor for this class
 	 * @param serviceInfo the ServiceInfo of the Service that this compartment is expected to handle
@@ -100,6 +105,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ACTIVE_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
 		this.errorRequestCount = Metrics.newCounter(ServiceCompartmentImpl.class, 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
+		this.errorRequestRate = Metrics.newMeter(ServiceCompartmentImpl.class,
+				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.ERROR_REQUEST_RATE_ATTR_INDEX, serviceInfo.getServiceKey().toString()),"errorRequests",TimeUnit.MINUTES);
 		//Initialize the Gauges
 		Metrics.newGauge(ServiceCompartmentImpl.class, 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.STARTUP_TIME_ATTR_INDEX, serviceInfo.getServiceKey().toString()),
@@ -176,6 +183,7 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 			this.lastServiceRequestResponseTime = executionEndTime - executionStartTime;
 			if (String.valueOf(ServiceFrameworkConstants.FAILURE_STATUS_CODE).equalsIgnoreCase(((ServiceResponseImpl)response).getStatusCode())) {
 				this.errorRequestCount.inc();
+				this.errorRequestRate.mark();
 			}
 		}		
 	}

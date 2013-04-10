@@ -52,9 +52,9 @@ public class SedaClient {
 			final int count = i;
 			threads[i] = new Thread() {
 				public void run() {
-					for (int j = 0; j < 5; j++) {
+					for (int j = 0; j < 50; j++) {
 						Earthling e = new Earthling();
-						e.setFirstName("Mr");
+						e.setFirstName(null);
 						e.setLastName("Trooper" + count + j);
 						Calendar c  = Calendar.getInstance();
 						c.set(1974, 10, 16);
