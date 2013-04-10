@@ -15,9 +15,13 @@
  */
 package org.trpr.platform.servicefw.impl.notifier;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.util.Assert;
 import org.trpr.platform.servicefw.spi.notifier.MetricsEvaluator;
 import org.trpr.platform.servicefw.spi.notifier.MetricsListener;
 
@@ -28,7 +32,7 @@ import org.trpr.platform.servicefw.spi.notifier.MetricsListener;
  * @author devashishshankar
  * @version 1.0, 13th March, 2013
  */
-public class MetricsListenerImpl implements MetricsListener {
+public class MetricsListenerImpl implements MetricsListener, InitializingBean {
 
 	/** The list of metricsEvaluators for this class */
 	private List<MetricsEvaluator> metricsEvaluators;
@@ -50,6 +54,15 @@ public class MetricsListenerImpl implements MetricsListener {
 		}
 	}
 	
+	/**
+	 * Interface method implementation. Schedules metrics evaluation using the Timer specified and after the delay interval
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(this.timer, "'timer' instance cannot be null");
+		this.timer.scheduleAtFixedRate(this, new Date(Calendar.getInstance().getTimeInMillis() + this.getDelay()), this.getDelay());		
+	}	
+	
 	/** Getter/Setter methods */	
 	@Override
 	public void setMetricsEvaluators(List<MetricsEvaluator> metricsEvaluators) {
@@ -62,7 +75,6 @@ public class MetricsListenerImpl implements MetricsListener {
 	@Override
 	public void setTimer(ConcurrentTaskScheduler timer) {
 		this.timer = timer;
-		this.timer.scheduleAtFixedRate(this, 10000);
 	}
 	@Override
 	public void setDelay(int time) {
@@ -71,5 +83,6 @@ public class MetricsListenerImpl implements MetricsListener {
 	public int getDelay() {
 		return delay;
 	}
-	/** End Getter/Setter methods */	
+	/** End Getter/Setter methods */
+
 }
