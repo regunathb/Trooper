@@ -28,7 +28,10 @@
 			   <xs:element name="fifteenMinRate"  type="xs:double" minOccurs="0"/>
 			   <xs:element name="lastServiceRequestResponseTime"  type="xs:double" minOccurs="0"/>
 			   <xs:element name="errorRequestsCount"  type="xs:long" minOccurs="0"/>
-			   <xs:element name="successRequestsCount"  type="xs:long" minOccurs="0"/> 	   			   
+			   <xs:element name="successRequestsCount"  type="xs:long" minOccurs="0"/> 	   	
+			   <xs:element name="oneMinErrorRate"  type="xs:double" minOccurs="0"/> 	  	 	
+			   <xs:element name="fiveMinErrorRate"  type="xs:double" minOccurs="0"/> 	  	
+			   <xs:element name="fifteenMinErrorRate"  type="xs:double" minOccurs="0"/> 	  	 		   
   			</xs:sequence>
 		</xs:extension>
 	</xs:complexContent>	

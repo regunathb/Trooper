@@ -9,7 +9,8 @@
 								<th style="border-right: 1px solid #b8c885" rowspan="2">Version</th>
 								<th style="border-right: 1px solid #b8c885" colspan="4">Counts</th>
 								<th style="border-right: 1px solid #b8c885" colspan="5">Response Time (ms)</th>
-								<th style="border-right: 1px solid #b8c885" colspan="3">Rate (Requests/sec)</th>
+								<th style="border-right: 1px solid #b8c885" colspan="3">Request Rate (Rps)</th>
+								<th style="border-right: 1px solid #b8c885" colspan="3">Error Rate (Rps)</th>
 								<th style="border-right: 1px solid #b8c885" colspan="2">TimeStamps</th>
 						
 							</tr>
@@ -25,6 +26,10 @@
 								<th>p99.9</th>
 								<th style="border-right: 1px solid #b8c885">mean</th> 
 
+								<th>1 min</th>
+								<th>5 min</th>
+								<th style="border-right: 1px solid #b8c885">15 min</th>
+								
 								<th>1 min</th>
 								<th>5 min</th>
 								<th style="border-right: 1px solid #b8c885">15 min</th>
@@ -103,6 +108,21 @@
 								</#if>
 								<#if statistics.fifteenMinRate??>
 								<td style="border-right: 1px solid #b8c885"> ${statistics.fifteenMinRate}</td>
+								<#else>
+								<td style="border-right: 1px solid #b8c885"> NA </td>
+								</#if>
+								<#if statistics.oneMinErrorRate??>
+								<td> ${statistics.oneMinErrorRate}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.fiveMinErrorRate??>
+								<td> ${statistics.fiveMinErrorRate}</td>
+								<#else>
+								<td> NA </td>
+								</#if>
+								<#if statistics.fifteenMinErrorRate??>
+								<td style="border-right: 1px solid #b8c885"> ${statistics.fifteenMinErrorRate}</td>
 								<#else>
 								<td style="border-right: 1px solid #b8c885"> NA </td>
 								</#if>

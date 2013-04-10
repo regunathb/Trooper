@@ -27,6 +27,7 @@ import org.trpr.platform.servicefw.spi.ServiceKey;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
@@ -60,6 +61,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 	public static final int ERROR_REQUEST_COUNT_ATTR_INDEX = 4;
 	public static final int RESPONSE_TIME_ATTR_INDEX = 5;
 	public static final int LAST_SERVICE_TIME_ATTR_INDEX = 6;
+	public static final int ERROR_REQUEST_RATE_ATTR_INDEX = 7;
 
 	/** Attribute names assigned to the Metrics */
 	private static final String[] ATTRIBUTE_NAMES = {
@@ -70,6 +72,7 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 		"errorRequestsCount",           //Counter
 		"responseTime",                 //Timer
 		"lastServiceRequestResponseTime",//Gauge
+		"errorRequestRate",             //Meter
 	};
 
 	/** Seperator for Attribute name and Service name in JMX */
@@ -114,6 +117,8 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 					getMetricName(ERROR_REQUEST_COUNT_ATTR_INDEX, serviceKeys[i].toString())));
 			Timer responseTimes = (Timer) metricsMap.get(new MetricName(ServiceCompartmentImpl.class,
 					getMetricName(RESPONSE_TIME_ATTR_INDEX, serviceKeys[i].toString())));
+			Meter errorRequestRate = (Meter) metricsMap.get(new MetricName(ServiceCompartmentImpl.class,
+					getMetricName(ERROR_REQUEST_RATE_ATTR_INDEX, serviceKeys[i].toString())));
 			//Populate Metrics to serviceStatistics
 			servicesStatistics[i] = new ServiceStatistics();
 			servicesStatistics[i].setServiceName(serviceKeys[i].getName());
@@ -142,6 +147,10 @@ public class ServiceStatisticsGatherer extends AppInstanceAwareMBean {
 				servicesStatistics[i].setOneMinRate((Double) responseTimes.oneMinuteRate());
 				servicesStatistics[i].setFiveMinRate((Double) responseTimes.fiveMinuteRate());
 				servicesStatistics[i].setFifteenMinRate((Double) responseTimes.fifteenMinuteRate());
+				servicesStatistics[i].setOneMinErrorRate((Double) errorRequestRate.oneMinuteRate());
+				servicesStatistics[i].setFiveMinErrorRate((Double) errorRequestRate.fiveMinuteRate());
+				servicesStatistics[i].setFifteenMinErrorRate((Double) errorRequestRate.fifteenMinuteRate());
+				
 			}
 			servicesStatistics[i].setSuccessRequestsCount(servicesStatistics[i].getTotalRequestsCount()
 					-servicesStatistics[i].getErrorRequestsCount());

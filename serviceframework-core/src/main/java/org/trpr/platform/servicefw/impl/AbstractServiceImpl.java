@@ -21,12 +21,16 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.service.model.common.error.BusinessEntityErrorDetail;
 import org.trpr.platform.service.model.common.error.ErrorDetail.ErrorBlock;
 import org.trpr.platform.service.model.common.error.ErrorSummary;
 import org.trpr.platform.service.model.common.error.ServiceRequestErrorDetail;
 import org.trpr.platform.service.model.common.event.ServiceAlert;
 import org.trpr.platform.service.model.common.event.ServiceEvent;
+import org.trpr.platform.service.model.common.platformexceptionresponse.ExceptionSummaryType;
+import org.trpr.platform.service.model.common.platformexceptionresponse.PlatformExceptionResponse;
 import org.trpr.platform.service.model.common.platformservicerequest.PlatformServiceRequest;
 import org.trpr.platform.service.model.common.platformserviceresponse.PlatformServiceResponse;
 import org.trpr.platform.service.model.common.status.Status;
@@ -60,6 +64,9 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 	/** Constants for string values used locally in this class	 */
 	private static final String UNDERSCORE = "_";
 	private static final String SERVICE_INVOCATION_TIMESTAMP = "serviceInvocationTimestamp";
+
+	/** The log for this class */
+	private static final Logger LOGGER = LogFactory.getLogger(AbstractServiceImpl.class);
 
 	/** The TaskManager to use for Task execution*/
 	@SuppressWarnings("rawtypes")
@@ -152,13 +159,13 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 		}
 		//Create a timer context, to time this request
 		final TimerContext context = responses.time();
-		try {
-			// add the service request time-stamp as a header
-			Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};
-			((ServiceRequestImpl<T>)request).addHeaders(headers);
+		// add the service request time-stamp as a header
+		Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};
+		((ServiceRequestImpl<T>)request).addHeaders(headers);
 
-			// signal start of execution to the service context
-			this.serviceContext.notifyServiceExecutionStart(request);
+		// signal start of execution to the service context
+		this.serviceContext.notifyServiceExecutionStart(request);
+		try {
 
 			ServiceResponse<S> serviceResponse = null;
 
@@ -175,6 +182,12 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 			this.serviceContext.notifyServiceExecutionEnd(request, serviceResponse, Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
 
 			return serviceResponse;
+		} catch (Exception e) {
+			LOGGER.error("AbstractServiceImpl:: Error Invoking service : "	+ request.getServiceName() + "_" + request.getServiceVersion(), e);
+			// catch and return a ServiceResponse for all kinds of exceptions
+			// that might arise when invoking a remote service
+			this.serviceContext.notifyServiceExecutionEnd(request, constructServiceResponseFromException(e), Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
+			throw new ServiceException(e);
 		}
 		finally {
 			context.stop();
@@ -244,5 +257,40 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 		TaskContext taskContext = getTaskManager().execute(tasks);
 		return taskContext;
 	}
+	
+	/**
+	 * Helper method to construct a ServiceResponse from the specified Throwable
+	 * instance. Used to report exception trace back to the caller for generic
+	 * exceptions
+	 * 
+	 * @param e
+	 *            the Throwable instance to construct the response from
+	 * @return ServiceResponse instance created from the specified throwable.
+	 */
+	@SuppressWarnings("unchecked")
+	protected ServiceResponse constructServiceResponseFromException(Throwable e) {
+		ServiceResponseImpl serviceResponseImpl = new ServiceResponseImpl(
+				String.valueOf(ServiceFrameworkConstants.FAILURE_STATUS_CODE));
+		PlatformExceptionResponse platformExceptionResponse = new PlatformExceptionResponse();
+		Status status = new Status();
+		status.setCode(ServiceFrameworkConstants.FAILURE_STATUS_CODE);
+		status.setMessage(ServiceFrameworkConstants.FAILURE_STATUS_MESSAGE);
+		platformExceptionResponse.setStatus(status);
+		ExceptionSummaryType exceptionSummaryType = new ExceptionSummaryType();
+		exceptionSummaryType.setErrorMessage(e.getMessage());
+		StackTraceElement[] stackTraceElement = e.getStackTrace();
+		StringBuffer stackTraceString = new StringBuffer();
+		stackTraceString.append(e.getClass().getName());
+		stackTraceString.append("\n");
+		for (int i = 0; i < stackTraceElement.length; i++) {
+			stackTraceString.append(stackTraceElement[i]);
+			stackTraceString.append("\n");
+		}
+		exceptionSummaryType.setStackTrace(stackTraceString.toString());
+		platformExceptionResponse.setExceptionSummary(exceptionSummaryType);
+		serviceResponseImpl.setResponseData(platformExceptionResponse);
+		return serviceResponseImpl;
+	}
+
 
 }
