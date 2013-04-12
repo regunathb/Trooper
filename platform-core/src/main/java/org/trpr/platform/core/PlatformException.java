@@ -26,10 +26,14 @@ package org.trpr.platform.core;
 
 public class PlatformException extends RuntimeException {
 
+	/** The serial version UID*/
 	private static final long serialVersionUID = -4064529933657504359L;
+	
+	/** Constants for error codes */
+	public static final int NO_CODE = -1;
 
 	/** Optional error code for this Exception */
-	private int errorCode = -1;
+	private int errorCode = NO_CODE;
 
 	/**
 	 * No args constructor
@@ -72,6 +76,17 @@ public class PlatformException extends RuntimeException {
 		super(message, cause);
 	}
 
+	/**
+	 * Constructs an instance of this Exception with the specified exception message, error code and cause
+	 * @param message String message for this Exception
+	 * @param cause the Throwable cause for this Exception
+	 * @param errorCode the exception error code
+	 */
+	public PlatformException(String message, Throwable cause, int errorCode) {
+		super(message, cause);
+		this.errorCode = errorCode;
+	}
+	
 	/**
 	 * Gets the root cause for this Exception
 	 * @return the root cause of this Exception
