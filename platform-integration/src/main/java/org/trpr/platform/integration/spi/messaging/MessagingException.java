@@ -26,7 +26,12 @@ import org.trpr.platform.core.PlatformException;
 
 public class MessagingException extends PlatformException {
 
+	/** The serial version UID*/
 	private static final long serialVersionUID = 1L;
+	
+	/** Relevant error codes for this Exception */
+	public static final int CONNECTION_FAILURE = 100;
+	public static final int QUEUE_EMPTY = 101;
 	
 	/**
 	 * Constructor for MessagingException.
@@ -37,12 +42,31 @@ public class MessagingException extends PlatformException {
 	}
 
 	/**
+	 * Constructs an instance of this MessagingException with the specified exception message and error code
+	 * @param message String message for this Exception
+	 * @param errorCode the errorCode for the message
+	 */
+	public MessagingException(String message, int errorCode) {
+		super(message, errorCode);
+	}
+	
+	/**
 	 * Constructor for MessagingException.
 	 * @param msg the detail message
 	 * @param cause the root cause 
 	 */
 	public MessagingException(String msg, Throwable cause) {
 		super(msg, cause);
+	}
+	
+	/**
+	 * Constructs an instance of this MessagingException with the specified exception message, error code and cause
+	 * @param message String message for this Exception
+	 * @param cause the Throwable cause for this Exception
+	 * @param errorCode the exception error code
+	 */
+	public MessagingException(String message, Throwable cause, int errorCode) {
+		super(message, cause, errorCode);
 	}
 	
 }
