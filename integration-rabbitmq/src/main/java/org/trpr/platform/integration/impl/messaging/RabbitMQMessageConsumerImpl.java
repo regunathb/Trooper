@@ -18,6 +18,7 @@ package org.trpr.platform.integration.impl.messaging;
 
 import java.util.List;
 
+import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.util.PlatformUtils;
@@ -167,7 +168,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 				totNoOfMessagesConsumed++; // increment the count though the message might have failed. Used in determining the configuration in round-robin					
 			}
 		}
-		throw new MessagingException("Error while getting queue depth. All configurations failed!. Last failed configuration : " + lastUsedConfiguration);
+		throw new MessagingException("Unable to queue depth. All configurations failed!. Last failed configuration : " + lastUsedConfiguration, MessagingException.CONNECTION_FAILURE);
 	}
 	
 	/**
@@ -190,6 +191,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 		int noOfQueues = rabbitMQConfigurations.size();
 		int attempt = 0;
 		RabbitMQConfiguration lastUsedConfiguration = null;
+		Throwable consumptionRootCause = null;
 		while (attempt < noOfQueues) {
 			int connectionIndex = (int)(totNoOfMessagesConsumed % noOfQueues);
 			RabbitMQConfiguration msgPubConfig = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
@@ -209,6 +211,8 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 					// continue to try with the next configuration
 					attempt++;
 					totNoOfMessagesConsumed++; // increment the count though the message failed. Used in determining the configuration in round-robin
+					// set the error root cause 
+					consumptionRootCause = e;
 					continue;
 				} 
 			}
@@ -234,12 +238,19 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 			} catch (Exception e) {
 				this.rabbitConnectionHolders[connectionIndex] = null; // the connection holder is not working. Remove from array
 				LOGGER.error("Error while consuming message from queue. Will try other configurations. Error is : " + e.getMessage(), e);
+				// set the error root cause
+				consumptionRootCause = e;
 			} finally {
 				attempt++; // try other configurations
 				totNoOfMessagesConsumed++; // increment the count though the message consumption failed. Used in determining the configuration in round-robin				
 			}
 		}
-		throw new MessagingException("No messages available for consumption in queue. All configurations failed!. Last failed configuration : " + lastUsedConfiguration);		
+		if (consumptionRootCause != null) { // there is a connection (or) other exception by which we are unable to return a message
+			throw new MessagingException("Error consuming message from queue. Last used configuration is : " + lastUsedConfiguration, consumptionRootCause, MessagingException.CONNECTION_FAILURE);
+		} else {
+			throw new MessagingException("No messages available for consumption in queue.",  MessagingException.QUEUE_EMPTY);
+		}		
+				
 	}
 	
 }
