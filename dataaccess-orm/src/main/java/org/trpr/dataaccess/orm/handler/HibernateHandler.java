@@ -34,7 +34,6 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.trpr.dataaccess.RDBMSHandler;
-import org.trpr.dataaccess.RDBMSIdentifier;
 import org.trpr.platform.core.spi.logging.PerformanceMetricsLogger;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.IncorrectResultSizePersistenceException;
@@ -141,7 +140,7 @@ public class HibernateHandler extends RDBMSHandler {
 			// signal performance metrics capture. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
 			this.performanceMetricsLogger.startPerformanceMetricsCapture();
 			String message = entity.getEntityName() + ":" + entity.getIdentifier();
-			this.getTemplate().load(entity, ((RDBMSIdentifier)entity.getIdentifier()).getObjectId());
+			this.getTemplate().load(entity, entity.getIdentifier().toString());
 			// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
 			this.performanceMetricsLogger.logPerformanceMetrics("HibernateHandler.findObject", message);
 			return entity;
@@ -166,19 +165,19 @@ public class HibernateHandler extends RDBMSHandler {
 			}
 		}catch(DataIntegrityViolationException die){
 			throw new org.trpr.platform.core.spi.persistence.DataIntegrityViolationException(
-					"Data integrity violation for entity:id " + entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId(), die);
+					"Data integrity violation for entity:id " + entity.getEntityName() + ":" + entity.getIdentifier().toString(), die);
 		} catch (DataAccessException de) {
 			throw new PersistenceException(
-					"Persistence failure for entity:id " + entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId(), de);
+					"Persistence failure for entity:id " + entity.getEntityName() + ":" + entity.getIdentifier().toString(), de);
 		} catch (Exception e) {
 			throw new PersistenceException(
-					"Unrecognized/Unhandled Exception while persisting entity:id " + entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId(), e);			
+					"Unrecognized/Unhandled Exception while persisting entity:id " + entity.getEntityName() + ":" + entity.getIdentifier().toString(), e);			
 		} finally {
 			template.clear();			
 		}
 		
 		// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
-		this.performanceMetricsLogger.logPerformanceMetrics("HibernateHandler.makePersistent", entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId());
+		this.performanceMetricsLogger.logPerformanceMetrics("HibernateHandler.makePersistent", entity.getEntityName() + ":" + entity.getIdentifier().toString());
 		
 		return entity;
 	}
@@ -199,16 +198,16 @@ public class HibernateHandler extends RDBMSHandler {
 			}
 		} catch (DataAccessException e) {
 			throw new PersistenceException(
-					"Delete failure for entity:id " + entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId(), e);
+					"Delete failure for entity:id " + entity.getEntityName() + ":" + entity.getIdentifier().toString(), e);
 		} catch (Exception e) {
 			throw new PersistenceException(
-					"Unrecognized/Unhandled Exception while deleting entity:id " + entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId(), e);			
+					"Unrecognized/Unhandled Exception while deleting entity:id " + entity.getEntityName() + ":" + entity.getIdentifier().toString(), e);			
 		} finally {
 			template.clear();			
 		}
 		
 		// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off
-		this.performanceMetricsLogger.logPerformanceMetrics("HibernateHandler.makeTransient", entity.getEntityName() + ":" + ((RDBMSIdentifier)entity.getIdentifier()).getObjectId());		
+		this.performanceMetricsLogger.logPerformanceMetrics("HibernateHandler.makeTransient", entity.getEntityName() + ":" + entity.getIdentifier().toString());		
 	}
 
 	/**
