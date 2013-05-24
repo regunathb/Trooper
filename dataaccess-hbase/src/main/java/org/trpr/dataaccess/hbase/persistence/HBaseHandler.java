@@ -28,6 +28,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.trpr.dataaccess.hbase.auth.AuthenticationProvider;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
 import org.trpr.dataaccess.hbase.persistence.entity.HBaseEntity;
@@ -93,6 +94,9 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	/** Map for type to serializer mappings*/
 	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
 	
+	/** Authentication provider, if any*/
+	private AuthenticationProvider authProvider;
+	
 	public HBaseHandler() {
 		// Default serializers. It can be overridden by setting new values in
 		// Spring bean definition
@@ -111,6 +115,10 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	public void afterPropertiesSet() throws Exception {
 		if (this.targetHbaseConfigurations.size() == 0 && this.hbaseConfiguration == null) {
 			throw new IllegalArgumentException("targetHbaseConfigurations (or) hbaseConfiguration is required");
+		}
+		// check if an authentication provider has been set and initialize it
+		if (this.getAuthProvider() != null) {
+			this.getAuthProvider().authenticatePrincipal(this.hbaseConfiguration);
 		}
 		// initialize the HTablePool(s) for the HBase configurations
 		if (this.hbaseConfiguration != null) {
@@ -263,6 +271,12 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	}
 	public int getHtablePoolSize() {
 		return this.htablePoolSize;
+	}
+	public AuthenticationProvider getAuthProvider() {
+		return this.authProvider;
+	}
+	public void setAuthProvider(AuthenticationProvider authProvider) {
+		this.authProvider = authProvider;
 	}
 	// //////////// UNSUPPORTED operations ////////////////
 
