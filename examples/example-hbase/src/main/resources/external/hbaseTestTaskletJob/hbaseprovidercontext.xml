@@ -20,9 +20,9 @@
 		-->
 		<property name="hbaseConfigProps">
 			<props>
-				<prop key="hbase.rootdir">hdfs://localhost:8020/hbase</prop>
+				<prop key="hbase.rootdir">hdfs://localhost/hbase</prop>
 				<prop key="hbase.master.port">60000</prop>
-				<prop key="hbase.zookeeper.quorum">localhost:2181</prop>
+				<prop key="hbase.zookeeper.quorum">localhost,localhost1,localhost2</prop>
 				<prop key="hbase.client.write.buffer">2097152</prop>
 			</props>
 		</property>
@@ -32,12 +32,26 @@
 				<value>hbase-earthling.hbase.xml</value>
 			</list>
 		</property>
+		<property name="authProvider" ref="kerberosAuthenticationProvider" />
+	</bean>
+
+	<bean id="kerberosAuthenticationProvider" class="org.trpr.dataaccess.hbase.auth.kerberos.KerberosAuthenticationProvider">
+		<property name="kerberosConfigLocation" value="/etc/krb5.conf" />
+		<property name="kerberosKeytabLocation" value="/Users/xxx/testprincipal.keytab" />
+		<property name="kerberosPrincipal" value="testprincipal" />
+		<property name="kerberosAuthProperties">
+			<props>
+				<prop key="hadoop.security.authentication">kerberos</prop>	
+				<prop key="hbase.master.kerberos.principal">hbase/_HOST@LOCALHOST</prop>	
+				<prop key="hbase.regionserver.kerberos.principal">hbase/_HOST@LOCALHOST</prop>					
+				<prop key="hbase.rpc.engine">org.apache.hadoop.hbase.ipc.SecureRpcEngine</prop>				
+			</props>
+		</property>
 	</bean>
 
 	<bean id="hbaseProvider" class="org.trpr.dataaccess.hbase.persistence.HBaseProvider">
 		<property name="handler" ref="hbaseHandler" />
 	</bean>
-
 
 	<bean id="hbaseDelegate"
 		class="org.trpr.platform.core.impl.persistence.PersistenceDelegate" />
