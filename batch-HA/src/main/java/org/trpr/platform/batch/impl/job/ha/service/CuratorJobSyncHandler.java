@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.ZooDefs;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
@@ -89,7 +91,13 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 			this.jobConfigurationService.setSyncService(this.syncService);
 		}
 		JsonInstanceSerializer<JobInstanceDetails> serializer = new JsonInstanceSerializer<JobInstanceDetails>(JobInstanceDetails.class);
-		//Get serviceDiscovery
+		//Create path if doesn't exist
+        try {
+            curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE).forPath(ZK_DEP_PATH_PREFIX, new byte[0]);
+        } catch (Exception e) {
+            LOGGER.error("Unable to create path: "+ZK_DEP_PATH_PREFIX);
+        }
+        //Get serviceDiscovery
 		this.serviceDiscovery = ServiceDiscoveryBuilder.builder(JobInstanceDetails.class)
 				.client(this.curatorFramework)
 				.basePath(ZK_DEP_PATH_PREFIX).serializer(serializer)
@@ -271,7 +279,7 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 		}
 
 		/**
-		 * Calls the {@link JobRegistryBeanPostProcessor#updateHosts()} to
+		 * Calls the {@link CuratorJobSyncHandler#updateHosts()} to
 		 * update the hosts as soon as cache is changed
 		 */
 		@Override
