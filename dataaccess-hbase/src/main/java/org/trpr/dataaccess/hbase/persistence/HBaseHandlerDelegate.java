@@ -91,7 +91,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 	 *            the HBaseMappingContainer instance containing meta data used
 	 *            in persistence
 	 */
-	public HBaseHandlerDelegate(HBaseMappingContainer hbaseMappingContainer) throws Exception {
+	public HBaseHandlerDelegate(HBaseMappingContainer hbaseMappingContainer) {
 		// Default serializers. It can be overridden by setting new values in
 		// Spring bean definition of the HBaseHandler
 		classNameToSerializerMap.put("java.lang.String", new StringSerializer());
