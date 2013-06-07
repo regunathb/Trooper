@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -134,6 +135,20 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		} else {
 			// probably the serializers have been customized, so set only the mapping container
 			this.hbaseHandlerDelegate.setHBaseMappingContainer(this.hbaseMappingContainer);
+		}
+		// now warm up the HBaseTablePool for all configured HBaseEntity instances
+		for (HbaseMapping mapping : this.hbaseMappingContainer.getMappingForAllClasses()) {
+			logger.info("Warming up HTable pool for : " + mapping.getHbaseClass().getTable());
+			// warm up the default pool
+			HTableInterface table = (HTableInterface)this.hbaseTablePool.getTable(mapping.getHbaseClass().getTable());
+			table.setAutoFlush(useAutoFlush);
+			table.close();
+			// warm up the sharded pools
+			for (HTablePool shardedPool : this.targetHbaseTablePools.values()) {
+				HTableInterface shardTable = (HTableInterface)shardedPool.getTable(mapping.getHbaseClass().getTable());
+				shardTable.setAutoFlush(useAutoFlush);
+				shardTable.close();				
+			}
 		}
 		this.hbaseHandlerDelegate.setUseAutoFlush(useAutoFlush);
 		this.hbaseHandlerDelegate.setUseWAL(useWAL);
