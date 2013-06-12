@@ -36,5 +36,7 @@
 	</bean>
 
 	<bean id="metricsTimer" class="org.springframework.scheduling.concurrent.ConcurrentTaskScheduler" />
+
+    <bean id="configService" class="org.trpr.platform.servicefw.impl.spring.admin.ConfigurationServiceImpl" />
 	
 </beans>

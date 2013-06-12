@@ -40,9 +40,7 @@
 							<#list serviceInfo as statistics >
 							<tr class="name-sublevel1-even">
 								<td style="border-right: 1px solid #b8c885">
-									<a href="/test/services/${statistics.serviceName}">
 									${statistics.serviceName}
-									</a>
 								</td>
 								<#if statistics.serviceVersion??>
 								<td style="border-right: 1px solid #b8c885">${statistics.serviceVersion}</td>
