@@ -6,6 +6,8 @@
   - Added support for loading configurations from Trooper config locations
   - Bugfixing for Batch HA mode, Zookeeper path is created if it doesn't exist
   - Minor bugfixing in ServiceFramework, BootstrapLauncher
+  - Configuration console for Service Framework core 
+  - Moved to Jackson for JSON marshalling/unmarshlling 
 <br />
 
 ## 1.2.2 (March 14, 2013)
