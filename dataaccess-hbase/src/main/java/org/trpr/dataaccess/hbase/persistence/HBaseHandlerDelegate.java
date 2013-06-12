@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -98,7 +98,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 		classNameToSerializerMap.put("java.lang.Long", new LongSerializer());
 		classNameToSerializerMap.put("java.lang.Integer", new IntegerSerializer());
 		classNameToSerializerMap.put("java.util.Date", new DateSerializer());		
-		this.hbaseMappingContainer = hbaseMappingContainer;
+		this.setHBaseMappingContainer(hbaseMappingContainer);
 	}
 
 	/**
@@ -178,10 +178,10 @@ public class HBaseHandlerDelegate implements InitializingBean {
 	 *             or any other errors.
 	 */
 	private void addEntity(HTablePool hbaseTablePool, HbaseMapping metadata, HBaseEntity entity) throws PersistenceException {
-		HTable table = null;
+		HTableInterface table = null;
 		HbaseClass classDefinition = metadata.getHbaseClass();
 		try {
-			table = (HTable) hbaseTablePool.getTable(classDefinition.getTable());
+			table = (HTableInterface) hbaseTablePool.getTable(classDefinition.getTable());
 			table.setAutoFlush(useAutoFlush);
 
 			Put put = new Put(constructRowKey(entity, classDefinition.getRowkeyDefinition()));
@@ -197,7 +197,11 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			throw new PersistenceException("Exception in putData of " + classDefinition.getTable(), e);
 		} finally {
 			if (table != null) {
-				hbaseTablePool.putTable(table);
+				try {
+					table.close();
+				} catch (IOException e) {
+					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -215,24 +219,28 @@ public class HBaseHandlerDelegate implements InitializingBean {
 	 *             in case anything goes wrong
 	 */
 	private void deleteEntity(HTablePool hbaseTablePool, HBaseEntity entity, HbaseMapping metadata) throws PersistenceException {
-		HTable table = null;
+		HTableInterface table = null;
 		try {
-			table = (HTable) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
+			table = (HTableInterface) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
 			Delete delete = new Delete(constructRowKey(entity, metadata.getHbaseClass().getRowkeyDefinition()));
 			table.delete(delete);
 		} catch (Exception e) {
 			throw new PersistenceException("Failed to delete entry for table " + metadata.getHbaseClass().getTable(), e);
 		} finally {
 			if (table != null) {
-				hbaseTablePool.putTable(table);
+				try {
+					table.close();
+				} catch (IOException e) {
+					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+				}
 			}
 		}
 	}
 
 	public HBaseEntity findEntity(HTablePool hbaseTablePool, HBaseEntity entity, HbaseMapping metadata) throws PersistenceException {
-		HTable table = null;
+		HTableInterface table = null;
 		try {
-			table = (HTable) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
+			table = (HTableInterface) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
 			byte[] rowKey = constructRowKey(entity, metadata.getHbaseClass().getRowkeyDefinition());
 			if (rowKey != null && rowKey.length > 0) {
 				// do a get operation
@@ -247,7 +255,11 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			throw new PersistenceException("Exception occcurred while performing search for table " + metadata.getHbaseClass().getTable(), e);
 		} finally {
 			if (table != null) {
-				hbaseTablePool.putTable(table);
+				try {
+					table.close();
+				} catch (IOException e) {
+					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+				}
 			}
 		}
 		return null;
@@ -269,9 +281,9 @@ public class HBaseHandlerDelegate implements InitializingBean {
 	 */
 	public Collection<PersistentEntity> findEntities(HTablePool hbaseTablePool, HBaseCriteria criteria, HbaseMapping metadata) throws PersistenceException {
 		List<PersistentEntity> searchResultList = new ArrayList<PersistentEntity>();
-		HTable table = null;
+		HTableInterface table = null;
 		try {
-			table = (HTable) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
+			table = (HTableInterface) hbaseTablePool.getTable(metadata.getHbaseClass().getTable());
 			// do a scan operation
 			Scan s = constructScanQuery(metadata, criteria);
 			ResultScanner scanner = table.getScanner(s);
@@ -293,7 +305,11 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			throw new PersistenceException("Exception occcurred while performing search for table " + metadata.getHbaseClass().getTable(), e);
 		} finally {
 			if (table != null) {
-				hbaseTablePool.putTable(table);
+				try {
+					table.close();
+				} catch (IOException e) {
+					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+				}
 			}
 		}
 		return searchResultList;

@@ -1,6 +1,10 @@
 #################
 ## Eclipse
 #################
+# Intellij
+.idea/
+*.iml
+*.iws
 
 *.pydevproject
 .project
@@ -15,6 +19,8 @@ local.properties
 .classpath
 .settings/
 .loadpath
+*.iml
+.idea/
 
 # External tool builders
 .externalToolBuilders/

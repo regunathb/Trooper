@@ -61,7 +61,6 @@ public class TestHBaseOps implements Tasklet {
 		testEntity.setIntValue(new Random().nextInt(10000));
 		testEntity.setDateValue(new Date());
 		testEntity.setByteArrayValue(uid.getBytes());
-
 		
 		write(testEntity);
 		update(testEntity);
@@ -69,6 +68,7 @@ public class TestHBaseOps implements Tasklet {
 		if (delete) {
 			delete(testEntity);
 		}
+		
 		scan();
 
 		return RepeatStatus.FINISHED;

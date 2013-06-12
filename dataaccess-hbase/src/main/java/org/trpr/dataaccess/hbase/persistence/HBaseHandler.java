@@ -25,9 +25,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.trpr.dataaccess.hbase.auth.AuthenticationProvider;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
 import org.trpr.dataaccess.hbase.persistence.entity.HBaseEntity;
@@ -93,6 +95,9 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	/** Map for type to serializer mappings*/
 	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
 	
+	/** Authentication provider, if any*/
+	private AuthenticationProvider authProvider;
+	
 	public HBaseHandler() {
 		// Default serializers. It can be overridden by setting new values in
 		// Spring bean definition
@@ -112,6 +117,10 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		if (this.targetHbaseConfigurations.size() == 0 && this.hbaseConfiguration == null) {
 			throw new IllegalArgumentException("targetHbaseConfigurations (or) hbaseConfiguration is required");
 		}
+		// check if an authentication provider has been set and initialize it
+		if (this.getAuthProvider() != null) {
+			this.getAuthProvider().authenticatePrincipal(this.hbaseConfiguration);
+		}
 		// initialize the HTablePool(s) for the HBase configurations
 		if (this.hbaseConfiguration != null) {
 			this.hbaseTablePool = new HTablePool(this.hbaseConfiguration, this.htablePoolSize);
@@ -126,6 +135,20 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		} else {
 			// probably the serializers have been customized, so set only the mapping container
 			this.hbaseHandlerDelegate.setHBaseMappingContainer(this.hbaseMappingContainer);
+		}
+		// now warm up the HBaseTablePool for all configured HBaseEntity instances
+		for (HbaseMapping mapping : this.hbaseMappingContainer.getMappingForAllClasses()) {
+			logger.info("Warming up HTable pool for : " + mapping.getHbaseClass().getTable());
+			// warm up the default pool
+			HTableInterface table = (HTableInterface)this.hbaseTablePool.getTable(mapping.getHbaseClass().getTable());
+			table.setAutoFlush(useAutoFlush);
+			table.close();
+			// warm up the sharded pools
+			for (HTablePool shardedPool : this.targetHbaseTablePools.values()) {
+				HTableInterface shardTable = (HTableInterface)shardedPool.getTable(mapping.getHbaseClass().getTable());
+				shardTable.setAutoFlush(useAutoFlush);
+				shardTable.close();				
+			}
 		}
 		this.hbaseHandlerDelegate.setUseAutoFlush(useAutoFlush);
 		this.hbaseHandlerDelegate.setUseWAL(useWAL);
@@ -263,6 +286,12 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	}
 	public int getHtablePoolSize() {
 		return this.htablePoolSize;
+	}
+	public AuthenticationProvider getAuthProvider() {
+		return this.authProvider;
+	}
+	public void setAuthProvider(AuthenticationProvider authProvider) {
+		this.authProvider = authProvider;
 	}
 	// //////////// UNSUPPORTED operations ////////////////
 

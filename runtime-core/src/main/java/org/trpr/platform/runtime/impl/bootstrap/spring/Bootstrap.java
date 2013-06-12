@@ -49,8 +49,8 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManagedBean, Runnable {
 
 	/** States for the background thread */
-	private static final int WAIT = 0;
-	private static final int EXIT = 1;
+	private static final int EXIT = 0;
+	private static final int WAIT = 1;
 	
 	/** The Trooper startup display contents*/
 	private static final MessageFormat STARTUP_DISPLAY = new MessageFormat( 
@@ -69,6 +69,9 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	
 	/** The Logger instance for this class */
 	private static final Logger LOGGER = LogFactory.getLogger(Bootstrap.class);
+	
+	/** The sleep duration before signalling a JVM kill via System.exit()*/
+	private static final long SLEEP_BEFORE_EXIT = 2000;
 	
 	/** The background thread state */
 	private int backgroundThreadState = WAIT;
@@ -307,7 +310,11 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		synchronized(this) {
 			notifyAll();
 		}	
+		// ideally the above code should cause the JVM to exit if only daemon threads are running
+		Thread.currentThread().sleep(SLEEP_BEFORE_EXIT);
 		System.out.println("** Trooper runtime shutdown! **");
+		// finally signal a JVM exit, if threads havent shutdown gracefully
+		System.exit(EXIT);
 	}
 	
 	/**

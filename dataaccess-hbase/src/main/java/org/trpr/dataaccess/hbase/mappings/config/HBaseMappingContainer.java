@@ -184,6 +184,15 @@ public class HBaseMappingContainer {
 	 * @return HbaseMapping contains the configuration info of a HBase table
 	 */
 	public HbaseMapping getMappingForClass(String className) {
-		return configs.get(className);
+		return this.configs.get(className);
 	}
+	
+	/**
+	 * Returns an array of all configured HbaseMapping instances that were loaded
+	 * @return array of HbaseMapping instances
+	 */
+	public HbaseMapping[] getMappingForAllClasses() {
+		return this.configs.values().toArray(new HbaseMapping[0]);
+	}
+	
 }

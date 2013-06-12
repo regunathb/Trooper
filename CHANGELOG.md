@@ -1,3 +1,13 @@
+## 1.2.3 (June 3, 2013)
+- **New features**
+  - Support for Kerberos authentication in CDH4
+  - Bumped up hibarnate version to 3.2.3-ga
+  - Added requestRate as a metric in Service Framework
+  - Added support for loading configurations from Trooper config locations
+  - Bugfixing for Batch HA mode, Zookeeper path is created if it doesn't exist
+  - Minor bugfixing in ServiceFramework, BootstrapLauncher
+<br />
+
 ## 1.2.2 (March 14, 2013)
 - **New features**
   - CodaHale metrics integration for better Metrics gathering. New metrics include: P50,P75,P99,P99.9 Response Times, 1-min, 5-min, 15-min rate, etc.
