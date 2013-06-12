@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.springframework.core.io.ClassPathResource;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.config.FileLocator;
@@ -43,6 +45,9 @@ import org.trpr.platform.runtime.impl.config.FileLocator;
 * @version 1.0 13 Feb 2013
 */
 public class PropertyPlaceholderConfigurer extends org.springframework.beans.factory.config.PropertyPlaceholderConfigurer {
+	
+	/** The logger for this class */
+	private static final Logger LOGGER = LogFactory.getLogger(PropertyPlaceholderConfigurer.class);
 	
 	/** The default properties location on the classpath */
 	private String defaultPropertiesOnClasspath;
@@ -66,14 +71,28 @@ public class PropertyPlaceholderConfigurer extends org.springframework.beans.fac
 		mergedProperties = super.mergeProperties();
 		// check if there is a properties path specified on the Trooper config paths
 		if (this.getPropertiesOnConfigPath() != null) {
-			FileReader fileReader = new FileReader(FileLocator.findUniqueFile(this.getPropertiesOnConfigPath()));
-			mergedProperties.load(fileReader);
-			fileReader.close();
+			FileReader fileReader = null;
+			try {
+				fileReader = new FileReader(FileLocator.findUniqueFile(this.getPropertiesOnConfigPath()));
+				mergedProperties.load(fileReader);
+			} catch (Exception e) {
+				// we dont expect this to happen if the file is found. Log a warning and proceed with default values
+				LOGGER.warn("Error loading property configurations from file : {}. Using defaults", this.getPropertiesOnConfigPath());
+			} finally {
+				if (fileReader != null) {
+					fileReader.close();
+				}
+			}
 		}
 		// check to see if there is an override via RuntimeVariables
 		String runtimePropertiesPath = RuntimeVariables.getVariable(RuntimeConstants.CONFIG_PROPERTIES_VAR);
 		if (runtimePropertiesPath != null) {
-			mergedProperties.load(new FileInputStream(new File(runtimePropertiesPath)));// not using FileLocator for this as we expect the path is absolute
+			try {
+				mergedProperties.load(new FileInputStream(new File(runtimePropertiesPath)));// not using FileLocator for this as we expect the path is absolute
+			} catch (Exception e) {
+				// we dont expect this to happen if the file is found. Log a warning and proceed with default values
+				LOGGER.warn("Error loading property configurations from file specified in JVM starup : {}. Using defaults", runtimePropertiesPath);
+			}
 		}
 		return mergedProperties; 
 	}
