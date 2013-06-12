@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: root
- * Date: 11/6/13
- * Time: 2:56 PM
- * To change this template use File | Settings | File Templates.
+ *   <code>ConfigurationServiceImpl</code> is the default implementation of @link{ConfigurationService}.
+ *   It stores and retrieves the configurations from file system.
+ *
+ *   @author devashish.shankar
+ *   @version 1.0, 12th June, 2013
  */
 public class ConfigurationServiceImpl implements ConfigurationService {
 
