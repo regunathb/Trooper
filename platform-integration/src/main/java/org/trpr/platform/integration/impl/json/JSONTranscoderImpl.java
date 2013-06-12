@@ -15,16 +15,10 @@
  */
 package org.trpr.platform.integration.impl.json;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.JsonConfig;
-import net.sf.json.util.NewBeanInstanceStrategy;
-
+import org.codehaus.jackson.map.ObjectMapper;
 import org.trpr.platform.integration.spi.json.JSONTranscoder;
 import org.trpr.platform.integration.spi.marshalling.MarshallingException;
 
@@ -36,67 +30,51 @@ import org.trpr.platform.integration.spi.marshalling.MarshallingException;
  * @version 1.0, 18/09/2012
  */
 public class JSONTranscoderImpl implements JSONTranscoder {
-
-	/** The indent for pretty print*/
-	private static final int PRETTY_PRINT_INDENT = 4;
 	
-	/** Map containing class names and static instantiation method names*/
-	private static Map<String, String> instantiationMap = new HashMap<String, String>();
+	/** The default DateFormat for Date serialization*/
+	private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat();
 	
-	/** Static block to initialize with custom instantiation for certain core Java types*/
-	static {
-		JSONTranscoderImpl.instantiationMap.put("java.util.Calendar", "getInstance");
-		JSONTranscoderImpl.instantiationMap.put("java.util.TimeZone", "getDefault");
+	/** The ObjectMapper instance for JSON marshalling/unmarshalling*/
+	private ObjectMapper mapper = new ObjectMapper();
+	
+	/** The DateFormat for Date serialization */
+	private DateFormat dateFormat = DEFAULT_FORMAT;
+	
+	/** Constructor for this class*/
+	public JSONTranscoderImpl() {
+		this.mapper.setDateFormat(this.getDateFormat());
 	}
-	
+
 	/**
 	 * Interface method implementation.
 	 * @see org.trpr.platform.integration.spi.json.JSONTranscoder#marshal(java.lang.Object)
 	 */
 	public String marshal(Object object) throws MarshallingException {
-		return JSONSerializer.toJSON(object).toString(JSONTranscoderImpl.PRETTY_PRINT_INDENT);
+		try {
+			return this.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(object);
+		} catch (Exception e) {
+			throw new MarshallingException("Error marshalling object : " + e.getMessage(), e);
+		}
 	}
 
 	/**
 	 * Interface method implementation
 	 * @see org.trpr.platform.integration.spi.json.JSONTranscoder#unmarshal(java.lang.String, java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T unmarshal(String json, Class<T> clazz) throws MarshallingException {
-		JsonConfig jsonConfig = new JsonConfig();  
-		jsonConfig.setRootClass(clazz);
-		jsonConfig.setNewBeanInstanceStrategy(new CustomNewInstanceStrategy());
-		return (T)JSONSerializer.toJava(JSONObject.fromObject(json), jsonConfig);
+		try {
+			return this.mapper.readValue(json, clazz);
+		} catch (Exception e) {
+			throw new MarshallingException("Error unmarshalling object : " + e.getMessage(), e);
+		}
 	}
 	
-	/** Getter/Setter methods*/
-	public void setInstantiationMap(Map<String,String> map) {
-		JSONTranscoderImpl.instantiationMap = map;
+	/** Start setter/getter methods */
+	public DateFormat getDateFormat() {
+		return this.dateFormat;
+	}
+	public void setDateFormat(DateFormat dateFormat) {
+		this.dateFormat = dateFormat;
 	}	
-	/** End Getter/Setter methods */
-	
-	/**
-	 * Custom instantiation strategy for specific types as needed. Uses no args constructor as the default if no cutomization is specified.
-	 */
-	private class CustomNewInstanceStrategy extends NewBeanInstanceStrategy {
-		private Object[] EMPTY_ARGS = new Object[0];
-	    private Class[] EMPTY_PARAM_TYPES = new Class[0];
-	    
-	    @SuppressWarnings({ "unchecked", "rawtypes" })
-		public Object newInstance(Class target, JSONObject source) throws InstantiationException, IllegalAccessException, 
-	    	SecurityException, NoSuchMethodException, InvocationTargetException {
-	    	if( target != null ) {
-	    		if (JSONTranscoderImpl.instantiationMap.containsKey(target.getName())) {
-	    			return target.getDeclaredMethod(JSONTranscoderImpl.instantiationMap.get(target.getName()), (Class[])null).invoke(null, (Object[])null);
-	    		} else {
-	    			Constructor c = target.getDeclaredConstructor( EMPTY_PARAM_TYPES );
-	    			c.setAccessible( true );
-	    			return c.newInstance( EMPTY_ARGS );
-	    	  }
-	       	}
-	       return null;
-	    }
-		
-	}
-
+	/** End setter/getter methods */
 }
