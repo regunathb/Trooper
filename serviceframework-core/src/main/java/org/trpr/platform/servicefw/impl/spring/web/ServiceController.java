@@ -15,10 +15,18 @@
  */
 package org.trpr.platform.servicefw.impl.spring.web;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 
 import javax.servlet.http.HttpServletRequest;
 
+
+import org.apache.commons.io.IOUtils;
+
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +42,8 @@ import org.trpr.platform.servicefw.impl.BrokerFactory;
 import org.trpr.platform.servicefw.impl.ServiceKeyImpl;
 import org.trpr.platform.servicefw.impl.ServiceRequestImpl;
 import org.trpr.platform.servicefw.impl.ServiceStatisticsGatherer;
+import org.trpr.platform.servicefw.impl.spring.admin.ConfigurationService;
+import org.trpr.platform.servicefw.spi.ServiceKey;
 import org.trpr.platform.servicefw.spi.ServiceRequest;
 import org.trpr.platform.servicefw.spi.ServiceResponse;
 
@@ -51,11 +61,14 @@ public class ServiceController {
 	/** The {@link ServiceStatisticsGatherer} object which is used to collect metrics */
 	private ServiceStatisticsGatherer serviceStatisticsGatherer;
 
+    /** ConfigurationService instance for loading and modifying configuration files */
+    private ConfigurationService configurationService;
+
 	/**
 	 * Finds the serviceName from the request URL
 	 */
 	@ModelAttribute("services")
-	public String getJobName(HttpServletRequest request) {
+	public String getServiceName(HttpServletRequest request) {
 		String path = request.getServletPath();
 		int index = path.lastIndexOf("services/") + 9;
 		if (index >= 0 && index<path.length()) {
@@ -64,30 +77,86 @@ public class ServiceController {
 		return path;
 	}
 
-	/** 
-	 * Controller for index(homepage) 
-	 */
-	@RequestMapping(value = {"/services"}, method = RequestMethod.GET)
-	public String jobs(ModelMap model, HttpServletRequest request) {
-		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
-		model.addAttribute("serviceInfo",serviceStatisticsAsArray);
-		if(request.getServletPath().endsWith(".json")) {
-			return "services-json";
-		}
-		return "services";
-	}
+    /**
+     * Controller for index(homepage)
+     */
+    @RequestMapping(value = {"/services"}, method = RequestMethod.GET)
+    public String services(ModelMap model, HttpServletRequest request) {
+        ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
+        model.addAttribute("serviceInfo",serviceStatisticsAsArray);
+        if(request.getServletPath().endsWith(".json")) {
+            return "services-json";
+        }
+        return "services";
+    }
 
-	/** Controller for Test page */
-	@RequestMapping(value = {"/test/services/{serviceName}"}, method = RequestMethod.GET)
-	public String test(ModelMap model, @ModelAttribute("services") String serviceName) {
-		ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
-		for(ServiceStatistics statistics:serviceStatisticsAsArray) {
-			if(statistics.getServiceName().equalsIgnoreCase(serviceName)) {
-				model.addAttribute("serviceInfo",statistics);
-			}
-		}		
-		return "test";
-	}
+    /**
+     * Controller for index(homepage)
+     */
+    @RequestMapping(value = {"/configuration"}, method = RequestMethod.GET)
+    public String configuration(ModelMap model, HttpServletRequest request) {
+        ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
+        model.addAttribute("serviceInfo",serviceStatisticsAsArray);
+        return "configuration";
+    }
+
+    /** Controller for Test page */
+    @RequestMapping(value = {"/test/services/{serviceName}"}, method = RequestMethod.GET)
+    public String test(ModelMap model, @ModelAttribute("services") String serviceName) {
+        ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
+        for(ServiceStatistics statistics:serviceStatisticsAsArray) {
+            if(statistics.getServiceName().equalsIgnoreCase(serviceName)) {
+                model.addAttribute("serviceInfo",statistics);
+            }
+        }
+        return "test";
+    }
+
+    /** Controller for Modify page */
+    @RequestMapping(value = {"/modify/services/{serviceName}"}, method = RequestMethod.GET)
+    public String modify(ModelMap model, @ModelAttribute("services") String serviceName) {
+        model.addAttribute("serviceName", serviceName);
+        model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName)))) ;
+        return "modifyConfig";
+    }
+    /** Controller for deploy page (called from modify) */
+    @RequestMapping(value = {"/deploy/services/{serviceName}"}, method = RequestMethod.POST)
+    public String deploy(ModelMap model, @ModelAttribute("services") String serviceName,
+                         @RequestParam(defaultValue = "") String XMLFileContents) {
+        model.addAttribute("serviceName", serviceName);
+
+        try {
+            this.configurationService.modifyConfig(this.constructServiceKey(serviceName),new ByteArrayResource(XMLFileContents.getBytes()));
+        } catch (Exception e) {
+            model.addAttribute("XMLFileError", "Unable to deploy file");
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            model.addAttribute("LoadingError", errors.toString());
+            if(errors.toString()==null) {
+                model.addAttribute("LoadingError", "Unexpected error");
+            }
+            model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName))));
+            return "modifyConfig";
+        }
+        //Loading success
+        model.addAttribute("SuccessMessage", "Successfully Deployed the new Handler Configuration");
+        Resource handlerFile = this.configurationService.getConfig(this.constructServiceKey(serviceName));
+        model.addAttribute("XMLFileContents",getContents(handlerFile));
+        try {
+            model.addAttribute("XMLFileName",handlerFile.getURI());
+        } catch (IOException e) {
+            model.addAttribute("XMLFileName","File not found");
+        }
+        return "viewConfig";
+    }
+
+    /** Controller for View Config page */
+    @RequestMapping(value = {"/viewConfig/services/{serviceName}"}, method = RequestMethod.GET)
+    public String viewConfig(ModelMap model, @ModelAttribute("services") String serviceName) {
+        model.addAttribute("serviceName", serviceName);
+        model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName)))) ;
+        return "viewConfig";
+    }
 
 	/** Controller which gets the Service details, runs the service and displays the output */
 	@RequestMapping(value = {"/execute/services/{serviceName}"}, method = RequestMethod.POST)
@@ -142,12 +211,46 @@ public class ServiceController {
 		return "response";
 	}
 
-	/** Getter Setter methods */
-	public ServiceStatisticsGatherer getServiceStatisticsGatherer() {
-		return serviceStatisticsGatherer;
-	}
 
-	public void setServiceStatisticsGatherer(ServiceStatisticsGatherer serviceStatisticsGatherer) {
-		this.serviceStatisticsGatherer = serviceStatisticsGatherer;
-	}
+    /**
+     * Helper method that gets the contents of a <code>Resource</code> in a single String
+     * @param resource Resource to be read
+     * @return Contents as a <code>String<code/>
+     */
+    private static String getContents(Resource resource) {
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(resource.getInputStream(), writer, "UTF-8");
+        } catch (IOException e) {
+            //TODO
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Helper method to construct a ServiceKey
+     * @param serviceNameAndVersion The name and version of Service seperated by ServiceKeyImpl.SERVICE_VERSION_SEPARATOR
+     * @return ServiceKey
+     */
+    private ServiceKey constructServiceKey(String serviceNameAndVersion) {
+        String[] nameAndVersion = serviceNameAndVersion.split(ServiceKeyImpl.SERVICE_VERSION_SEPARATOR);
+        if(nameAndVersion.length!=2) {
+            throw new RuntimeException("Invalid serviceNameAndVersion");
+        }
+        return new ServiceKeyImpl(nameAndVersion[0],nameAndVersion[1]);
+    }
+
+    /** Getter Setter methods */
+    public ServiceStatisticsGatherer getServiceStatisticsGatherer() {
+        return serviceStatisticsGatherer;
+    }
+    public void setServiceStatisticsGatherer(ServiceStatisticsGatherer serviceStatisticsGatherer) {
+        this.serviceStatisticsGatherer = serviceStatisticsGatherer;
+    }
+    public ConfigurationService getConfigurationService() {
+        return configurationService;
+    }
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 }

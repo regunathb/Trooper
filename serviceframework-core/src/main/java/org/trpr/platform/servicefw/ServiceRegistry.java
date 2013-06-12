@@ -37,7 +37,28 @@ public class ServiceRegistry {
 
 	/** List of ServiceInfo instances that form this registry*/
 	private LinkedList<ServiceInfo> serviceInfoList = new LinkedList<ServiceInfo>();
-	
+
+    /**
+     * Checks whether a Service is present in the registry
+     * @param key ServiceKey to be checked
+     * @return true, if found, false otherwise
+     */
+    public boolean contains(ServiceKey key) {
+        if(this.getServiceInfo(key)!=null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes a Service with the specified ServiceKey from the registry, if found
+     */
+    public void remove(ServiceKey key) {
+        ServiceInfo toRemove = this.getServiceInfo(key);
+        if(toRemove!=null) {
+            this.serviceInfoList.remove(toRemove);
+        }
+    }
 	/**
 	 * Adds a ServiceInfo to this registry using the specified service meta data
 	 * @param serviceName the service name identifier
