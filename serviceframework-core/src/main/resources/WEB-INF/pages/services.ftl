@@ -38,7 +38,7 @@
 								<th style="border-right: 1px solid #b8c885">Last Called</th>
 							</tr>
 							<#list serviceInfo as statistics >
-							<tr class="name-sublevel1-even">
+							<tr>
 								<td style="border-right: 1px solid #b8c885">
 									${statistics.serviceName}
 								</td>
