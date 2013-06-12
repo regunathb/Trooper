@@ -58,7 +58,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      * @param serviceName
      * @param modifiedServiceConfigFile
      */
-    public void modifyConfig(ServiceKey serviceName, ByteArrayResource modifiedServiceConfigFile) {
+    public void modifyConfig(ServiceKey serviceName, ByteArrayResource modifiedServiceConfigFile) throws IOException {
         //Check if Service file can be read
         File oldServiceFile = null;
         try {
@@ -91,9 +91,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             throw new PlatformException(e);
         }
 
+        Resource configFile =  this.getConfig(serviceName);
+        List<ServiceKey> prevList = this.configFileToServices.remove(configFile);
         try {
-            this.springServicesContainer.loadComponent(this.getConfig(serviceName));
+            this.springServicesContainer.loadComponent(configFile);
         } catch(Exception e) {
+            this.configFileToServices.put(configFile.getURI(),prevList);
             this.restorePrevConfigFile(serviceName);
             this.springServicesContainer.loadComponent(this.getConfig(serviceName));
             throw new PlatformException(e);

@@ -165,6 +165,10 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 
         this.configurationService = this.servicesContext.getBean(ConfigurationServiceImpl.class);
         this.configurationService.setSpringServicesContainer(this);
+
+        this.serviceCompartments = new HashMap<ServiceKey, ServiceCompartment<T,S>>();
+        this.serviceInfos = new HashMap<ServiceKey, ServiceInfo>();
+
         for (File serviceBeansFile : serviceBeansFiles) {
             this.loadComponent(new FileSystemResource(serviceBeansFile));
         }
@@ -172,19 +176,6 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		// Set this ServiceContainer and ServiceRegistry on the BrokerFactory TODO : Need a better way of doing this
 		BrokerFactory.setServiceContainer(this);
 		BrokerFactory.setServiceRegistry(this.serviceRegistry);
-
-		// now initialize ServiceCompartmentS for all ServiceS
-		// create ServiceCompartment instances for the located services
-		this.serviceCompartments = new HashMap<ServiceKey, ServiceCompartment<T,S>>();
-		this.serviceInfos = new HashMap<ServiceKey, ServiceInfo>();
-		for(ServiceInfo serviceInfo : this.serviceRegistry.getAllServiceInfos()) {
-			ServiceKey 	serviceKey=serviceInfo.getServiceKey();
-			serviceInfos.put(serviceKey,serviceInfo);
-			ServiceCompartment<T,S> serviceCompartment= new ServiceCompartmentImpl<T,S>(serviceInfo);
-			serviceCompartment.init();
-			serviceCompartments.put(serviceKey,serviceCompartment);
-		}
-		
 	}
 
     /**
@@ -210,10 +201,24 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
                         }
                         this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], projectName, ServiceFrameworkConstants.DEFAULT_DOMAIN);
                         this.configurationService.addService(serviceKey,resource);
+                        //Remove the service Key from serviceInfos and serviceComaprtments
+                        if(serviceInfos.get(serviceKey)!=null) {
+                            serviceInfos.remove(serviceKey);
+                        }
+                        if(serviceCompartments.get(serviceKey)!=null) {
+                            serviceCompartments.remove(serviceKey).destroy();
+                        }
+                        //Service Key and compartment initing
+                        ServiceInfo serviceInfo = this.serviceRegistry.getServiceInfo(serviceKey);
+                        serviceInfos.put(serviceKey,serviceInfo);
+                        ServiceCompartment<T,S> serviceCompartment= new ServiceCompartmentImpl<T,S>(serviceInfo);
+                        serviceCompartment.init();
+                        serviceCompartments.put(serviceKey,serviceCompartment);
                     } catch (Exception ex) {
                         // the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
                         throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
                     }
+
                 }
             } catch (IOException e) {
                   throw new RuntimeException("Unable to load ApplicationContext from Resource: "+resource);

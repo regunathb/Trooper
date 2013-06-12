@@ -4,6 +4,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.trpr.platform.servicefw.spi.ServiceKey;
 
+import java.io.IOException;
+
 /**
  * <code>ConfigurationService</code> provides methods for accessing and modifying Configurations for Services
  *
@@ -24,7 +26,7 @@ public interface ConfigurationService {
      * @param serviceKey The key of the Service for which Configuration has to be modified
      * @param modifiedConfigFile The byte array representation of the Configuration file
      */
-    public void modifyConfig(ServiceKey serviceKey, ByteArrayResource modifiedConfigFile);
+    public void modifyConfig(ServiceKey serviceKey, ByteArrayResource modifiedConfigFile) throws IOException;
 
     /**
      * Add a service, along with its configFile.
