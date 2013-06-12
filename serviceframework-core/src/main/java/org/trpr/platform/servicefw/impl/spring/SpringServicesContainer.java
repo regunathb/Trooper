@@ -117,6 +117,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
     /** Local reference for all BootstrapExtensionS loaded by the Container and set on this ComponentContainer*/
     private BootstrapExtension[] loadedBootstrapExtensions;	
 
+    /** The configuration Service instance */
     private ConfigurationServiceImpl configurationService;
 
 	/**
@@ -323,9 +324,6 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
     public void setLoadedBootstrapExtensions(BootstrapExtension...bootstrapExtensions) {
     	this.loadedBootstrapExtensions = bootstrapExtensions;
     }
-
-
-    //public void loadServicesContext
     
 	public static AbstractApplicationContext getCommonServiceBeansContext() {
 		return commonServiceBeansContext;

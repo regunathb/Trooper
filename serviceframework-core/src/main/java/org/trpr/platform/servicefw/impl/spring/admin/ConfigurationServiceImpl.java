@@ -39,7 +39,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     /** The ComponentContainer for reloading */
     private SpringServicesContainer springServicesContainer;
 
-    @Override
+    /**
+     * Interface method implementation.
+     * @param serviceKey The key of the Service for which Configuration has to be retrieved
+     * @return
+     */
     public Resource getConfig(ServiceKey serviceKey) {
         for(URI key : configFileToServices.keySet()) {
             if(this.configFileToServices.get(key).contains(serviceKey)) {
@@ -49,7 +53,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return null;
     }
 
-    @Override
+    /**
+     *Interface method implementation.
+     * @param serviceName
+     * @param modifiedServiceConfigFile
+     */
     public void modifyConfig(ServiceKey serviceName, ByteArrayResource modifiedServiceConfigFile) {
         //Check if Service file can be read
         File oldServiceFile = null;
@@ -93,7 +101,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         this.removePrevConfigFile(serviceName);
     }
 
-    @Override
+    /**
+     * Interface method implementation.
+     * @param serviceKey The key of the Service
+     * @param configFile  The configFile containing the bean definition of the Service
+     */
     public void addService(ServiceKey serviceKey, Resource configFile) {
         try {
             if(this.configFileToServices.get(configFile.getURI())==null) {
