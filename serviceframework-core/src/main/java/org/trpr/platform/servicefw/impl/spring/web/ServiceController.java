@@ -80,7 +80,7 @@ public class ServiceController {
     /**
      * Controller for index(homepage)
      */
-    @RequestMapping(value = {"/services"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/services","/"}, method = RequestMethod.GET)
     public String services(ModelMap model, HttpServletRequest request) {
         ServiceStatistics[] serviceStatisticsAsArray = this.serviceStatisticsGatherer.getStats();
         model.addAttribute("serviceInfo",serviceStatisticsAsArray);

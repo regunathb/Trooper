@@ -13,10 +13,6 @@
 	</bean>
 
 
-	<bean class="org.trpr.platform.servicefw.impl.spring.web.HomeController">
-		<property name="defaultResources" ref="defaultResources" />
-	</bean>
-
 	<util:properties id="defaultResources"
 		location="classpath:/WEB-INF/pages/properties/html-resources.properties" />
 </beans>
