@@ -2,27 +2,34 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 <beans>
 
-	<!-- The reference implementation services -->
-	<bean id="greetingService_1.0" class="org.trpr.example.service.greeting.GreetingService">
-		<property name="taskManager" ref="taskManager" />
-		<property name="serviceContext" ref="serviceContext" />
-	</bean>	
+    <!-- The reference implementation services -->
+    <bean id="greetingService_1.0" class="org.trpr.example.service.greeting.GreetingService">
+        <property name="taskManager" ref="taskManager" />
+        <property name="serviceContext" ref="serviceContext" />
+    </bean>
 
-	<!-- The reference implementation services -->
-	<bean id="simpleGreetingService_1.0" class="org.trpr.example.service.greeting.SimpleGreetingService">
-		<property name="serviceContext" ref="serviceContext" />
-	</bean>	
+    <!-- The reference implementation services -->
+    <bean id="simpleGreetingService_1.0" class="org.trpr.example.service.greeting.SimpleGreetingService">
+        <property name="serviceContext" ref="serviceContext" />
+    </bean>
 
-	<bean id="echoService_1.0" class="org.trpr.example.service.echo.EchoService">
-		<property name="taskManager" ref="taskManager" />
-		<property name="serviceContext" ref="serviceContext" />
-	</bean>	
-	<bean id="echoService_2.0" class="org.trpr.example.service.echo.EchoService">
-		<property name="taskManager" ref="taskManager" />
-		<property name="serviceContext" ref="serviceContext" />
-	</bean>
-	
+    <bean id="echoService_1.0" class="org.trpr.example.service.echo.EchoService">
+        <property name="taskManager" ref="taskManager" />
+        <property name="serviceContext" ref="serviceContext" />
+    </bean>
+    <bean id="echoService_2.0" class="org.trpr.example.service.echo.EchoService">
+        <property name="taskManager" ref="taskManager" />
+        <property name="serviceContext" ref="serviceContext" />
+    </bean>
+    <bean id="echoService_3.0" class="org.trpr.example.service.echo.EchoService">
+        <property name="taskManager" ref="taskManager" />
+        <property name="serviceContext" ref="serviceContext" />
+    </bean>
+
+
 </beans>
+				
+				
 				
 				
 				

@@ -46,6 +46,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      */
     public Resource getConfig(ServiceKey serviceKey) {
         for(URI key : configFileToServices.keySet()) {
+
             if(this.configFileToServices.get(key).contains(serviceKey)) {
                 return new FileSystemResource(key.getPath());
             }
@@ -92,11 +93,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
 
         Resource configFile =  this.getConfig(serviceName);
-        List<ServiceKey> prevList = this.configFileToServices.remove(configFile);
         try {
             this.springServicesContainer.loadComponent(configFile);
         } catch(Exception e) {
-            this.configFileToServices.put(configFile.getURI(),prevList);
             this.restorePrevConfigFile(serviceName);
             this.springServicesContainer.loadComponent(this.getConfig(serviceName));
             throw new PlatformException(e);
