@@ -48,14 +48,14 @@ Trooper is licensed under : The Apache Software License, Version 2.0. Here is a 
 
 ## Trooper users
 
-(_Write to us if you are a Trooper user and would like to be mentioned here_)
+( _Write to us if you are a Trooper user and would like to be mentioned here_ )
 
 * [Flipkart](http://www.flipkart.com) - large eCommerce portal in India
-** Catalog update propagation to website uses Trooper Batch and Orchestration profiles
-** Notification platform uses Trooper Batch and Orchestration profiles
-** Review Summarization processing pipeline is built using [Sift](https://github.com/regunathb/Sift) and Trooper Batch
-** Phantom (Service Proxy) uses Trooper Basic profile and HBase persistence libraries. Mobile API platform is built on Service Proxy.
+  * Catalog update propagation to website uses Trooper Batch and Orchestration profiles
+  * Notification platform uses Trooper Batch and Orchestration profiles
+  * Review Summarization processing pipeline is built using [Sift](https://github.com/regunathb/Sift) and Trooper Batch
+  * Phantom (Service Proxy) uses Trooper Basic profile and HBase persistence libraries. Mobile API platform is built on Service Proxy.
 
 *  R&D department of a big company providing national electricity in France
-** Uses Trooper Batch profile in an application that helps researchers to do theirs statistics studies. It is used to import new 
+  * Uses Trooper Batch profile in an application that helps researchers to do theirs statistics studies. It is used to import new 
 data daily from many sources.  
