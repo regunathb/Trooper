@@ -1,3 +1,10 @@
+## 1.2.4 (June 19, 2013)
+  - Forced System.exit() in bootstrap destroy
+  - Warm up HTable instances during startup for faster read/write to HBase 
+  - Bugfixing in dataacess-hbase
+  - Ignore errors in case properties file is not found (and apply defaults)
+<br />
+
 ## 1.2.3 (June 3, 2013)
 - **New features**
   - Support for Kerberos authentication in CDH4
