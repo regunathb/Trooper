@@ -207,7 +207,7 @@ public class PersistenceManagerProvider implements PersistenceManager {
 	 * @see PersistenceManager#findEntity(Criteria)
 	 */
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
-		checkAndUnsetShardedEntityContextHolder(criteria);
+		checkAndPopulateShardedEntityContextHolder(new Criteria[]{criteria});
 		PersistentEntity entity =  findSuitableProvider(criteria.getManagedClass()).findEntity(criteria);
 		checkAndUnsetShardedEntityContextHolder(criteria);
 		return entity;
@@ -219,7 +219,7 @@ public class PersistenceManagerProvider implements PersistenceManager {
 	 * @see PersistenceManager#findEntity(PersistentEntity)
 	 */
 	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
-		checkAndUnsetShardedEntityContextHolder(entity);
+		checkAndPopulateShardedEntityContextHolder(new PersistentEntity[]{entity});
 		entity =  findSuitableProvider(entity).findEntity(entity);
 		checkAndUnsetShardedEntityContextHolder(entity);
 		return entity;
@@ -326,7 +326,6 @@ public class PersistenceManagerProvider implements PersistenceManager {
 		checkAndPopulateShardedEntityContextHolder(criteria);
 		returnValue = this.persistenceDelegate.update(findSuitableProviders(criteria),criteria);
 		// unset the context using the first entity
-		checkAndUnsetShardedEntityContextHolder(criteria[0]);		
 		checkAndUnsetShardedEntityContextHolder(criteria[0]);		
 		return returnValue;
 	}
