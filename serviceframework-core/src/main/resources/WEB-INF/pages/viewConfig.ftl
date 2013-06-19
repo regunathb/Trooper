@@ -7,7 +7,7 @@
 	${SuccessMessage}
 	</#if>
     </span>
-    <H1> Name: ${serviceName} ( <a href="/modify/services/${serviceName}">Edit</a> ) </H1>
+    <H1> Name: ${serviceName} (<a href="/modify/services/${serviceName}">Edit</a> | <a href="/reInit/services/${serviceName}">ReInit</a>) </H1>
     <br />
 
     <h2> Service Configuration File:</h2>

@@ -55,6 +55,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     /**
+     * Reloads the configuration file containing the service
+     * @param serviceKey the Service Key
+     */
+    @Override
+    public void reloadConfig(ServiceKey serviceKey) {
+         Resource config = this.getConfig(serviceKey);
+         if(config!=null) {
+            this.springServicesContainer.loadComponent(config);
+         }
+    }
+    /**
      *Interface method implementation.
      * @param serviceName
      * @param modifiedServiceConfigFile
