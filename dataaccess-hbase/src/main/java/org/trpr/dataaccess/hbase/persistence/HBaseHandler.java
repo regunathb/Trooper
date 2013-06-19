@@ -197,7 +197,7 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		// ShardedEntityContextHolder SHOULD be the same.
 		ShardedEntity shardedEntity = ShardedEntityContextHolder.getShardedEntity();
 		if (shardedEntity != null) {
-			if (shardedEntity != entity) {
+			if (!shardedEntity.getShardHint().equals(entity.getShardHint())) {
 				// ideally this should not happen at all
 				logger.error("The sharded entity in context does not match the passed in value. Context entity shard is : [" + shardedEntity.getShardHint() + "], passed-in entity shard hint is [" + entity.getShardHint() + "]");
 				throw new IllegalStateException("The sharded entity in context does not match the passed in value. Context entity shard is : [" + shardedEntity.getShardHint() + "], passed-in entity shard hint is [" + entity.getShardHint() + "]");
