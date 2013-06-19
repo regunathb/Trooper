@@ -13,6 +13,7 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
+| Version 1.2.4    | June 2013      |     ServiceFramework configuration console, bugfixing, minor improvements
 | Version 1.2.3    | June 2013      |     Kerberos Authentication, bugfixing, minor improvements
 | Version 1.2.2    | March 2013      |     CodaHale metrics, Notifications for metrics
 | Version 1.2.1    | March 2013      |     HTTP Console for Services, Batch optimizations  
