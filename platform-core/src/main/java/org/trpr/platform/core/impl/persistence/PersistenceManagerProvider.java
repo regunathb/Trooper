@@ -207,7 +207,10 @@ public class PersistenceManagerProvider implements PersistenceManager {
 	 * @see PersistenceManager#findEntity(Criteria)
 	 */
 	public PersistentEntity findEntity(Criteria criteria) throws PersistenceException {
-		return findSuitableProvider(criteria.getManagedClass()).findEntity(criteria);
+		checkAndUnsetShardedEntityContextHolder(criteria);
+		PersistentEntity entity =  findSuitableProvider(criteria.getManagedClass()).findEntity(criteria);
+		checkAndUnsetShardedEntityContextHolder(criteria);
+		return entity;
 	}
 	
 	/**
@@ -216,7 +219,10 @@ public class PersistenceManagerProvider implements PersistenceManager {
 	 * @see PersistenceManager#findEntity(PersistentEntity)
 	 */
 	public PersistentEntity findEntity(PersistentEntity entity) throws PersistenceException {
-		return findSuitableProvider(entity).findEntity(entity);
+		checkAndUnsetShardedEntityContextHolder(entity);
+		entity =  findSuitableProvider(entity).findEntity(entity);
+		checkAndUnsetShardedEntityContextHolder(entity);
+		return entity;
 	}
 	
 	/**
