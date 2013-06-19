@@ -16,9 +16,6 @@ It is an umbrella project for a number of things:
 | Version 1.2.4    | June 2013      |     ServiceFramework configuration console, bugfixing
 | Version 1.2.3    | June 2013      |     Kerberos Authentication, bugfixing, minor improvements
 | Version 1.2.2    | March 2013      |     CodaHale metrics, Notifications for metrics
-| Version 1.2.1    | March 2013      |     HTTP Console for Services, Batch optimizations  
-| Version 1.1.0    | February 2013   |     Support for dynamic deployment of jobs, clustering      
-| Version 1.0.0    | December 2012   |     First stable release      
 
 ## Changelog
 
