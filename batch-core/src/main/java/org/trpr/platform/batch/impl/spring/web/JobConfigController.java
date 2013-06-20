@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Controller;
@@ -242,27 +243,73 @@ public class JobConfigController {
 		return "configuration/modify/jobs/job";
 	}
 
-	/**
-	 * Displays a read only version of job configuration
-	 * This method gets the XMLFile, Dependencies from jobService and displays it.
-	 */
-	@RequestMapping(value = "/configuration/jobs/{jobName}", method = RequestMethod.GET)
-	public String viewConfigDetails(ModelMap model, @ModelAttribute("jobName") String jobName, Errors errors,
-			@RequestParam(defaultValue = "0") int startJobInstance, @RequestParam(defaultValue = "20") int pageSize) throws IOException {	
-		//Adding jobName to view
-		jobName= jobName.substring(jobName.lastIndexOf('/')+1);		
-		model.addAttribute("jobName", jobName);
-		//Adding XMLFileContents & dependencies to view
-		String XMLFileContents = ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName));
-		model.addAttribute("XMLFileName", this.jobConfigService.getJobConfig(jobName).getFilename());	
-		model.addAttribute("XMLFileContents", XMLFileContents);
-		String jobDirectory = this.jobConfigService.getJobStoreURI(jobName).getPath();
-		model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");
-		//if job has dependencies
-		if(this.jobConfigService.getJobDependencyList(jobName)!=null) {
-			model.addAttribute("dependencies", this.jobConfigService.getJobDependencyList(jobName));
-		}
-		return "configuration/jobs/job";
-	}
+    /**
+     * Displays a read only version of job configuration
+     * This method gets the XMLFile, Dependencies from jobService and displays it.
+     */
+    @RequestMapping(value = "/configuration/jobs/{jobName}", method = RequestMethod.GET)
+    public String viewConfigDetails(ModelMap model, @ModelAttribute("jobName") String jobName) throws IOException {
+        //Adding jobName to view
+        jobName= jobName.substring(jobName.lastIndexOf('/')+1);
+        model.addAttribute("jobName", jobName);
+        //Adding XMLFileContents & dependencies to view
+        String XMLFileContents = ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName));
+        model.addAttribute("XMLFileName", this.jobConfigService.getJobConfig(jobName).getFilename());
+        model.addAttribute("XMLFileContents", XMLFileContents);
+        String jobDirectory = this.jobConfigService.getJobStoreURI(jobName).getPath();
+        model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");
+        //if job has dependencies
+        if(this.jobConfigService.getJobDependencyList(jobName)!=null) {
+            model.addAttribute("dependencies", this.jobConfigService.getJobDependencyList(jobName));
+        }
+        return "configuration/jobs/job";
+    }
+
+    /**
+     * ReInits the Job. All the jobs present in the configuration file will be reInited
+     */
+    @RequestMapping(value = "/configuration/reInit/jobs/{jobName}", method = RequestMethod.GET)
+    public String reInitJob(ModelMap model, @ModelAttribute("jobName") String jobName) throws IOException {
+        //Adding jobName to view
+        jobName= jobName.substring(jobName.lastIndexOf('/')+1);
+        model.addAttribute("jobName", jobName);
+        //Adding XMLFileContents & dependencies to view
+        String XMLFileContents = ConfigFileUtils.getContents(this.jobConfigService.getJobConfig(jobName));
+        model.addAttribute("XMLFileName", this.jobConfigService.getJobConfig(jobName).getFilename());
+        model.addAttribute("XMLFileContents", XMLFileContents);
+
+        try {
+            //Try deploying
+            this.jobConfigService.deployJob(Arrays.asList(new String[] {jobName}));
+        }
+        catch (Exception e) {
+            LOGGER.info("Error while deploying job",e);
+            //View: Add Error and rest of the attributes
+            //Get stacktrace as string
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            model.addAttribute("LoadingError", errors.toString());
+            if(errors.toString()==null) {
+                model.addAttribute("LoadingError", "Unexpected error");
+            }
+            model.addAttribute("XMLFileContents", XMLFileContents.trim());
+            model.addAttribute("jobName", jobName);
+            if(jobConfigService.getJobDependencyList(jobName)!=null) {
+                model.addAttribute("dependencies", jobConfigService.getJobDependencyList(jobName));
+            }
+            model.addAttribute("XMLFileContents", XMLFileContents.trim());
+            //Redirect
+            return "configuration/modify/jobs/job";
+        }
+        String jobDirectory = this.jobConfigService.getJobStoreURI(jobName).getPath();
+        model.addAttribute("JobDirectoryName",jobDirectory.substring(jobDirectory.lastIndexOf('/')+1)+"/lib");
+
+        model.addAttribute("SuccessMessage", "The job was successfully reInited!");
+        //if job has dependencies
+        if(this.jobConfigService.getJobDependencyList(jobName)!=null) {
+            model.addAttribute("dependencies", this.jobConfigService.getJobDependencyList(jobName));
+        }
+        return "configuration/jobs/job";
+    }
 
 }

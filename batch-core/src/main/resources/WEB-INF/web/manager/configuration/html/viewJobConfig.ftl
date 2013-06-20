@@ -2,14 +2,15 @@
 <div id="job">
 
 	<#assign url><@spring.url relativeUrl="${servletPath}/modify/jobs/${jobName}"/></#assign>
-	<#assign mod_url><@spring.url relativeUrl="${servletPath}/configuration/modify/jobs/${jobName}"/></#assign>
+    <#assign mod_url><@spring.url relativeUrl="${servletPath}/configuration/modify/jobs/${jobName}"/></#assign>
+    <#assign reinit_url><@spring.url relativeUrl="${servletPath}/configuration/reInit/jobs/${jobName}"/></#assign>
 	
 	<span style="color:green; font-weight:bold">
 	<#if SuccessMessage??>
 	${SuccessMessage}
 	</#if>
 	</span>
-	<H1> Name: ${jobName} (<a href="${mod_url}"> Edit </a>) </H1>
+	<H1> Name: ${jobName} (<a href="${mod_url}"> Edit </a> | <a href="${reinit_url}"> ReInit </a>) </H1>
 		
 	<h2> Job Configuration File:</h2>
 	<br />
@@ -32,7 +33,7 @@
 		    hlLine = editor.addLineClass(cur, "background", "activeline");
 		  }
 		});
-</script>
+    </script>
 	
 	
 
