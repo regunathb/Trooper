@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -37,8 +35,10 @@ import org.trpr.dataaccess.hbase.serializer.DateSerializer;
 import org.trpr.dataaccess.hbase.serializer.IntegerSerializer;
 import org.trpr.dataaccess.hbase.serializer.LongSerializer;
 import org.trpr.dataaccess.hbase.serializer.StringSerializer;
+import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.impl.persistence.AbstractPersistenceHandler;
 import org.trpr.platform.core.impl.persistence.sharding.ShardedEntityContextHolder;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.spi.persistence.Criteria;
 import org.trpr.platform.core.spi.persistence.PersistenceException;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
@@ -62,7 +62,10 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
 @ManagedResource(objectName = "spring.application:type=Trooper,application=Performance-Metrics,name=HBaseMetrics-", description = "HBase Performance Metrics Logger")
 public class HBaseHandler extends AbstractPersistenceHandler implements InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(HBaseHandler.class);
+	/**
+	 * The Log instance for this class
+	 */
+	private static final Logger LOGGER = LogFactory.getLogger(HBaseHandler.class);
 
 	/** The default HTablePool size */
 	private static final int HTABLE_POOL_SIZE = 10;
@@ -138,7 +141,7 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		}
 		// now warm up the HBaseTablePool for all configured HBaseEntity instances
 		for (HbaseMapping mapping : this.hbaseMappingContainer.getMappingForAllClasses()) {
-			logger.info("Warming up HTable pool for : " + mapping.getHbaseClass().getTable());
+			LOGGER.info("Warming up HTable pool for : " + mapping.getHbaseClass().getTable());
 			// warm up the default pool
 			HTableInterface table = (HTableInterface)this.hbaseTablePool.getTable(mapping.getHbaseClass().getTable());
 			table.setAutoFlush(useAutoFlush);
@@ -199,7 +202,7 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		if (shardedEntity != null) {
 			if (!shardedEntity.getShardHint().equals(entity.getShardHint())) {
 				// ideally this should not happen at all
-				logger.error("The sharded entity in context does not match the passed in value. Context entity shard is : [" + shardedEntity.getShardHint() + "], passed-in entity shard hint is [" + entity.getShardHint() + "]");
+				LOGGER.error("The sharded entity in context does not match the passed in value. Context entity shard is : [" + shardedEntity.getShardHint() + "], passed-in entity shard hint is [" + entity.getShardHint() + "]");
 				throw new IllegalStateException("The sharded entity in context does not match the passed in value. Context entity shard is : [" + shardedEntity.getShardHint() + "], passed-in entity shard hint is [" + entity.getShardHint() + "]");
 			}
 			if (this.targetHbaseTablePools.containsKey(shardedEntity.getShardHint())) {
@@ -210,7 +213,7 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 			if (tablePool == null) {
 				// throw an error if even the default shard configuration is not
 				// defined
-				logger.error("Cannot determine target HBase Configuration for lookup key [" + shardedEntity.getShardHint() + "]");
+				LOGGER.error("Cannot determine target HBase Configuration for lookup key [" + shardedEntity.getShardHint() + "]");
 				throw new IllegalStateException("Cannot determine target HBase Configuration for lookup key [" + shardedEntity.getShardHint() + "]");
 			}
 		}
@@ -254,7 +257,7 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 			Collection<PersistentEntity> persistentEntities = this.hbaseHandlerDelegate.findEntities(getHbaseTablePool((HBaseEntity)criteria.getManagedClass().newInstance()), (HBaseCriteria) criteria, getMappingForClass(criteria.getManagedClass().getName()));
 			return persistentEntities;
 		} catch (Exception e) {
-			logger.error("Error while reading data :: ", e);
+			LOGGER.error("Error while reading data :: ", e);
 			throw new PersistenceException("Error while reading data :: ", e);
 		} finally {
 			// log performance metrics captured. actual capture will happen only if it has been enabled via #startPerformanceMetricsLogging(). Default is off

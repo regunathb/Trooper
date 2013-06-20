@@ -25,8 +25,6 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
@@ -50,6 +48,8 @@ import org.trpr.dataaccess.hbase.serializer.DateSerializer;
 import org.trpr.dataaccess.hbase.serializer.IntegerSerializer;
 import org.trpr.dataaccess.hbase.serializer.LongSerializer;
 import org.trpr.dataaccess.hbase.serializer.StringSerializer;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.spi.persistence.PersistenceException;
 import org.trpr.platform.core.spi.persistence.PersistentEntity;
 import org.trpr.platform.core.spi.persistence.Serializer;
@@ -64,8 +64,10 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
  */
 public class HBaseHandlerDelegate implements InitializingBean {
 
-	/** Logger for this class */
-	private static final Log logger = LogFactory.getLog(HBaseHandlerDelegate.class);
+	/**
+	 * The Log instance for this class
+	 */
+	private static final Logger LOGGER = LogFactory.getLogger(HBaseHandlerDelegate.class);
 
 	/** The serializer map */
 	private Map<String, Serializer> classNameToSerializerMap = new HashMap<String, Serializer>();
@@ -200,7 +202,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				try {
 					table.close();
 				} catch (IOException e) {
-					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+					LOGGER.warn("Error returning table to the pool : " + e.getMessage(), e);
 				}
 			}
 		}
@@ -231,7 +233,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				try {
 					table.close();
 				} catch (IOException e) {
-					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+					LOGGER.warn("Error returning table to the pool : " + e.getMessage(), e);
 				}
 			}
 		}
@@ -251,14 +253,14 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Exception occurred in searchData:", e);
+			LOGGER.error("Exception occurred in searchData:", e);
 			throw new PersistenceException("Exception occcurred while performing search for table " + metadata.getHbaseClass().getTable(), e);
 		} finally {
 			if (table != null) {
 				try {
 					table.close();
 				} catch (IOException e) {
-					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+					LOGGER.warn("Error returning table to the pool : " + e.getMessage(), e);
 				}
 			}
 		}
@@ -301,14 +303,14 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Exception occurred in searchData:", e);
+			LOGGER.error("Exception occurred in searchData:", e);
 			throw new PersistenceException("Exception occcurred while performing search for table " + metadata.getHbaseClass().getTable(), e);
 		} finally {
 			if (table != null) {
 				try {
 					table.close();
 				} catch (IOException e) {
-					logger.warn("Error returning table to the pool : " + e.getMessage(), e);
+					LOGGER.warn("Error returning table to the pool : " + e.getMessage(), e);
 				}
 			}
 		}
@@ -560,7 +562,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				PropertyUtils.setProperty(entity, attribute, value);
 			}
 		} catch (Exception e) {
-			logger.error("Error setting attribute " + attribute, e);
+			LOGGER.error("Error setting attribute " + attribute, e);
 		}
 	}
 
@@ -642,7 +644,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 			try {
 				columnQualifier = Bytes.add(columnQualifier, convertToBytes(getAttribute(entity, column.getColumnQualifierAttribute())));
 			} catch (Exception e) {
-				logger.error("Error reading column qualifier value for : " + column.getColumnQualifierAttribute(), e);
+				LOGGER.error("Error reading column qualifier value for : " + column.getColumnQualifierAttribute(), e);
 			}
 		}
 		if (columnQualifier.length == 0) {
@@ -681,7 +683,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 				return idValue;
 			}
 		} catch (Exception e) {
-			logger.error("Error reading ID attribute : " + rowIdMetaData.getValueAttribute(), e);
+			LOGGER.error("Error reading ID attribute : " + rowIdMetaData.getValueAttribute(), e);
 			return new byte[0];
 		}
 	}
@@ -727,7 +729,7 @@ public class HBaseHandlerDelegate implements InitializingBean {
 		try {
 			returnValue = PropertyUtils.getProperty(entity, attribute);
 		} catch (Exception e) {
-			logger.error("Error reading attribute : '" + attribute + "' in class " + entity.getClass().getName(), e);
+			LOGGER.error("Error reading attribute : '" + attribute + "' in class " + entity.getClass().getName(), e);
 		}
 		return returnValue;
 	}

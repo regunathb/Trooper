@@ -26,13 +26,13 @@ import java.util.Map;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.trpr.dataaccess.hbase.model.config.ColumnDefinition;
 import org.trpr.dataaccess.hbase.model.config.CompositeRowKey;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
 import org.trpr.dataaccess.hbase.model.config.RowKeyDefinition;
 import org.trpr.dataaccess.hbase.model.config.RowKeyMember;
+import org.trpr.platform.core.impl.logging.LogFactory;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.integration.impl.xml.XMLTranscoderImpl;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.config.ConfigurationException;
@@ -49,10 +49,14 @@ import org.trpr.platform.runtime.spi.config.ConfigurationException;
 public class HBaseMappingContainer {
 
 	/**
+	 * The Log instance for this class
+	 */
+	private static final Logger LOGGER = LogFactory.getLogger(HBaseMappingContainer.class);
+
+	/**
 	 * Map holds the hbase mappings information
 	 */
 	private Map<String, HbaseMapping> configs;
-	private static final Log logger = LogFactory.getLog(HBaseMappingContainer.class);	
 	
 	/**
 	 * No argument constructor
@@ -76,7 +80,7 @@ public class HBaseMappingContainer {
 				validate(mappingFile, mapping);
 				this.configs.put(mapping.getHbaseClass().getName(), mapping);
 			} catch (Exception e) {
-				logger.error("Error initializing HBase configurations", e);
+				LOGGER.error("Error initializing HBase configurations", e);
 				throw new ConfigurationException("Error initializing HBase configurations", e);
 			}
 		}
