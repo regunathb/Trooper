@@ -34,4 +34,10 @@ public interface ConfigurationService {
      * @param configFile  The configFile containing the bean definition of the Service
      */
     public void addService(ServiceKey serviceKey, Resource configFile);
+
+    /**
+     * Reloads the configuration file containing the service
+     * @param serviceKey the Service Key
+     */
+    void reloadConfig(ServiceKey serviceKey);
 }

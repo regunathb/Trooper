@@ -119,6 +119,30 @@ public class ServiceController {
         model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName)))) ;
         return "modifyConfig";
     }
+
+    /** Controller for View Config page */
+    @RequestMapping(value = {"/reInit/services/{serviceName}"}, method = RequestMethod.GET)
+    public String reInit(ModelMap model, @ModelAttribute("services") String serviceName) {
+        model.addAttribute("serviceName", serviceName);
+        model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName)))) ;
+        try {
+            this.configurationService.reloadConfig(this.constructServiceKey(serviceName));
+        } catch(Exception e) {
+            model.addAttribute("XMLFileError", "Exception while Reiniting. This could be due to external changes to config files");
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            model.addAttribute("LoadingError", errors.toString());
+            if(errors.toString()==null) {
+                model.addAttribute("LoadingError", "Unexpected error");
+            }
+            model.addAttribute("XMLFileContents",getContents(this.configurationService.getConfig(this.constructServiceKey(serviceName))));
+
+        }
+        model.addAttribute("SuccessMessage","Succesfully reInited service configuration");
+        return "viewConfig";
+    }
+
+
     /** Controller for deploy page (called from modify) */
     @RequestMapping(value = {"/deploy/services/{serviceName}"}, method = RequestMethod.POST)
     public String deploy(ModelMap model, @ModelAttribute("services") String serviceName,
