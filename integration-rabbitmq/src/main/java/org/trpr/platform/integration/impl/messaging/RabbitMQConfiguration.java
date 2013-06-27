@@ -92,6 +92,7 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 		sb.append ("\n==Rabbit MQ Configuration==");
 		sb.append("\n[HostName = " + this.getHostName());
 		sb.append(", VirtualHost = " + this.getVirtualHost());
+		sb.append(", Port = " + this.getPortNumber());
 		sb.append(", ExchangeName = " + this.getExchangeName());
 		sb.append(", QueueName = " + this.getQueueName());
 		sb.append(", ExchageType = " + this.getExchangeType());
