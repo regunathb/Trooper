@@ -20,6 +20,7 @@
 package org.trpr.mule.transport.rabbitmq;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -68,19 +69,18 @@ public class RabbitConnector extends AbstractConnector {
 
 	/** Connection related variables*/
     private Connection connection;
-    private String username;
-    private String password;
-    private String virtualHost;
-    private String host;
     private int durableMessageCommitCount = DEFAULT_DURABLE_MSG_COMMIT_COUNT;
     private int prefetchCount = DEFAULT_PREFETCH_COUNT;
-    private int port = com.rabbitmq.client.AMQP.PROTOCOL.PORT;
+    
+    private List<RabbitMQConfiguration> rabbitMQConfigurations;
     
 	/** Heartbeat interval, in seconds for message request.*/
 	private int requestHeartBeat;    
 
 	/** The ReplyToHandler */
     private RabbitReplyToHandler repyToHandler;
+    
+    private int lastUsedConnectionIndex = -1;
 
     /**
      * Interface method implementation. Returns the string "amqp" as the supported protocol
@@ -179,15 +179,34 @@ public class RabbitConnector extends AbstractConnector {
      * Abstract method implementation. Creates the AMQP connection
      * @see org.mule.transport.AbstractConnector#doConnect()
      */
-    protected void doConnect() throws Exception {       
-        ConnectionFactory factory = new ConnectionFactory();
-		factory.setUsername(username);
-		factory.setPassword(password);
-		factory.setVirtualHost(virtualHost);
-		factory.setRequestedHeartbeat(requestHeartBeat);
-		factory.setHost(host);
-		factory.setPort(port);
-        connection = factory.newConnection();
+    protected void doConnect() throws Exception {
+		if(connection == null) {
+			int totalNumberOfNodes = rabbitMQConfigurations.size(); int tries = 0; 
+			while(tries <= totalNumberOfNodes) {
+    			int index = (lastUsedConnectionIndex + 1)%totalNumberOfNodes;
+                RabbitMQConfiguration rabbitMQConfiguration = null;
+				try {
+                    ConnectionFactory factory = new ConnectionFactory();
+                    rabbitMQConfiguration = rabbitMQConfigurations.get(index);
+            		factory.setUsername(rabbitMQConfiguration.getUserName());
+            		factory.setPassword(rabbitMQConfiguration.getPassword());
+            		factory.setVirtualHost(rabbitMQConfiguration.getVirtualHost());
+            		factory.setRequestedHeartbeat(requestHeartBeat);
+            		factory.setHost(rabbitMQConfiguration.getHostName());
+            		factory.setPort(rabbitMQConfiguration.getPortNumber());
+                    connection = factory.newConnection();
+                    lastUsedConnectionIndex = index;
+                    logger.info("Connection successfully created to configuration = " + rabbitMQConfiguration);
+                    return;
+				}
+				catch(Exception e) {
+					logger.info("Failed to connect to Rabbit MQ Node. Configuration is " + rabbitMQConfiguration + ". Will try other configurations");
+				}
+				tries ++;
+			}
+			logger.error("Failed to connect to all configured Rabbit MQ nodes");
+			throw new Exception("Failed to connect to all configured Rabbit MQ nodes");
+		}
     }
     
     /**
@@ -262,36 +281,6 @@ public class RabbitConnector extends AbstractConnector {
     public void setConnection(Connection connection) {
         this.connection = connection;
     }
-    public String getHost() {
-        return this.host;
-    }
-    public void setHost(String host) {
-        this.host = host;
-    }
-    public String getPassword() {
-        return this.password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public int getPort() {
-        return this.port;
-    }
-    public void setPort(int port) {
-        this.port = port;
-    }
-    public String getUsername() {
-        return this.username;
-    }
-    public void setUsername(String username){
-        this.username = username;
-    }
-    public String getVirtualHost() {
-        return this.virtualHost;
-    }
-    public void setVirtualHost(String virtualHost) {
-        this.virtualHost = virtualHost;
-    }
 	public int getDurableMessageCommitCount() {
 		return this.durableMessageCommitCount;
 	}
@@ -310,4 +299,15 @@ public class RabbitConnector extends AbstractConnector {
 	public void setRequestHeartBeat(int requestHeartBeat) {
 		this.requestHeartBeat = requestHeartBeat;
 	}
+
+	public List<RabbitMQConfiguration> getRabbitMQConfigurations()
+	{
+		return rabbitMQConfigurations;
+	}
+
+	public void setRabbitMQConfigurations(List<RabbitMQConfiguration> rabbitMQConfigurations)
+	{
+		this.rabbitMQConfigurations = rabbitMQConfigurations;
+	}
+	
 }
