@@ -21,19 +21,15 @@ import org.trpr.platform.integration.spi.messaging.MessagingException;
  * @version 1.0, 26/06/2013
  */
 
-public class LastUsedRabbitMQMessagePublisherImpl extends RabbitMQMessagePublisherImpl
-{
+public class LastUsedRabbitMQMessagePublisherImpl extends RabbitMQMessagePublisherImpl {
 	private int lastUsedConfigurationIndex = 0;
 	
-	public void publish(Object message) throws MessagingException 
-	{
+	public void publish(Object message) throws MessagingException {
 		validateMessage(message);
-		try
-		{
+		try {
 			publishToConnection(message,lastUsedConfigurationIndex);
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			lastUsedConfigurationIndex = publishWithRoundRobinPolicy(message);
 		}
 	}
