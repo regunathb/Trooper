@@ -191,7 +191,7 @@ public class RabbitConnector extends AbstractConnector {
             		factory.setUsername(rabbitMQConfiguration.getUserName());
             		factory.setPassword(rabbitMQConfiguration.getPassword());
             		factory.setVirtualHost(rabbitMQConfiguration.getVirtualHost());
-            		factory.setRequestedHeartbeat(requestHeartBeat);
+            		factory.setRequestedHeartbeat(rabbitMQConfiguration.getRequestHeartBeat());
             		factory.setHost(rabbitMQConfiguration.getHostName());
             		factory.setPort(rabbitMQConfiguration.getPortNumber());
                     connection = factory.newConnection();

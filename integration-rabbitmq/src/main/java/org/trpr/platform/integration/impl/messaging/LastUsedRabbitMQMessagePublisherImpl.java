@@ -9,9 +9,9 @@ import org.trpr.platform.integration.spi.messaging.MessagingException;
  * provider. This implementation is compatible with Java client API of RabbitMQ version 2.2.0. Backward/Forward
  * compatibility with other versions
  * requires verification.
- * This publisher will exhaust all {@link RabbitMQConfiguration} instances when trying to publish a message and fails
- * only when every one of the
- * configurations fail to connect or fail otherwise.
+ * This publisher tries to reuse the last used successful configuration to publish a message. 
+ * If the last used configuration fails then this publisher will exhaust all {@link RabbitMQConfiguration} instances 
+ * when trying to publish a message and fails only when every one of the configurations fail to connect or fail otherwise.
  * This class implements the Spring {@link org.springframework.beans.factory.DisposableBean} and calls
  * {@link #closeConnections()} method to
  * cleanup connections when the application context is torn down. The dependence on Spring is justified by the need to
