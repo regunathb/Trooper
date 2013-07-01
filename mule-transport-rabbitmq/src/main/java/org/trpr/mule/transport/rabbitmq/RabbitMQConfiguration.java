@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trpr.platform.integration.impl.messaging;
+package org.trpr.mule.transport.rabbitmq;
 
 /**
  * The <code>RabbitMQConfiguration</code> class is a data holder for RabbitMQ connection details. This implementation is 
  * compatible with Java client API of RabbitMQ version 2.2.0. Backward/Forward compatibility with other versions requires verification. 
- * 
- * @author Regunath B
- * @version 1.0, 28/05/2012
  */
 
 public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
