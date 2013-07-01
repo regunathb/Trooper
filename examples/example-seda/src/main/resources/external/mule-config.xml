@@ -63,11 +63,23 @@
 	</model>
 
     <rabbitmq:connector name="LocalhostRabbitMQConnector">
-        <spring:property name="host" value="localhost" />
-        <spring:property name="virtualHost" value="/" />
-        <spring:property name="port" value="5672" />
-        <spring:property name="username" value="guest" />
-        <spring:property name="password" value="guest" />
+   		<spring:list>
+			<spring:bean class="org.trpr.mule.transport.rabbitmq.RabbitMQConfiguration" id="queueConfiguration1">
+		        <spring:property name="userName" value="guest" />
+		        <spring:property name="password" value="guest" />
+		        <spring:property name="hostName" value="localhost" />
+		        <spring:property name="virtualHost" value="/" />
+		        <spring:property name="portNumber" value="5672" />
+			</spring:bean>
+			<spring:bean class="org.trpr.mule.transport.rabbitmq.RabbitMQConfiguration" id="queueConfiguration2">
+		        <spring:property name="userName" value="guest" />
+		        <spring:property name="password" value="guest" />
+		        <spring:property name="hostName" value="localhost" />
+		        <spring:property name="virtualHost" value="/" />
+		        <spring:property name="portNumber" value="5673" />
+			</spring:bean>
+		</spring:list>
+    
         <spring:property name="retryPolicyTemplate">
             <spring:bean
                 class="org.mule.modules.common.retry.policies.ExhaustingRetryPolicyTemplate">
