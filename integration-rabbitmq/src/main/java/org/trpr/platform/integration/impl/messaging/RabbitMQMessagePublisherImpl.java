@@ -111,8 +111,7 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 		publishWithRoundRobinPolicy(message);
 	}
 
-	protected int publishWithRoundRobinPolicy(Object message) throws MessagingException
-    {
+	protected int publishWithRoundRobinPolicy(Object message) throws MessagingException {
 	    int noOfQueues = rabbitMQConfigurations.size();
 		int attempt = 0;
 		RabbitMQConfiguration lastUsedConfiguration = null;
