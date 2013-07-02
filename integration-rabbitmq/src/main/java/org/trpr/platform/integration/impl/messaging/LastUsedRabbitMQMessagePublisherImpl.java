@@ -54,8 +54,7 @@ public class LastUsedRabbitMQMessagePublisherImpl extends RabbitMQMessagePublish
 		validateMessage(message);
 		try {
 			publishToConnection(message,lastUsedConfigurationIndex);
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			lastUsedConfigurationIndex = publishWithRoundRobinPolicy(message);
 		}
 	}
