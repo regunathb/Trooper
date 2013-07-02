@@ -38,8 +38,18 @@ import org.trpr.platform.integration.spi.messaging.MessagingException;
  */
 
 public class LastUsedRabbitMQMessagePublisherImpl extends RabbitMQMessagePublisherImpl {
+	/**
+	 * The index of the rabbit mq configuration that was last used for connection.
+	 */
 	private int lastUsedConfigurationIndex = 0;
 	
+	/**
+	 * Publishes the message to the last successful configuration that was used to publish a message. 
+	 * If the last used configuration fails or does not exist then this publisher will exhaust all {@link RabbitMQConfiguration} instances 
+	 * when trying to publish a message and fails only when every one of the configurations fail to connect or fail otherwise.
+	 * It also remembers the successful configuration and this us used in future publishes. 
+	 * @param message Message that needs to be published
+	 */
 	public void publish(Object message) throws MessagingException {
 		validateMessage(message);
 		try {
