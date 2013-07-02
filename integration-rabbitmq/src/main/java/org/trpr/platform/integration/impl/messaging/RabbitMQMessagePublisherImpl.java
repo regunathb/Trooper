@@ -173,8 +173,7 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 	    synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 	    	// check after monitor acquisition in order to ensure that multiple threads do not create
 	    	// a connection for the same configuration. \
-	    	if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) //Added code to check if connection is valid ... otherwise create a new connection
-	    	{ 
+	    	if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { //Added code to check if connection is valid ... otherwise create a new connection 
 	    		this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
 	    		this.rabbitConnectionHolders[connectionIndex].createConnection();
 	    	}
@@ -191,8 +190,7 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 	protected void publishToConnection(Object message, int connectionIndex) throws Exception {
 		RabbitMQConfiguration rabbitMQConfiguration = rabbitMQConfigurations.get(connectionIndex); 
 
-	    if(this.rabbitConnectionHolders[connectionIndex] == null)
-	    {
+	    if(this.rabbitConnectionHolders[connectionIndex] == null) {
 	    	throw new MessagingException("Connection not initialized");
 	    }
 	    
