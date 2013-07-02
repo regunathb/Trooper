@@ -110,7 +110,16 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 		validateMessage(message);
 		publishWithRoundRobinPolicy(message);
 	}
-
+	
+	/**
+	 * This method publishes the specified message in a round robin fashion. 
+	 * It tries all the rabbit-mq configurations provided.
+	 * If connection is successful it returns the index of the configuration to which connection was successful.
+	 * If connection to all provided configurations are unsuccessful then a Messaging Exception is thrown.
+	 * @param message Message that needs to be published
+	 * @return index of the configuration to which connection was successful.
+	 * @throws MessagingException
+	 */
 	protected int publishWithRoundRobinPolicy(Object message) throws MessagingException {
 	    int noOfQueues = rabbitMQConfigurations.size();
 		int attempt = 0;
@@ -143,26 +152,28 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 		}
 		throw new MessagingException("Error while publishing message into queue. All configurations failed!. Last failed configuration : " + lastUsedConfiguration);
     }
-
-	protected void validateMessage(Object message)
-    {
+	
+	/**
+	 * Validates the message to be published.
+	 * @param message Message that needs to be published.
+	 */
+	protected void validateMessage(Object message) {
 	    if (null == message) {
 			throw new MessagingException("Message parameter cannot be null");
 		}
     }
 
 	/**
-	 * Checks if the connection is for the configuration is null or invalid. If yes then creates a new connection as per the configuration
-	 * @param connectionIndex
-	 * @param rabbitMQConfiguration
+	 * Checks if the connection for the configuration is null or invalid. 
+	 * If yes then creates a new connection as per the configuration.
+	 * @param connectionIndex Index of the configuration and the connection
+	 * @param rabbitMQConfiguration Configuration for which the connection needs to be validated
 	 */
-	private void validateAndInitConnection(int connectionIndex, RabbitMQConfiguration rabbitMQConfiguration)
-    {
+	private void validateAndInitConnection(int connectionIndex, RabbitMQConfiguration rabbitMQConfiguration) {
 	    synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
 	    	// check after monitor acquisition in order to ensure that multiple threads do not create
 	    	// a connection for the same configuration. \
-	    	if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) //Added code to check if connection is valid ... otherwise create a new connection
-	    	{ 
+	    	if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { //Added code to check if connection is valid ... otherwise create a new connection 
 	    		this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
 	    		this.rabbitConnectionHolders[connectionIndex].createConnection();
 	    	}
@@ -170,7 +181,8 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
     }
 
 	/**
-	 * Publishes on a provided connection as per the connection configuration index. If the connection is null or if publishing fails it throws an Exception.
+	 * Publishes on a provided connection as per the connection configuration index. 
+	 * If the connection is null or if publishing fails it throws an Exception.
 	 * @param message
 	 * @param connectionIndex
 	 * @throws Exception
@@ -178,8 +190,7 @@ public class RabbitMQMessagePublisherImpl implements MessagePublisher, Disposabl
 	protected void publishToConnection(Object message, int connectionIndex) throws Exception {
 		RabbitMQConfiguration rabbitMQConfiguration = rabbitMQConfigurations.get(connectionIndex); 
 
-	    if(this.rabbitConnectionHolders[connectionIndex] == null)
-	    {
+	    if(this.rabbitConnectionHolders[connectionIndex] == null) {
 	    	throw new MessagingException("Connection not initialized");
 	    }
 	    
