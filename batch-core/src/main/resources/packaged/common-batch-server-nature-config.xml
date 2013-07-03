@@ -23,6 +23,7 @@
                 <bean id="Connector" class="org.trpr.platform.batch.impl.jetty.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
                     <property name="jobConfigService" ref="jobConfigService" />
                     <property name="port" value="${batch.core.jetty.admin.port}"/>
+                    <property name="acceptors" value="2"/>                    
                 </bean>
             </list>
         </property>
