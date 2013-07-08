@@ -1,3 +1,10 @@
+## 1.2.5 (July 08, 2013)
+  - Added ability to re-init Batch jobs and Services. Available using REST endpoints
+  - Added support to renew TGT tickets for Kerberos secured CDH4 client access libraries i.e. dataaccess-hbase
+  - Added support to connect to live RabbitMQ nodes in a cluster, node affinity
+  - Bug fixes. Notably Jetty console display settings for batch-core
+<br />  
+
 ## 1.2.4 (June 19, 2013)
   - Forced System.exit() in bootstrap destroy
   - Warm up HTable instances during startup for faster read/write to HBase 

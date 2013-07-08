@@ -13,9 +13,10 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
+| Version 1.2.5    | July 2013      |     Re-init of Services, Batch Jobs, RabbitMQ cluster routing, bugfixes
 | Version 1.2.4    | June 2013      |     ServiceFramework configuration console, bugfixing
 | Version 1.2.3    | June 2013      |     Kerberos Authentication, bugfixing, minor improvements
-| Version 1.2.2    | March 2013      |     CodaHale metrics, Notifications for metrics
+| Version 1.2.2    | March 2013     |     CodaHale metrics, Notifications for metrics
 
 ## Changelog
 
