@@ -12,7 +12,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-core</artifactId>
 	<name>Batch Core</name>
-	<version>1.2.5.1</version>
+	<version>1.2.6</version>
 	<description>Trooper Batch Core</description>
 
 	<licenses>
