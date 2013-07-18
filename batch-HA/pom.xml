@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.2.5.1</version>
 		</dependency>		
 		<!-- Third party dependencies -->	
 		<dependency>

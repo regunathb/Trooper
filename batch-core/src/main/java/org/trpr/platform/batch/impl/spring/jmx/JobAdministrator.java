@@ -132,9 +132,6 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 		}
 	}	
 
-	/** The Spring JMX managed attribute that returns the batch stats as a JMX supported type*/
-	private TabularDataSupport batchInvocationStatistics = new TabularDataSupport(tableType);	
-
 	/** The host IP placeholder */
 	private String hostIP;
 	
@@ -176,8 +173,7 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	 */
 	@ManagedAttribute
 	public TabularDataSupport getIndividualJobExecutionMetrics() {
-		this.populateJobStatistics();
-		return batchInvocationStatistics;
+		return this.populateJobStatistics();
 	}
 	
 	/**
@@ -217,8 +213,9 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	/**
 	 * Wraps the job statistics into JMX types
 	 */
-	private void populateJobStatistics() {
+	private TabularDataSupport populateJobStatistics() {
 		// clear existing stats in the TabularDataSupport and re-populate it with current data extracted from batch framework classes
+		TabularDataSupport batchInvocationStatistics = new TabularDataSupport(tableType);
 		batchInvocationStatistics.clear();
 		JobStatistics[] stats = getStats();
 		for (JobStatistics stat : stats) {
@@ -241,6 +238,7 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 				LOGGER.error("Error constructing JMX data type from job statistics. Error is : " + e.getMessage(), e);
 			}
 		}
+		return batchInvocationStatistics;
 	}
 	
 	/**
@@ -298,9 +296,6 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	}
 	
 	/** Getter setter methods*/
-	public void setBatchInvocationStatistics(TabularDataSupport batchInvocationStatistics) {
-		this.batchInvocationStatistics = batchInvocationStatistics;
-	}	
 	public JobOperator getJobOperator() {
 		return jobOperator;
 	}
