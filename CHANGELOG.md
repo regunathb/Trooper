@@ -1,3 +1,8 @@
+## 1.2.6 (July 23, 2013)
+  - Modified POM files to make build versions explicit
+  - Bug fixes. Notably race condition in batch JMX administrator
+<br />  
+
 ## 1.2.5 (July 08, 2013)
   - Added ability to re-init Batch jobs and Services. Available using REST endpoints
   - Added support to renew TGT tickets for Kerberos secured CDH4 client access libraries i.e. dataaccess-hbase
