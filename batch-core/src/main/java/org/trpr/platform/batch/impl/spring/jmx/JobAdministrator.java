@@ -214,9 +214,8 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	 * Wraps the job statistics into JMX types
 	 */
 	private TabularDataSupport populateJobStatistics() {
-		// clear existing stats in the TabularDataSupport and re-populate it with current data extracted from batch framework classes
+		// Re-creates the invocation statistics object each time
 		TabularDataSupport batchInvocationStatistics = new TabularDataSupport(tableType);
-		batchInvocationStatistics.clear();
 		JobStatistics[] stats = getStats();
 		for (JobStatistics stat : stats) {
 			Object[] statValues = new Object[ATTRIBUTE_NAMES.length];
