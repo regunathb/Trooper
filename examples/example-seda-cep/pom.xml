@@ -3,15 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+	
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.6</version>
+		<relativePath>../../</relativePath>
 	</parent>
+	
 	<groupId>org.trpr</groupId>
 	<artifactId>example-seda-cep</artifactId>
 	<name>Example Orchestration with CEP</name>
-	<version>1.0.0</version>
+	<version>1.2.6</version>
 	<description>Trooper Example Orchestration with CEP</description>
 
 	<licenses>
@@ -158,17 +161,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-seda</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-services</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.6</version>
 		</dependency>				
 	</dependencies>
 	

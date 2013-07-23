@@ -3,16 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+	
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.6</version>
+		<relativePath>../../</relativePath>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>example-services</artifactId>
 	<name>Example Services</name>
-	<version>1.0.0</version>
+	<version>1.2.6</version>
 	<description>Trooper Example Services</description>
 
 	<licenses>
@@ -59,12 +61,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-models</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.6</version>
 		</dependency>				
 	</dependencies>
 	
