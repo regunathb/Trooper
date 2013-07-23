@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.6</version>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>runtime-core</artifactId>
 	<name>Platform Runtime Core</name>
-	<version>${org.trpr.version}</version>
+	<version>1.2.6</version>
 	<description>Trooper Runtime Core project</description>
 
 	<licenses>
@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.2.6</version>
 		</dependency>	
 	</dependencies>
 	

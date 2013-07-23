@@ -11,7 +11,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-seda-cep</artifactId>
 	<name>Example Orchestration with CEP</name>
-	<version>${org.trpr.version}</version>
+	<version>1.0.0</version>
 	<description>Trooper Example Orchestration with CEP</description>
 
 	<licenses>
@@ -158,17 +158,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-seda</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-services</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>				
 	</dependencies>
 	

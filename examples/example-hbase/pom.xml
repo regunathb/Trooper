@@ -11,7 +11,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-hbase</artifactId>
 	<name>Example HBase</name>
-	<version>${org.trpr.version}</version>
+	<version>1.0.0</version>
 	<description>Trooper Example HBase</description>
 
 	<licenses>
@@ -83,12 +83,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>dataaccess-hbase</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>						
 	</dependencies>
 	

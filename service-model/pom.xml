@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.6</version>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>service-model</artifactId>
 	<name>Service Model</name>
-	<version>${org.trpr.version}</version>
+	<version>1.2.6</version>
 	<description>Trooper Service Model</description>
 
 	<licenses>
@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.2.6</version>
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>        
@@ -104,7 +104,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>platform-model</artifactId>
-			                                <version>${org.trpr.version}</version>
+			                                <version>1.0.0</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>

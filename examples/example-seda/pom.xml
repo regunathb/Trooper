@@ -12,7 +12,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-seda</artifactId>
 	<name>Example Orchestration</name>
-	<version>${org.trpr.version}</version>
+	<version>1.0.0</version>
 	<description>Trooper Example Orchestration</description>
 
 	<licenses>
@@ -88,18 +88,18 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>integration-rabbitmq</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-seda</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-services</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>				
 	</dependencies>
 	

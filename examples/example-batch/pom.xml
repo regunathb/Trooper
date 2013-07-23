@@ -11,7 +11,7 @@
 	<groupId>org.trpr</groupId>
 	<artifactId>example-batch</artifactId>
 	<name>Example Batch</name>
-	<version>${org.trpr.version}</version>
+	<version>1.0.0</version>
 	<description>Trooper Example Batch</description>
 
 	<licenses>
@@ -84,17 +84,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-models</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>integration-rabbitmq</artifactId>
-			<version>${org.trpr.version}</version>
+			<version>1.0.0</version>
 		</dependency>								
 	</dependencies>
 	
