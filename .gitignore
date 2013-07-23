@@ -171,6 +171,7 @@ pip-log.txt
 *.class
 target
 bin
+pom.xml.versionsBackup
 .svn/README.md~
 /README.md~
 /CHANGELOG.md~

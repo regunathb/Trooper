@@ -77,6 +77,16 @@
 		<module>integration-rabbitmq</module>	
 		<module>dataaccess-hbase</module>		
 		<module>dataaccess-orm</module>		
+		<!-- Example projects -->
+		<!-- DONOT deploy
+		<module>examples/example-batch</module>		
+		<module>examples/example-batch-HA</module>				
+		<module>examples/example-hbase</module>		
+		<module>examples/example-models</module>		
+		<module>examples/example-seda</module>		
+		<module>examples/example-seda-cep</module>		
+		<module>examples/example-services</module>	
+		-->
 	</modules>
 			
 </project>
