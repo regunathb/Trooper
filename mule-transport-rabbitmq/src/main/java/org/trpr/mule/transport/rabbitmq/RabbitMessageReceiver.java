@@ -104,7 +104,7 @@ public class RabbitMessageReceiver extends AbstractMessageReceiver implements Co
      * @see org.mule.transport.AbstractConnectable#doConnect()
      */
     protected void doConnect() throws Exception {
-    	// local variables for dead letter queue and exhange
+    	// local variables for dead letter queue and exchange
     	String dlQueue = null, dlExchange = null;
     	
         RabbitConnector conn = (RabbitConnector) connector;
