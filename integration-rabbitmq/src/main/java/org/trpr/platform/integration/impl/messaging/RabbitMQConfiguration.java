@@ -25,6 +25,13 @@ package org.trpr.platform.integration.impl.messaging;
 
 public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 
+	/** The constant referring to the suffix used for naming dead letter exchanges and queues*/
+	public static final String DEAD_SUFFIX = ".dead";
+	
+	/** The Dead letter exchange arguments for RabbitMQ */
+	public static final String RMQ_DL_ARGUMENT = "x-dead-letter-exchange";
+	public static final String RMQ_DL_RT_KEY = "x-dead-letter-routing-key";
+	
 	/** The default durable commit count*/
 	public static final int DEFAULT_DURABLE_MSG_COMMIT_COUNT = 1;
 	
@@ -38,6 +45,11 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 	 * The RabbitMQ queue name
 	 */
 	private String queueName;
+	
+	/**
+	 * DLQ settings for the connection
+	 */
+	private boolean dlqEnabled;
 
 	/**
 	 * noAck to acknowledge message receipt and processing explicitly.
@@ -78,6 +90,7 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 		this.durable=parent.isDurable();
 		
 		this.queueName = parent.getQueueName();
+		this.dlqEnabled = parent.isDlqEnabled();
 		this.noAck=parent.isNoAck();
 		this.durableMessageCommitCount = parent.getDurableMessageCommitCount();
 		this.disableTX = parent.isDisableTX();
@@ -132,6 +145,12 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 	public void setDurableMessageCommitCount(int durableMessageCommitCount) {
 		this.durableMessageCommitCount = durableMessageCommitCount;
 	}
+	public boolean isDlqEnabled() {
+		return this.dlqEnabled;
+	}
+	public void setDlqEnabled(boolean dlqEnabled) {
+		this.dlqEnabled = dlqEnabled;
+	}	
 	/**==== End Spring DI style setters/getters */
 	
 }

@@ -17,6 +17,8 @@
 package org.trpr.platform.integration.impl.messaging;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -89,8 +91,11 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	 */
 	public void createConnection(boolean disableTX) throws MessagingException {
 		
+    	// local variables for dead letter queue and exchange
+    	String dlQueue = null, dlExchange = null;
+
 		if (this.rabbitMQRpcConfiguration != null) {
-			this.createConnection(this.rabbitMQRpcConfiguration); // set up a RPC style connection
+			this.createRPCConnection(this.rabbitMQRpcConfiguration); // set up a RPC style connection
 			return;
 		}
 		
@@ -110,11 +115,20 @@ public class RabbitConnectionHolder implements ShutdownListener {
 					if (rabbitMQConfiguration.isDurable() && !rabbitMQConfiguration.isDisableTX() && !disableTX) {
 						this.channel.txSelect();
 					}
-					this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,null);	
+					if (rabbitMQConfiguration.isDlqEnabled()) {
+		            	dlQueue = rabbitMQConfiguration.getQueueName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
+		            	dlExchange = rabbitMQConfiguration.getExchangeName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
+		            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
+		            	args.put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
+		            	args.put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
+						this.channel.queueDeclare(dlQueue,rabbitMQConfiguration.isDurable(),false,false,null);// create the dead letter queue for the queue
+						this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,args);// declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
+						this.channel.queueBind(dlQueue, dlExchange, rabbitMQConfiguration.getRoutingKey());	// bind the DLQ to the DLQ exchange if dead lettering is enabled					
+					} else {
+						this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,null);
+					}
+					this.channel.queueBind(rabbitMQConfiguration.getQueueName(), rabbitMQConfiguration.getExchangeName(), rabbitMQConfiguration.getRoutingKey());
 					
-					this.channel.queueBind(rabbitMQConfiguration.getQueueName(),
-							rabbitMQConfiguration.getExchangeName(),
-							rabbitMQConfiguration.getRoutingKey());
 				} catch (Exception e) {
 					LOGGER.error("Error initializing RabbitMQ connection : " + e.getMessage() + rabbitMQConfiguration.toString(), e);
 					throw new MessagingException(
@@ -181,8 +195,21 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	 */
 	public int getMessageCount() throws Exception {
 		try{
-			return channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
-					rabbitMQConfiguration.isDurable(),false,false,null).getMessageCount();	
+			if (rabbitMQConfiguration.isDlqEnabled()) {
+		    	// local variables for dead letter queue and exchange
+		    	String dlQueue = null, dlExchange = null;
+            	dlQueue = rabbitMQConfiguration.getQueueName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
+            	dlExchange = rabbitMQConfiguration.getExchangeName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
+            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
+            	args.put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
+            	args.put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
+				this.channel.queueDeclare(dlQueue,rabbitMQConfiguration.isDurable(),false,false,null);// create the dead letter queue for the queue
+				return this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
+					rabbitMQConfiguration.isDurable(),false,false,args).getMessageCount();// declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
+			} else {
+				return channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
+					rabbitMQConfiguration.isDurable(),false,false,null).getMessageCount();
+			}
 		} catch (IOException e) {
 			LOGGER.error("Error retrieving message count for queue. Returning 0. Configuration is : " + rabbitMQConfiguration);
 		}
@@ -246,11 +273,30 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	}
 	
 	/**
+	 * Helper method to create RabbitMQ {@link Connection} and {@link Channel} for the specified {@link RabbitMQConfiguration}. 
+	 * Calls {@link #createConnection(RabbitMQRpcConfiguration)} and then initializes any DLQ exchanges if required
+	 * @param configuration the RabbitMQConfiguration
+	 * @throws MessagingException in case of errors during connection & channel creation
+	 */
+	private void createConnection(RabbitMQConfiguration configuration) throws MessagingException {
+		this.createRPCConnection(configuration);
+		// create a dead letter exchange if the queue has enabled dead lettering
+		if (rabbitMQConfiguration.isDlqEnabled()) {
+			try {
+				this.channel.exchangeDeclare(configuration.getExchangeName()+RabbitMQConfiguration.DEAD_SUFFIX,configuration.getExchangeType(),configuration.isDurable());
+			} catch (Exception e) {
+				LOGGER.error("Error initializing RabbitMQ connection for : " + configuration.toString(), e);
+				throw new MessagingException("Error initializing RabbitMQ connection for : " + configuration.toString()); //not passing the root cause as it is logged here
+			}				
+		}		
+	}
+	
+	/**
 	 * Helper method to create RabbitMQ {@link Connection} and {@link Channel} for the specified {@link RabbitMQRpcConfiguration}
 	 * @param configuration the RabbitMQRpcConfiguration or one of its sub-types to create connection objects for
 	 * @throws MessagingException in case of errors during connection & channel creation
 	 */
-	private void createConnection(RabbitMQRpcConfiguration configuration) throws MessagingException {
+	private void createRPCConnection(RabbitMQRpcConfiguration configuration) throws MessagingException {
 		
 		synchronized (this) { // all code blocks that mutate the connection and channel objects held by this class are synchronized
 			
@@ -269,15 +315,10 @@ public class RabbitConnectionHolder implements ShutdownListener {
 				this.conn.addShutdownListener(this);
 				// create the channel
 				this.channel = this.conn.createChannel();
-				this.channel.exchangeDeclare(
-						configuration.getExchangeName(), 
-						configuration.getExchangeType(),
-						configuration.isDurable());
-				
+				this.channel.exchangeDeclare(configuration.getExchangeName(), configuration.getExchangeType(),configuration.isDurable());				
 			} catch (Exception e) {
 				LOGGER.error("Error initializing RabbitMQ connection for : " + configuration.toString(), e);
-				throw new MessagingException(
-						"Error initializing RabbitMQ connection for : " + configuration.toString()); //not passing the root cause as it is logged here
+				throw new MessagingException("Error initializing RabbitMQ connection for : " + configuration.toString()); //not passing the root cause as it is logged here
 			}
 		}
 		
