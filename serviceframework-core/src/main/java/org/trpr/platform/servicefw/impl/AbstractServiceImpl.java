@@ -182,10 +182,9 @@ public abstract class AbstractServiceImpl<T extends PlatformServiceRequest, S ex
 			this.serviceContext.notifyServiceExecutionEnd(request, serviceResponse, Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
 
 			return serviceResponse;
+			
 		} catch (Exception e) {
-			LOGGER.error("AbstractServiceImpl:: Error Invoking service : "	+ request.getServiceName() + "_" + request.getServiceVersion(), e);
 			// catch and return a ServiceResponse for all kinds of exceptions
-			// that might arise when invoking a remote service
 			this.serviceContext.notifyServiceExecutionEnd(request, constructServiceResponseFromException(e), Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
 			throw new ServiceException(e);
 		}
