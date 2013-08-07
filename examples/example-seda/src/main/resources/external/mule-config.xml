@@ -13,6 +13,15 @@
 		Sample end-point configuration for durable end-point i.e. durable exchange, queue and messages. DONOT use this for SEDA configurations. 
 		<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput&amp;durable=true"/>
 	 -->
+
+	<!--
+		Sample end-point configuration for enabling message re-queuing and dead-lettering. 
+		<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput&amp;message-requeued=true&amp;dead-lettered=true&amp;durable=true"/>
+		Note that this works only for synchronous end-points like this declaration below:
+		<inbound>
+			<inbound-endpoint ref="GreetingInputEndpoint" synchronous="true" transformer-refs="EarthlingToGreetingServiceRequest"/>
+		</inbound>		  
+	-->
 	 
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="GreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoInputEndpoint" address="amqp://myexchange:direct/?queue=echoInput"/>
