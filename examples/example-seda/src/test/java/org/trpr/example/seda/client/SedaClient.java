@@ -30,6 +30,7 @@ public class SedaClient {
 		conf.setPassword("guest");
 		conf.setQueueName("greetingInput");
 		conf.setRoutingKey("greetingInput");
+		conf.setDlqEnabled(true);
 		rabbitMQConfigurations.add(conf);
 		publisher.setRabbitMQConfigurations(rabbitMQConfigurations);
 		/*
