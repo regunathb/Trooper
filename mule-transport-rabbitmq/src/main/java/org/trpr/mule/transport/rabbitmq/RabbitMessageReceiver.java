@@ -20,6 +20,8 @@
 package org.trpr.mule.transport.rabbitmq;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.resource.spi.work.Work;
 
@@ -38,11 +40,11 @@ import org.mule.transport.AbstractMessageReceiver;
 import org.mule.util.StringUtils;
 
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
-import com.rabbitmq.client.AMQP.BasicProperties;
 
 /**
  * The <code>RabbitMessageReceiver</code> is the {@link MessageReceiver} implementation for the RabbitMQ Mule transport.
@@ -102,34 +104,52 @@ public class RabbitMessageReceiver extends AbstractMessageReceiver implements Co
      * @see org.mule.transport.AbstractConnectable#doConnect()
      */
     protected void doConnect() throws Exception {
+    	// local variables for dead letter queue and exhange
+    	String dlQueue = null, dlExchange = null;
+    	
         RabbitConnector conn = (RabbitConnector) connector;
         RabbitConnector.ChannelHolder ch = conn.createChannel(endpoint);
         channel = ch.getChannel();
         logger.debug("Receiver opened channel: " + channel);
 
         queue = EndpointUtils.getQueue(endpoint);
+        routingKey = EndpointUtils.getRoutingKey(endpoint);
+        if (EndpointUtils.getExchangeType(endpoint).equals("direct") && StringUtils.isEmpty(routingKey)) {
+            routingKey = queue;
+        }
+        
         if (queue == null) {
             logger.debug("Declaring private queue");
             queue = channel.queueDeclare().getQueue();
             logger.debug("Private queue name: " + queue);
         } else {
-            logger.debug("Declaring well-known queue: " + queue);           
-    		// Input Queue
-    		channel.queueDeclare(queue,EndpointUtils.getDurable(endpoint),false,false,null);
+            logger.debug("Declaring well-known queue: " + queue);      
+            if (EndpointUtils.isDeadLetterEnabled(endpoint)) { // check if dead lettering is enabled on the endpoint for the queue 
+            	dlQueue = queue + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
+            	dlExchange = EndpointUtils.getExchange(endpoint) + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
+            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
+            	args.put(EndpointUtils.RMQ_DL_ARGUMENT, dlExchange);  
+            	args.put(EndpointUtils.RMQ_DL_RT_KEY, routingKey);
+            	channel.queueDeclare(dlQueue,EndpointUtils.isDurable(endpoint),false,false,null); // create the dead letter queue for the one mentioned in the endpoint
+	    		channel.queueDeclare(queue,EndpointUtils.isDurable(endpoint),false,false,args); // declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
+            } else {
+	    		// Input Queue
+	    		channel.queueDeclare(queue,EndpointUtils.isDurable(endpoint),false,false,null); // no dead lettering
+            }
         }
         
         if (startOnConnect) { // start the consumer only if set to start on connect
             doStart();
         }
         
-        exchange = EndpointUtils.declareExchange(channel, endpoint);
-        routingKey = EndpointUtils.getRoutingKey(endpoint);
-        if (EndpointUtils.getExchangeType(endpoint).equals("direct") && StringUtils.isEmpty(routingKey)) {
-            routingKey = queue;
-        }
+        exchange = EndpointUtils.declareExchange(channel, endpoint); // creates the exchange and DLQ exchange as well, if required by the endpoint
         logger.debug("Using exchange: " + exchange + ", routing key: " + routingKey);
         channel.queueBind(queue, exchange, routingKey);
-
+        if (EndpointUtils.isDeadLetterEnabled(endpoint) && dlQueue != null && dlExchange != null) { // bind the DLQ to the DLQ exchange if dead lettering is enabled
+            logger.debug("Using dl exchange: " + dlExchange + ", routing key: " + routingKey);
+            channel.queueBind(dlQueue, dlExchange, routingKey);
+        }
+        
         // start the re-connect thread only if it is not started yet
         if (reconnectState != TRY_RECONNECT) {
         	Thread thread = new Thread(this);
@@ -359,7 +379,11 @@ public class RabbitMessageReceiver extends AbstractMessageReceiver implements Co
 	            // for receivers, service and dispatcher results in exceptions getting handled and bundled into the response Mule message. This necessitates
 	            // processing of response to determine execution outcome of invoking the service component.
 	            if (synchronous && returnMessage.getExceptionPayload() != null) {
-	            	return; // return without acking
+	            	if (env.isRedeliver()) {
+	            		channel.basicReject(env.getDeliveryTag(), false); // reject the message without re-queuing 
+	            	} else {
+	            		channel.basicReject(env.getDeliveryTag(), EndpointUtils.isMessageRequeued(endpoint)); // reject the message passing in the re-queuing flag declared on the endpoint
+	            	}
 	            } else {
 	            	channel.basicAck(env.getDeliveryTag(), false);
 	            }

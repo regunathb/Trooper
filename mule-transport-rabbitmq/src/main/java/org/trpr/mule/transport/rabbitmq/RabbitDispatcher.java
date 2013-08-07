@@ -118,12 +118,12 @@ public class RabbitDispatcher extends AbstractMessageDispatcher {
      */
     protected void doDispatch(MuleEvent event) throws Exception {
         MuleMessage msg = event.getMessage();
-        AMQP.BasicProperties msgProps = EndpointUtils.getDurable(endpoint) ? MessageProperties.PERSISTENT_BASIC : MessageProperties.BASIC;
+        AMQP.BasicProperties msgProps = EndpointUtils.isDurable(endpoint) ? MessageProperties.PERSISTENT_BASIC : MessageProperties.BASIC;
         rpcClient.publish(msgProps, msg.getPayloadAsBytes());
         dispatchedMessageCount++;
         // commit the message if the endpoint is durable and the commit count is reached. 
         // The channel should and would have been created with txSelect in the RabbitConnector
-        if (EndpointUtils.getDurable(endpoint) && (dispatchedMessageCount % ((RabbitConnector)connector).getDurableMessageCommitCount() == 0)) {
+        if (EndpointUtils.isDurable(endpoint) && (dispatchedMessageCount % ((RabbitConnector)connector).getDurableMessageCommitCount() == 0)) {
         	// synchronized on the channel to avoid the below RabbitMQ client exception, caused in multi-threaded execution using the same channel:
         	// java.lang.IllegalStateException: cannot execute more than one synchronous AMQP command at a time
         	synchronized(channel) {
@@ -140,7 +140,7 @@ public class RabbitDispatcher extends AbstractMessageDispatcher {
         try {
         	// Commit any non-committed durable messages because the commit count was not reached. This is done before this dispatcher goes down
             // The channel should and would have been created with txSelect in the RabbitConnector
-            if (EndpointUtils.getDurable(endpoint)) {
+            if (EndpointUtils.isDurable(endpoint)) {
             	// synchronized on the channel to avoid the below RabbitMQ client exception, caused in multi-threaded execution using the same channel:
             	// java.lang.IllegalStateException: cannot execute more than one synchronous AMQP command at a time
             	synchronized(channel) {
@@ -163,7 +163,7 @@ public class RabbitDispatcher extends AbstractMessageDispatcher {
         final MuleMessage msg = event.getMessage();
     	// durable settings are NOT ideal for synchronous calls as non-consumed messages will remain for ever. Throw exception if the endpoint is 
         // configured as durable
-        if (EndpointUtils.getDurable(endpoint)) {
+        if (EndpointUtils.isDurable(endpoint)) {
         	throw new Exception("Durable end-points not supported for synchronous calls. Configuration mis-match.");
         }
         byte[] response = rpcClient.primitiveCall(msg.getPayloadAsBytes());

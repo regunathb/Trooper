@@ -34,6 +34,13 @@ import com.rabbitmq.client.Channel;
  * @version 1.0, 17/08/2012
  */
 public class EndpointUtils {
+	
+	/** The constant referring to the suffix used for naming dead letter exchanges and queues*/
+	public static final String DEAD_SUFFIX = ".dead";
+	
+	/** The Dead letter exchange arguments for RabbitMQ */
+	public static final String RMQ_DL_ARGUMENT = "x-dead-letter-exchange";
+	public static final String RMQ_DL_RT_KEY = "x-dead-letter-routing-key";
 
 	/**
 	 * Returns a String realm if specified
@@ -73,17 +80,34 @@ public class EndpointUtils {
     /**
      * Returns the durability setting on the endpoint
      */
-    public static boolean getDurable(ImmutableEndpoint e) {
+    public static boolean isDurable(ImmutableEndpoint e) {
         return MapUtils.getBooleanValue(e.getProperties(), "durable", false);
     }
 
+    /**
+     * Returns the dead-letter setting on the endpoint
+     */
+    public static boolean isDeadLetterEnabled(ImmutableEndpoint e) {
+        return MapUtils.getBooleanValue(e.getProperties(), "dead-lettered", false);
+    }
+
+    /**
+     * Returns the message-re-queued setting on the endpoint
+     */
+    public static boolean isMessageRequeued(ImmutableEndpoint e) {
+        return MapUtils.getBooleanValue(e.getProperties(), "message-requeued", false);
+    }
+    
     /**
      * Declares an Exchange on the specified Channel using the exchange details derived from the specified Endpoint
      */
     public static String declareExchange(Channel channel, ImmutableEndpoint e) throws IOException {
         String exchange = EndpointUtils.getExchange(e);
         if (exchange != null) {
-        	channel.exchangeDeclare(exchange, EndpointUtils.getExchangeType(e),getDurable(e));
+        	channel.exchangeDeclare(exchange, EndpointUtils.getExchangeType(e),isDurable(e));
+        	if (EndpointUtils.isDeadLetterEnabled(e)) { // create a dead letter exchange if the endpoint has enabled dead lettering
+            	channel.exchangeDeclare(exchange+EndpointUtils.DEAD_SUFFIX, EndpointUtils.getExchangeType(e),isDurable(e));        		
+        	}
         }
         return exchange;
     }

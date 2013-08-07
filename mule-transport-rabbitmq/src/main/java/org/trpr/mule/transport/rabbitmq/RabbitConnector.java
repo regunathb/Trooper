@@ -113,7 +113,7 @@ public class RabbitConnector extends AbstractConnector {
         // set the newly created channel in txSelect mode if the endpoint is marked as durable and is of 
         // type OutboundEndPoint. TX is not supported for inbound end-points. Acking is preferred mechanism
         // for control over message consumption i.e. in RabbitMessageReceiver
-        if (EndpointUtils.getDurable(endpoint) && endpoint instanceof OutboundEndpoint) {
+        if (EndpointUtils.isDurable(endpoint) && endpoint instanceof OutboundEndpoint) {
         	channel.txSelect();
         }
         return new ChannelHolder(channel);
