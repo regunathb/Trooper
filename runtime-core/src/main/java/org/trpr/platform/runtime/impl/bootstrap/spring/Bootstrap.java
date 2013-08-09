@@ -144,9 +144,6 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 			return;
 		}
 		
-		// Add a shutdown hook
-		Runtime.getRuntime().addShutdownHook(new BootstrapShutdownThread(this));
-		
 		// Start up the background thread which will keep the JVM alive when #stop() is called on this Bootstrap via a management console/interface
 		Thread backgroundThread = new Thread(this);
 		backgroundThread.setName(RuntimeConstants.BOOTSTRAP_BACKGROUND_THREADNAME);
@@ -367,24 +364,6 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		}
 	}
 	
-	/**
-	 * Shutdown hook Thread class
-	 */
-	private class BootstrapShutdownThread extends Thread {
-		private Bootstrap bootstrap;
-		/** Constructor for this Thread*/
-		public BootstrapShutdownThread(Bootstrap bootstrap) {
-			this.bootstrap = bootstrap;
-		}
-		public void run() {
-			try {
-				this.bootstrap.destroy(); // destroy this Bootstrap instance when this shutdown thread is run
-			} catch (Exception e) {
-				// do nothing as the JVM is terminating anyway
-			}
-		}
-	}
-
 	/** Helper method to publish {@link PlatformEvent} for bootstrap life-cycle */
 	private void publishBootstrapEvent(String msg, String status){
 		PlatformEvent bootstrapEvent=new PlatformEvent();
