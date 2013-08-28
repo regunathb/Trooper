@@ -54,7 +54,7 @@ Trooper is licensed under : The Apache Software License, Version 2.0. Here is a 
   * Catalog update propagation to website uses Trooper Batch and Orchestration profiles
   * Notification platform uses Trooper Batch and Orchestration profiles
   * Review Summarization processing pipeline is built using [Sift](https://github.com/regunathb/Sift) and Trooper Batch
-  * Phantom (Service Proxy) uses Trooper Basic profile and HBase persistence libraries. Mobile API platform is built on Service Proxy.
+  * [Phantom](https://github.com/Flipkart/phantom) (Service Proxy) uses Trooper Basic profile and HBase persistence libraries. Mobile API platform is built on Service Proxy.
 
 *  R&D department of a big company providing national electricity in France
   * Uses Trooper Batch profile in an application that helps researchers to do theirs statistics studies. It is used to import new 
