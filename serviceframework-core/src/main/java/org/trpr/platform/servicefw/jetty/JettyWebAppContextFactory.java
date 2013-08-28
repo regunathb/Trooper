@@ -73,13 +73,11 @@ public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 				fileToString = fileToString.replace("file:/","jar:file:/");
 				if (fileToString.contains("serviceframework-core-")) {
 					path = fileToString;
-					System.out.println("Jar : " + path);
 					break;
 				}
 			} else {
 				if (fileToString.contains("serviceframework-core")) {
 					path = fileToString;
-					System.out.println("file : " + path);
 					break;
 				}
 			}
