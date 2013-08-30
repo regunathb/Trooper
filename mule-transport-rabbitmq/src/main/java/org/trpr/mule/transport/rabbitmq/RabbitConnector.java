@@ -183,11 +183,11 @@ public class RabbitConnector extends AbstractConnector {
 		if(connection == null) {
 			int totalNumberOfNodes = rabbitMQConfigurations.size(); int tries = 0; 
 			while(tries <= totalNumberOfNodes) {
-    			int index = (lastUsedConnectionIndex + 1)%totalNumberOfNodes;
+				lastUsedConnectionIndex = (lastUsedConnectionIndex + 1)%totalNumberOfNodes;
                 RabbitMQConfiguration rabbitMQConfiguration = null;
 				try {
                     ConnectionFactory factory = new ConnectionFactory();
-                    rabbitMQConfiguration = rabbitMQConfigurations.get(index);
+                    rabbitMQConfiguration = rabbitMQConfigurations.get(lastUsedConnectionIndex);
             		factory.setUsername(rabbitMQConfiguration.getUserName());
             		factory.setPassword(rabbitMQConfiguration.getPassword());
             		factory.setVirtualHost(rabbitMQConfiguration.getVirtualHost());
@@ -195,7 +195,6 @@ public class RabbitConnector extends AbstractConnector {
             		factory.setHost(rabbitMQConfiguration.getHostName());
             		factory.setPort(rabbitMQConfiguration.getPortNumber());
                     connection = factory.newConnection();
-                    lastUsedConnectionIndex = index;
                     logger.info("Connection successfully created to configuration = " + rabbitMQConfiguration);
                     return;
 				}
