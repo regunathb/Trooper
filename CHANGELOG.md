@@ -1,3 +1,7 @@
+## 1.2.7 (Oct 27, 2013)
+  - Bug fix for preventing concurrent job execution in batch profile
+<br />  
+
 ## 1.2.6 (July 23, 2013)
   - Modified POM files to make build versions explicit
   - Bug fixes. Notably race condition in batch JMX administrator
