@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.2.6</version>
+		<version>1.2.7</version>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-integration</artifactId>
 	<name>Platform Integration</name>
-	<version>1.2.6</version>
+	<version>1.2.7</version>
 	<description>Trooper Integration project</description>
 
 	<licenses>
@@ -64,17 +64,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-task</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>			
 		<!-- Third party dependencies -->
 		<dependency>

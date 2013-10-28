@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.2.6</version>
+		<version>1.2.7</version>
 	</parent>
 	<groupId>org.trpr</groupId>
 	<artifactId>dataaccess-hbase</artifactId>
 	<name>Data Access HBase</name>
-	<version>1.2.6</version>
+	<version>1.2.7</version>
 	<description>Trooper Data Access HBase project</description>
 
 	<licenses>
@@ -63,12 +63,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-integration</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>
 		<!-- Third party dependencies -->
 		<dependency>
