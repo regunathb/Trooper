@@ -44,7 +44,7 @@
 		<constructor-arg index="0"><ref bean="jobRepository"/></constructor-arg>
 		<constructor-arg index="1"><ref bean="jobExplorer"/></constructor-arg>
 		<constructor-arg index="2"><ref bean="jobRegistry"/></constructor-arg>
-		<constructor-arg index="3"><ref bean="jobLauncher"/></constructor-arg>
+		<constructor-arg index="3"><ref bean="asyncJobLauncher"/></constructor-arg>
 		<constructor-arg index="4"><ref bean="scheduleRepository"/></constructor-arg>
 	</bean>	
 	
@@ -76,9 +76,15 @@
 	<!-- Configuring Common Batch Job Registry.  -->
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />	
 	
-	<!-- Configuring Common Batch Job Launcher.  -->
+	<!-- Configuring Common Sync .Batch Job Launcher.  -->
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<!-- Configuring Common Async .Batch Job Launcher.  -->
+	<bean id="asyncJobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="asyncJobExecutor" />
 	</bean>
 
 	<!-- Async Task executor used in all jobs -->
@@ -87,7 +93,7 @@
 	
 	<!-- The Job operator bean for launching adhoc jobs -->
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
-		<property name="jobLauncher" ref="jobLauncher"/>
+		<property name="jobLauncher" ref="asyncJobLauncher"/>
 		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="jobRegistry" ref="jobRegistry"/>
