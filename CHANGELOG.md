@@ -1,5 +1,6 @@
-## 1.2.7 (Oct 27, 2013)
+## 1.2.8 (Oct 27, 2013)
   - Bug fix for preventing concurrent job execution in batch profile
+  - Bug fix in Rabbit consumer for queue with zero messages
 <br />  
 
 ## 1.2.6 (July 23, 2013)
