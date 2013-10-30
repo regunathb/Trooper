@@ -7,13 +7,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.2.7</version>
+		<version>1.2.8</version>
 	</parent>
 
 	<groupId>org.trpr</groupId>
 	<artifactId>platform-task</artifactId>
 	<name>Platform Task</name>
-	<version>1.2.7</version>
+	<version>1.2.8</version>
 	<description>Trooper Task Framework project</description>
 
 	<licenses>
@@ -65,12 +65,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.2.7</version>
+			<version>1.2.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-model</artifactId>
-			<version>1.2.7</version>
+			<version>1.2.8</version>
 		</dependency>					
 		<!-- Third party dependencies -->
 		<dependency>
