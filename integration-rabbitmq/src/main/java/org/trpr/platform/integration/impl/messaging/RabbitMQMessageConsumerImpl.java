@@ -18,7 +18,6 @@ package org.trpr.platform.integration.impl.messaging;
 
 import java.util.List;
 
-import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.util.PlatformUtils;
@@ -224,12 +223,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 				    if (!msgPubConfig.isNoAck()) { // Client is expected to ack explicitly, else donot as per AMQP spec
 				    	this.rabbitConnectionHolders[connectionIndex].getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(),false);
 				    }
-			    }
-			    
-				// Check if the connection holder is working and has returned a message. Set it to the array. This assignment does not happen
-		    	// if there are no messages in the queue and means that the connection is recreated the next time this method is called.
-		    	// Essentially we only keep connections when a message is successfully retrieved from the queue.
-				this.rabbitConnectionHolders[connectionIndex] = (message != null ? this.rabbitConnectionHolders[connectionIndex] : null);
+			    }			    
 				if (message == null) { 
 					continue; // try other configurations
 				} else {
