@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.2.8</version>
+		<version>1.2.9</version>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>batch-core</artifactId>
 	<name>Batch Core</name>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 	<description>Trooper Batch Core</description>
 
 	<licenses>
@@ -90,12 +90,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>runtime-core</artifactId>
-			<version>1.2.8</version>
+			<version>1.2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-model</artifactId>
-			<version>1.2.8</version>
+			<version>1.2.9</version>
 		</dependency>	
 		<!-- Third party dependencies -->
 		<dependency>

@@ -7,7 +7,7 @@
 	<artifactId>trooper</artifactId>
 	<name>Trooper Full Build</name>
 	<packaging>pom</packaging>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 
 	<licenses>
     	<license>
@@ -78,7 +78,7 @@
 		<module>dataaccess-hbase</module>		
 		<module>dataaccess-orm</module>		
 		<!-- Example projects -->
-		<!-- DONOT deploy
+		<!-- Do not deploy
 		<module>examples/example-batch</module>		
 		<module>examples/example-batch-HA</module>				
 		<module>examples/example-hbase</module>		

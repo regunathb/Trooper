@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.2.6</version>
+		<version>1.2.9</version>
 		<relativePath>../../</relativePath>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>example-batch</artifactId>
 	<name>Example Batch</name>
-	<version>1.2.6</version>
+	<version>1.2.9</version>
 	<description>Trooper Example Batch</description>
 
 	<licenses>
@@ -85,17 +85,17 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-models</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>integration-rabbitmq</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.9</version>
 		</dependency>								
 	</dependencies>
 	
