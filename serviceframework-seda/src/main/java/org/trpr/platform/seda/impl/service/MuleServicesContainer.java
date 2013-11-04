@@ -18,18 +18,24 @@ package org.trpr.platform.seda.impl.service;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.registry.Registry;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.Resource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.seda.common.SedaFrameworkConstants;
+import org.trpr.platform.servicefw.common.ServiceFrameworkConstants;
+import org.trpr.platform.servicefw.impl.spring.ServiceConfigInfo;
 import org.trpr.platform.servicefw.impl.spring.SpringServicesContainer;
 import org.trpr.platform.servicefw.spi.ServiceContainer;
 import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
@@ -54,6 +60,11 @@ public class MuleServicesContainer extends SpringServicesContainer {
 	private static final String SERVICE_EVENT_PRODUCER = "serviceEventProducer";
 	
 	/**
+	 * The Spring application context that would hold all service declarations from all services
+	 */
+    private AbstractApplicationContext servicesContext;	
+	
+	/**
 	 * The MuleContext instance
 	 */
 	private MuleContext muleContext;
@@ -73,7 +84,7 @@ public class MuleServicesContainer extends SpringServicesContainer {
 		String[] muleConfigPaths = (String[])fileNamesList.toArray(new String[0]);		
 		try {
 			SpringXmlConfigurationBuilder springConfigBuilder = new SpringXmlConfigurationBuilder(muleConfigPaths);
-			springConfigBuilder.setParentContext(super.getServicesContext());
+			springConfigBuilder.setParentContext(this.servicesContext);
 			this.muleContext = new DefaultMuleContextFactory().createMuleContext(springConfigBuilder);
 			this.muleContext.start();
 		} catch (Exception e) {
@@ -121,6 +132,33 @@ public class MuleServicesContainer extends SpringServicesContainer {
 	public boolean isServiceExecutionCheckPointingRequired() {
 		return true;
 	}	
+
+	/**
+	 * Overriden superclass method. Throws an operation not supported exception to indicate that dynamic loading/reloading of service beans is not supported
+	 * @see org.trpr.platform.servicefw.impl.spring.SpringServicesContainer#loadComponent(org.springframework.core.io.Resource)
+	 */
+	public void loadComponent(Resource resource) {
+		throw new UnsupportedOperationException("Dynamic loading/realoding of service beans is not supported by : " + this.getClass().getName());
+	}
+
+	/**
+	 * Overriden superclass method. Creates a single application context containing all the service beans
+	 * @throws PlatformException
+	 */
+	protected void loadServiceContexts() throws PlatformException {
+		// locate and load the individual service bean XML files using the common batch beans context as parent
+		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);	
+		List<String> fileNamesList = new LinkedList<String>();		
+		for (File serviceBeansFile : serviceBeansFiles) {
+			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
+            // to relative path
+            fileNamesList.add(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());			
+		}	
+		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
+                SpringServicesContainer.getCommonServiceBeansContext());
+		this.registerServiceContext(new ServiceConfigInfo(new File(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG), null, this.servicesContext));
+	}
+
 	
 	/**
 	 * Helper method to get the ServiceEventProducer from the Mule SpringRegistry configured as mule-config.xml
