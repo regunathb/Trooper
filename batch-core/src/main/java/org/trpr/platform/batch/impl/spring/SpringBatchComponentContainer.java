@@ -186,7 +186,7 @@ public class SpringBatchComponentContainer implements ComponentContainer {
 	}
 	
 	/**
-	 * Loads the job context from path specified in the BatchConfigInfo. Looks for file by name BatchFrameworkConstants.SPRING_BATCH_CONFIG. 
+	 * Loads the job context from path specified in the BatchConfigInfo. 
 	 * @param batchConfigInfo containing absolute path to the job's configuration location i.e. folder
 	 */
 	private void loadJobContext(BatchConfigInfo batchConfigInfo) {

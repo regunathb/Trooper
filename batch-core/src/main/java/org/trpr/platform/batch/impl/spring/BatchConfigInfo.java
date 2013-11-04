@@ -19,6 +19,7 @@ import java.io.File;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.trpr.platform.batch.BatchFrameworkConstants;
 
 /**
  * The <code>BatchConfigInfo</code> class is a structure that holds job configuration information and the ApplicationContext for the job
@@ -28,14 +29,14 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class BatchConfigInfo {
 
 	/** The sub-folder containing Job and dependent binaries. This is used in addition to the batch runtime classpath.
-	 *  This path is relative to the location where BatchFrameworkConstants.SPRING_BATCH_CONFIG file is found 
+	 *  This path is relative to the location where {@link BatchFrameworkConstants#SPRING_BATCH_CONFIG} file is found 
 	 */
 	public static final String BINARIES_PATH = "lib";
 
 	/** The prefix to be added to file absolute paths when loading Spring XMLs using the FileSystemXmlApplicationContext*/
 	public static final String FILE_PREFIX = "file:";
 	
-	/** The the BatchFrameworkConstants.SPRING_BATCH_CONFIG file containing job bean */
+	/** The {@link BatchFrameworkConstants#SPRING_BATCH_CONFIG} file containing job bean */
 	private File jobConfigXML;
 	
 	/** The path to Job and dependent binaries*/
