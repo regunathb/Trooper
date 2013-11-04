@@ -13,7 +13,7 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
-| Version 1.2.8    | Oct 2013       |     Bug-fix release for batch profile, Rabbit consumer
+| Version 1.2.9    | Nov 2013       |     Bug-fix release for batch & seda/service profiles, Rabbit consumer
 | Version 1.2.6    | July 2013      |     Fixed POM dependencies, bugfixes
 | Version 1.2.5    | July 2013      |     Re-init of Services, Batch Jobs, RabbitMQ cluster routing, bugfixes
 | Version 1.2.4    | June 2013      |     ServiceFramework configuration console, bugfixing
