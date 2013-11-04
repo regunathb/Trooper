@@ -46,7 +46,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      */
     public Resource getConfig(ServiceKey serviceKey) {
         for(URI key : configFileToServices.keySet()) {
-
             if(this.configFileToServices.get(key).contains(serviceKey)) {
                 return new FileSystemResource(key.getPath());
             }
