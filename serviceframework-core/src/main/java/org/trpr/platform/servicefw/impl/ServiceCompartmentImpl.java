@@ -53,6 +53,9 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 
 	/** Constant for invalid response time in milliseconds execution counts*/
 	public static final long INVALID_STATISTICS_VALUE = -1L;
+	
+	/** The Service instance */
+	private Service<T,S> service;
 
 	/**
 	 * The timestamp when this service compartment was created
@@ -96,8 +99,9 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 * Constructor for this class
 	 * @param serviceInfo the ServiceInfo of the Service that this compartment is expected to handle
 	 */
-	public ServiceCompartmentImpl(ServiceInfo serviceInfo) {
+	public ServiceCompartmentImpl(ServiceInfo serviceInfo, Service<T,S> service) {
 		this.serviceInfo = serviceInfo; 
+		this.service = service;
 		//Initialize the counters
 		this.totalUsageCount = Metrics.newCounter(ServiceCompartmentImpl.class, 
 				ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.TOTAL_REQUEST_COUNT_ATTR_INDEX, serviceInfo.getServiceKey().toString()));
@@ -150,8 +154,8 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	}
 
 	@SuppressWarnings("unchecked")
-	public ServiceResponse processRequest(Service service, ServiceRequest request) throws ServiceException {
-		return invokeService(service, request);
+	public ServiceResponse processRequest(ServiceRequest request) throws ServiceException {
+		return invokeService(request);
 	}
 
 	/**
@@ -196,11 +200,11 @@ public class ServiceCompartmentImpl<T extends PlatformServiceRequest, S extends 
 	 *            ServiceRequest which has the payload.
 	 * @return ServiceResponse from the invoked service.
 	 */
-	protected ServiceResponse invokeService(Service<T,S> service, ServiceRequest<T> request) {
+	protected ServiceResponse invokeService(ServiceRequest<T> request) {
 		ServiceResponse serviceResponse = null;
 		request.setServiceVersion(this.serviceInfo.getServiceKey().getVersion());
 		try {
-			serviceResponse = service.processRequest(request);
+			serviceResponse = this.service.processRequest(request);
 		} catch (Exception e) {
 			LOGGER.error("ServiceCompartmentImpl :: Error Invoking service : "	+ request.getServiceName() + "_" + request.getServiceVersion(), e);
 			// catch and return a ServiceResponse for all kinds of exceptions

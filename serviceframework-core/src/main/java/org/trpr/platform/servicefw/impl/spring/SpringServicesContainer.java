@@ -31,11 +31,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.trpr.platform.core.PlatformException;
+import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.event.PlatformEventProducer;
+import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
@@ -73,9 +74,13 @@ import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
  * @see ServiceContainer
  * @author Regunath B
  * @version 1.0, 16/08/2012
+ * @version 2.0, 08/11/2013
  */
 public class SpringServicesContainer<T extends PlatformServiceRequest, S extends PlatformServiceResponse> implements ServiceContainer<T,S> {
 
+	/** The logger for this class */
+	private static final Logger LOGGER = LogFactory.getLogger(SpringServicesContainer.class);
+	
 	/** The separator char i.e '_' between service name and its version*/
 	private static final String SERVICE_VERSION_SEPARATOR= "_";
 	
@@ -227,16 +232,8 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 * @see ServiceContainer#invokeService(ServiceInfo, ServiceRequest)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ServiceResponse invokeService(ServiceInfo serviceInfo,
-			ServiceRequest request) throws ServiceException {
-		ServiceCompartment serviceCompartment = getCompartment(serviceInfo.getServiceKey());
-		for (ServiceConfigInfo serviceConfigInfo : this.servicesContextList) {
-			if (serviceConfigInfo.getServiceContext().containsBean(serviceInfo.getServiceKey().toString())) {
-				Service service = (Service)serviceConfigInfo.getServiceContext().getBean(serviceInfo.getServiceKey().toString());
-				return serviceCompartment.processRequest(service,request);
-			}
-		}
-		throw new ServiceException("No service bean found that matches : " + serviceInfo.getServiceKey().toString());
+	public ServiceResponse invokeService(ServiceInfo serviceInfo, ServiceRequest request) throws ServiceException {
+		return getCompartment(serviceInfo.getServiceKey()).processRequest(request);
 	}
 
 	/**
@@ -325,6 +322,47 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	 */
 	protected void registerServiceContext(ServiceConfigInfo serviceConfigInfo) {
 		this.servicesContextList.add(serviceConfigInfo);
+		// register the loaded services with the registry
+        String[] serviceBeanIds = serviceConfigInfo.getServiceContext().getBeanNamesForType(Service.class);
+        for (String serviceBeanId : serviceBeanIds) {
+            try {
+                // find the project name from the Resource that was used to load the bean
+            	BeanDefinition serviceBeanDefinition = serviceConfigInfo.getServiceContext().getBeanFactory().getBeanDefinition(serviceBeanId);
+                String projectName = this.getProjectName((((AbstractBeanDefinition)serviceBeanDefinition).getResource()).getFile().getAbsolutePath());
+                String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
+                ServiceKey serviceKey = new ServiceKeyImpl(serviceNameParts[0], serviceNameParts[1]);
+                // add the service configuration information
+                this.configurationService.addService(serviceKey,new FileSystemResource(serviceConfigInfo.getServiceConfigXML()));
+                // check if the service application context is actually initialized and the bean does exist 
+                // before adding it to registry, service-infos and creating a usable service compartment
+                if (serviceConfigInfo.getServiceContext().isActive() && serviceConfigInfo.getServiceContext().containsBean(serviceBeanId)) {
+	                //Remove the service from registry, if found
+	                if(this.serviceRegistry.contains(serviceKey)) {
+	                    this.serviceRegistry.remove(serviceKey);
+	                }
+	                // TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
+	                this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], projectName, ServiceFrameworkConstants.DEFAULT_DOMAIN);
+	                //Remove the service Key from serviceInfos and serviceComaprtments
+	                if(serviceInfos.get(serviceKey)!=null) {
+	                    serviceInfos.remove(serviceKey);
+	                }
+	                if(serviceCompartments.get(serviceKey)!=null) {
+	                    serviceCompartments.remove(serviceKey).destroy();
+	                }
+	                //Service Key and compartment initing
+	                ServiceInfo serviceInfo = this.serviceRegistry.getServiceInfo(serviceKey);
+	                serviceInfos.put(serviceKey,serviceInfo);
+	                ServiceCompartment<T,S> serviceCompartment= new ServiceCompartmentImpl<T,S>(serviceInfo, 
+	                		(Service<T,S>)serviceConfigInfo.getServiceContext().getBean(serviceBeanId));
+	                serviceCompartment.init();
+	                serviceCompartments.put(serviceKey,serviceCompartment);
+                }
+                
+            } catch (Exception ex) {
+                // the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
+                throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
+            }
+        }				
 	}
 	
 	/**
@@ -384,44 +422,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		} 
 		// now load the service context and add it into the servicecontexts list
 		serviceConfigInfo.loadServiceContext(serviceCL);
-		this.registerServiceContext(serviceConfigInfo);
-		
-		// register the loaded services with the registry
-        String[] serviceBeanIds = serviceConfigInfo.getServiceContext().getBeanNamesForType(Service.class);
-        for (String serviceBeanId : serviceBeanIds) {
-            try {
-                // find the project name from the Resource that was used to load the bean
-            	BeanDefinition serviceBeanDefinition = serviceConfigInfo.getServiceContext().getBeanFactory().getBeanDefinition(serviceBeanId);
-                String projectName = this.getProjectName((((AbstractBeanDefinition)serviceBeanDefinition).getResource()).getFile().getAbsolutePath());
-                String[] serviceNameParts = serviceBeanId.split(SERVICE_VERSION_SEPARATOR);
-                // TODO find a way to determine domain names for a service, using ServiceFrameworkConstants.DEFAULT_DOMAIN for now
-                ServiceKey serviceKey = new ServiceKeyImpl(serviceNameParts[0], serviceNameParts[1]);
-                //Remove the service from registry, if found
-                if(this.serviceRegistry.contains(serviceKey)) {
-                    this.serviceRegistry.remove(serviceKey);
-                }
-                this.serviceRegistry.addServiceInfoToRegistry(serviceNameParts[0], serviceNameParts[1], projectName, ServiceFrameworkConstants.DEFAULT_DOMAIN);
-                this.configurationService.addService(serviceKey,new FileSystemResource(serviceConfigInfo.getServiceConfigXML()));
-                //Remove the service Key from serviceInfos and serviceComaprtments
-                if(serviceInfos.get(serviceKey)!=null) {
-                    serviceInfos.remove(serviceKey);
-                }
-                if(serviceCompartments.get(serviceKey)!=null) {
-                    serviceCompartments.remove(serviceKey).destroy();
-                }
-                //Service Key and compartment initing
-                ServiceInfo serviceInfo = this.serviceRegistry.getServiceInfo(serviceKey);
-                serviceInfos.put(serviceKey,serviceInfo);
-                ServiceCompartment<T,S> serviceCompartment= new ServiceCompartmentImpl<T,S>(serviceInfo);
-                serviceCompartment.init();
-                serviceCompartments.put(serviceKey,serviceCompartment);
-                
-            } catch (Exception ex) {
-                // the service name is not as per standard naming convention of <serviceName>_<serviceVersion>. Throw an exception
-                throw new ServiceException("Invalid service bean name? Convention is <serviceName>_<serviceVersion>. Offending bean name is : " + serviceBeanId, ex);
-            }
-
-        }		
+		this.registerServiceContext(serviceConfigInfo);		
 	}	
 	
 	/**

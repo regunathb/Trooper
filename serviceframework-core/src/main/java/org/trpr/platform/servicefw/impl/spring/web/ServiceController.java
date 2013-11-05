@@ -163,11 +163,11 @@ public class ServiceController {
             return "modifyConfig";
         }
         //Loading success
-        model.addAttribute("SuccessMessage", "Successfully Deployed the new Handler Configuration");
-        Resource handlerFile = this.configurationService.getConfig(this.constructServiceKey(serviceName));
-        model.addAttribute("XMLFileContents",getContents(handlerFile));
+        model.addAttribute("SuccessMessage", "Successfully Deployed the new Service Configuration");
+        Resource serviceConfigFile = this.configurationService.getConfig(this.constructServiceKey(serviceName));
+        model.addAttribute("XMLFileContents",getContents(serviceConfigFile));
         try {
-            model.addAttribute("XMLFileName",handlerFile.getURI());
+            model.addAttribute("XMLFileName",serviceConfigFile.getURI());
         } catch (IOException e) {
             model.addAttribute("XMLFileName","File not found");
         }

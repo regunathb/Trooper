@@ -38,12 +38,11 @@ public interface ServiceCompartment<T extends PlatformServiceRequest, S extends 
 	
 	/**
 	 * Conduit point for calling the associated service.
-	 * @param service the Service instance to invoke
 	 * @param req the Service Request
 	 * @return ServiceResponse the service response
 	 * @throws ServiceException exception thrown in case of error in service invocation
 	 */
-	public ServiceResponse<S> processRequest(Service<T,S> service, ServiceRequest<T> req) throws ServiceException;
+	public ServiceResponse<S> processRequest(ServiceRequest<T> req) throws ServiceException;
 	
 	/**
 	 * Signals service execution start
@@ -58,7 +57,7 @@ public interface ServiceCompartment<T extends PlatformServiceRequest, S extends 
 	 * @param executionStartTime the execution start timestamp
 	 * @param executionEndTime the execution end timestamp
 	 */
-	public void notifyServiceExecutionEnd(ServiceRequest<T> request, ServiceResponse<S> response,	long executionStartTime, long executionEndTime);
+	public void notifyServiceExecutionEnd(ServiceRequest<T> request, ServiceResponse<S> response, long executionStartTime, long executionEndTime);
 	
 	/**
 	 * Gets the service information which was used to load and

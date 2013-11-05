@@ -25,8 +25,10 @@ import org.mule.api.MuleException;
 import org.mule.api.registry.Registry;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.Resource;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -150,13 +152,19 @@ public class MuleServicesContainer extends SpringServicesContainer {
 		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);	
 		List<String> fileNamesList = new LinkedList<String>();		
 		for (File serviceBeansFile : serviceBeansFiles) {
-			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
-            // to relative path
-            fileNamesList.add(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());			
+			// dont load the individual service context, just register an empty context for display purposes
+			GenericApplicationContext nonRefreshedServiceContext = new GenericApplicationContext();
+			XmlBeanDefinitionReader beanDefReader = new XmlBeanDefinitionReader(nonRefreshedServiceContext);
+			// add the "file:" prefix to file names to explicitly state that it is on the file system and not a classpath resource
+			beanDefReader.loadBeanDefinitions(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());
+			ServiceConfigInfo nonInitedServiceConfigInfo = new ServiceConfigInfo(serviceBeansFile, null, nonRefreshedServiceContext);
+			super.registerServiceContext(nonInitedServiceConfigInfo); 
+			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path to relative path
+            fileNamesList.add(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());		            
 		}	
 		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
                 SpringServicesContainer.getCommonServiceBeansContext());
-		this.registerServiceContext(new ServiceConfigInfo(new File(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG), null, this.servicesContext));
+		super.registerServiceContext(new ServiceConfigInfo(new File(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG), null, this.servicesContext));
 	}
 
 	

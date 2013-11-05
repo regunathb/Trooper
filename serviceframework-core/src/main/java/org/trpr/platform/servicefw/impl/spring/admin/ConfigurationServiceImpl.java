@@ -119,6 +119,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      * @param configFile  The configFile containing the bean definition of the Service
      */
     public void addService(ServiceKey serviceKey, Resource configFile) {
+    	FileSystemResource fileResource = (FileSystemResource)configFile;
+		// check if the bean definition XML really exists or is just a canonical location and therefore may be ignored in mapping services to XML location
+		if (!fileResource.exists()) {
+			LOGGER.info("Not registering beans from : " + fileResource + " as file does not exist. Is this a canonical file?");
+			return;
+		} 
         try {
             if(this.configFileToServices.get(configFile.getURI())==null) {
                 this.configFileToServices.put(configFile.getURI(), new LinkedList<ServiceKey>());
