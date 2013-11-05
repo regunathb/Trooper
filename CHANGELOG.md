@@ -1,4 +1,4 @@
-## 1.2.9 (Nov 4, 2013)
+## 1.2.9 (Nov 5, 2013)
   - Bug fix for preventing concurrent job execution in batch profile
   - Bug fix in Rabbit consumer for queue with zero messages
   - Bug fix to prevent duplicate loading of services in service profile
