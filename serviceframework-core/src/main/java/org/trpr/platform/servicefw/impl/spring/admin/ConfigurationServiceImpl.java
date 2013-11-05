@@ -122,7 +122,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     	FileSystemResource fileResource = (FileSystemResource)configFile;
 		// check if the bean definition XML really exists or is just a canonical location and therefore may be ignored in mapping services to XML location
 		if (!fileResource.exists()) {
-			LOGGER.info("Not registering beans from : " + fileResource + " as file does not exist. Is this a canonical file?");
+			LOGGER.debug("Not registering service bean configuration from : " + fileResource + " as file does not exist. Is this a canonical file?");
 			return;
 		} 
         try {

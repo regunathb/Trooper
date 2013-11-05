@@ -74,7 +74,7 @@ import org.trpr.platform.servicefw.spi.event.ServiceEventProducer;
  * @see ServiceContainer
  * @author Regunath B
  * @version 1.0, 16/08/2012
- * @version 2.0, 08/11/2013
+ * @version 2.0, 05/11/2013
  */
 public class SpringServicesContainer<T extends PlatformServiceRequest, S extends PlatformServiceResponse> implements ServiceContainer<T,S> {
 
@@ -356,6 +356,8 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 	                		(Service<T,S>)serviceConfigInfo.getServiceContext().getBean(serviceBeanId));
 	                serviceCompartment.init();
 	                serviceCompartments.put(serviceKey,serviceCompartment);
+                } else {
+                	LOGGER.debug("Not registering Service: " + serviceKey + ". App context may not have been initialized from : " + serviceConfigInfo.getServiceConfigXML());
                 }
                 
             } catch (Exception ex) {
