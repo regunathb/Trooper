@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="
-    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
-    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
-    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
-    http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<!-- The Jetty server beans  -->
     <bean id="jettyServer" class="org.eclipse.jetty.server.Server" init-method="start"> <!-- Dont specify destroy-method attribute here as it shutsdown the JVM -->
@@ -22,6 +17,7 @@
             <list>
                 <bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector" destroy-method="stop"> <!-- Specify the destroy-method here to close the server socket -->
            			<property name="port" value="${services.core.jetty.admin.port}"/>
+                    <property name="acceptors" value="2"/>
                 </bean>
             </list>
         </property>

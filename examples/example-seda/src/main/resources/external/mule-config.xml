@@ -5,9 +5,9 @@
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:rabbitmq="http://www.mulesource.org/schema/mule/rabbitmq/2.2"
 	xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core/2.2 classpath:packaged/xsd/mule.xsd
-       http://www.mulesource.org/schema/mule/rabbitmq/2.2 classpath:packaged/xsd/mule-rabbitmq.xsd
-	   http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd">
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/rabbitmq/2.2 http://www.mulesource.org/schema/mule/rabbitmq/2.2/mule-rabbitmq.xsd
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<!--
 		Sample end-point configuration for durable end-point i.e. durable exchange, queue and messages. DONOT use this for SEDA configurations. 

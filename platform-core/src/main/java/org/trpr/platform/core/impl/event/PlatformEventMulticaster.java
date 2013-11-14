@@ -60,11 +60,11 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 			PlatformApplicationEvent platformApplicationEvent = (PlatformApplicationEvent)event;
 			String eventEndpointURI = platformApplicationEvent.getEndpointURI();
 			if (eventEndpointURI == null) {
-				LOGGER.warn("End-point URI of PlatformApplicationEvent is null. Event will not be forwarded. Event type is : " + platformApplicationEvent.getClass().getName()); 
+				LOGGER.debug("End-point URI of PlatformApplicationEvent is null. Event will not be forwarded. Event type is : " + platformApplicationEvent.getClass().getName()); 
 				return;
 			}
 			if (!isSubscriptionMatch(eventEndpointURI, subscriptions)) {
-				LOGGER.warn("Endpoint URI doesnot match any of the subscriptions specified on this multi-caster. Event will not be forwarded. Event URI is : " + eventEndpointURI); 
+				LOGGER.debug("Endpoint URI doesnot match any of the subscriptions specified on this multi-caster. Event will not be forwarded. Event URI is : " + eventEndpointURI); 
 				return;				
 			}
 			for (Iterator iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
@@ -77,7 +77,7 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 			}
 		} else {
 			// log a warning and ignore the event
-			LOGGER.warn("Spring ApplicationEvent of un-supported type received : " + event.getClass().getName() + ". Only PlatformApplicationEvent instances with be forwarded.");
+			LOGGER.debug("Spring ApplicationEvent of un-supported type received : " + event.getClass().getName() + ". Only PlatformApplicationEvent instances with be forwarded.");
 		}
 	}
 	
