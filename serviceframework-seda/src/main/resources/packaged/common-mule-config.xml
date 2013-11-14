@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd"
+       default-init-method="initialise">
+
+    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="org.mule.api.transport.Connector" value="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
+                <entry key="org.mule.endpoint.URIBuilder" value="org.mule.config.spring.editors.URIBuilderPropertyEditor"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
+
+    <bean name="_mulePropertyPlaceholderProcessor"
+          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        <property name="factories">
+            <map>
+                <entry key="hostname">
+                    <bean class="org.mule.config.factories.HostNameFactory"/>
+                </entry>
+            </map>
+        </property>
+        <!-- other processors may be applied later -->
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"/>
+
+    <bean name="_muleNotificationManager"
+          class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
+
+    <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
+
+    <mule:mule>
+
+
+        <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
+             Configuration element is required here so that spring creates a MuleConfiguration instance and
+             populates it with defaults from schema
+        -->
+        <mule:configuration/>
+
+        <mule:notifications>
+            <mule:notification event="CONTEXT"/>
+            <mule:notification event="MODEL"/>
+            <mule:notification event="SERVICE"/>
+            <mule:notification event="SECURITY"/>
+            <mule:notification event="MANAGEMENT"/>
+            <mule:notification event="CONNECTION"/>
+            <mule:notification event="REGISTRY"/>
+            <mule:notification event="CUSTOM"/>
+            <mule:notification event="EXCEPTION"/>
+            <mule:notification event="TRANSACTION"/>
+        </mule:notifications>
+
+        <mule:model name="_muleSystemModel"/>
+
+    </mule:mule>
+
+    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
+        <property name="persistenceStrategy">
+            <bean class="org.mule.util.queue.FilePersistenceStrategy"/>
+        </property>
+    </bean>
+
+    <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
+
+    <bean name="_muleProperties" class="java.util.HashMap"/>
+
+    <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
+
+    <bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
+
+    <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
+
+    <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultServiceThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
+
+    <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
+    the transformers will be available even when using the the TransientRegistry only -->
+
+</beans>

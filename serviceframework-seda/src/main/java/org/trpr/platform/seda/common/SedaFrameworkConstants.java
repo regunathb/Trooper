@@ -26,6 +26,9 @@ package org.trpr.platform.seda.common;
 
 public abstract class SedaFrameworkConstants {
 	
+	/** The common Mule config file. We expect to find this packaged in a jar i.e. on the classpath */
+	public static final String COMMON_MULE_CONFIG = "packaged/common-mule-config.xml";
+	
 	/** File names for service configuration file names*/
 	public static final String MULE_CONFIG = "mule-config.xml";
 

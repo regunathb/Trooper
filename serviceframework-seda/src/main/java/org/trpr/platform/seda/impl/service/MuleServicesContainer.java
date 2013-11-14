@@ -23,7 +23,6 @@ import java.util.List;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.registry.Registry;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -36,6 +35,7 @@ import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.seda.common.SedaFrameworkConstants;
+import org.trpr.platform.seda.impl.mule.spring.SpringXmlConfigurationBuilder;
 import org.trpr.platform.servicefw.common.ServiceFrameworkConstants;
 import org.trpr.platform.servicefw.impl.spring.ServiceConfigInfo;
 import org.trpr.platform.servicefw.impl.spring.SpringServicesContainer;
@@ -75,17 +75,20 @@ public class MuleServicesContainer extends SpringServicesContainer {
 	 * Overriden superclass method. Calls super.init() and also initializes the MuleContext
 	 * @see SpringServicesContainer#init()
 	 */
-	public void init() throws PlatformException {
-		super.init();				
-		// load the mule configurations and set the SpringServicesContainer's servicesContext bean context as the parent
-		File[] serviceBeansFiles = FileLocator.findFiles(SedaFrameworkConstants.MULE_CONFIG);					
+	public void init() throws PlatformException {		
+		super.init();		
 		LinkedList<String> fileNamesList = new LinkedList<String>();
+		// add the common Mule beans file
+		fileNamesList.add(SedaFrameworkConstants.COMMON_MULE_CONFIG);
+		// add the Mule configurations containing Mule service definitions
+		File[] serviceBeansFiles = FileLocator.findFiles(SedaFrameworkConstants.MULE_CONFIG);					
 		for (File serviceBeansFile : serviceBeansFiles) {
 			fileNamesList.add(serviceBeansFile.getAbsolutePath());			
 		}
 		String[] muleConfigPaths = (String[])fileNamesList.toArray(new String[0]);		
 		try {
 			SpringXmlConfigurationBuilder springConfigBuilder = new SpringXmlConfigurationBuilder(muleConfigPaths);
+			springConfigBuilder.setUseDefaultConfigResource(false); // turn off using the default config resource as we have a custom config defined in SedaFrameworkConstants.COMMON_MULE_CONFIG
 			springConfigBuilder.setParentContext(this.servicesContext);
 			this.muleContext = new DefaultMuleContextFactory().createMuleContext(springConfigBuilder);
 			this.muleContext.start();
@@ -163,7 +166,7 @@ public class MuleServicesContainer extends SpringServicesContainer {
             fileNamesList.add(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());		            
 		}	
 		this.servicesContext = new FileSystemXmlApplicationContext((String[])fileNamesList.toArray(new String[0]),
-                SpringServicesContainer.getCommonServiceBeansContext());
+				SpringServicesContainer.getCommonServiceBeansContext());
 		super.registerServiceContext(new ServiceConfigInfo(new File(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG), null, this.servicesContext));
 	}
 
