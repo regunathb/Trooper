@@ -1,3 +1,8 @@
+## 1.3.0 (Nov 14, 2013)
+  - Upgrade of all modules to use Spring 3.2.5.RELEASE
+  - Enhancements/fixes to modules to make them compatible with Spring 3.2.5.RELEASE version
+<br />  
+
 ## 1.2.9 (Nov 5, 2013)
   - Bug fix for preventing concurrent job execution in batch profile
   - Bug fix in Rabbit consumer for queue with zero messages
