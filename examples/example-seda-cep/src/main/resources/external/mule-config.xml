@@ -4,12 +4,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:rabbitmq="http://www.mulesource.org/schema/mule/rabbitmq/2.2"
-	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
 	xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core/2.2 classpath:packaged/xsd/mule.xsd
-       http://www.mulesource.org/schema/mule/rabbitmq/2.2 classpath:packaged/xsd/mule-rabbitmq.xsd
-       http://www.mulesource.org/schema/mule/vm/2.2 classpath:packaged/xsd/mule-vm.xsd
-	   http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd">
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/rabbitmq/2.2 http://www.mulesource.org/schema/mule/rabbitmq/2.2/mule-rabbitmq.xsd
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="CEPGreetingInputEndpoint" address="amqp://myexchange:direct/?queue=greetingInput"/>
 	<endpoint connector-ref="LocalhostRabbitMQConnector" name="EchoMatchInputEndpoint" address="amqp://myexchange:direct/?queue=echoMatchInput"/>
@@ -62,11 +60,24 @@
 	</model>
 
     <rabbitmq:connector name="LocalhostRabbitMQConnector">
-        <spring:property name="host" value="localhost" />
-        <spring:property name="virtualHost" value="/" />
-        <spring:property name="port" value="5672" />
-        <spring:property name="username" value="guest" />
-        <spring:property name="password" value="guest" />
+    	<spring:property name="rabbitMQConfigurations">
+	   		<spring:list>
+				<spring:bean class="org.trpr.mule.transport.rabbitmq.RabbitMQConfiguration" id="queueConfiguration1">
+			        <spring:property name="userName" value="guest" />
+			        <spring:property name="password" value="guest" />
+			        <spring:property name="hostName" value="localhost" />
+			        <spring:property name="virtualHost" value="/" />
+			        <spring:property name="portNumber" value="5672" />
+				</spring:bean>
+				<spring:bean class="org.trpr.mule.transport.rabbitmq.RabbitMQConfiguration" id="queueConfiguration2">
+			        <spring:property name="userName" value="guest" />
+			        <spring:property name="password" value="guest" />
+			        <spring:property name="hostName" value="localhost" />
+			        <spring:property name="virtualHost" value="/" />
+			        <spring:property name="portNumber" value="5673" />
+				</spring:bean>
+			</spring:list>
+		</spring:property>    
         <spring:property name="retryPolicyTemplate">
             <spring:bean
                 class="org.mule.modules.common.retry.policies.ExhaustingRetryPolicyTemplate">
@@ -74,6 +85,8 @@
                 <spring:property name="retryLimit" value="100" />
             </spring:bean>
         </spring:property>
+    	<receiver-threading-profile maxThreadsActive="8" maxThreadsIdle="5"/>
+    	<dispatcher-threading-profile maxThreadsActive="8" maxThreadsIdle="5"/>
         <custom-exception-strategy class="org.trpr.platform.seda.impl.mule.exceptionhandling.ServiceExceptionStrategy">
             <spring:property name="jmxNotificationDispatcher" ref="jmxNotificationBean"/>
         </custom-exception-strategy>
