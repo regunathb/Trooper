@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.3.0</version>
+		<version>1.3.1</version>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>dataaccess-orm</artifactId>
 	<name>Data Access ORM</name>
-	<version>1.3.0</version>
+	<version>1.3.1</version>
 	<description>Trooper Data Access ORM project</description>
 
 	<licenses>
@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>platform-core</artifactId>
-			<version>1.3.0</version>
+			<version>1.3.1</version>
 		</dependency>		
 		<!-- Third party dependencies -->
 		<dependency>
