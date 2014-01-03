@@ -1,3 +1,7 @@
+## 1.3.1 (Jan 5, 2014)
+  - Bug fix for invoking Metrics Timer in service profile
+<br />  
+
 ## 1.3.0 (Nov 14, 2013)
   - Upgrade of all modules to use Spring 3.2.5.RELEASE
   - Enhancements/fixes to modules to make them compatible with Spring 3.2.5.RELEASE version
