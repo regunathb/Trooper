@@ -34,6 +34,7 @@ import org.trpr.platform.servicefw.spi.ServiceResponse;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 /**
  * <code>SimpleAbstractServiceImpl<code> is an implementation of the {@link Service} interface that provides common behavior for all services that require 
@@ -84,6 +85,8 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 					ServiceStatisticsGatherer.getMetricName(ServiceStatisticsGatherer.RESPONSE_TIME_ATTR_INDEX, request.getServiceName()+ServiceKeyImpl.SERVICE_VERSION_SEPARATOR+request.getServiceVersion()),
 					TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		}
+		//Create a timer context, to time this request
+		final TimerContext context = responses.time();		
 		// add the service request time-stamp as a header
 		Header[] headers = new Header[] {new Header(SERVICE_INVOCATION_TIMESTAMP, String.valueOf(System.currentTimeMillis()))};
 		((ServiceRequestImpl<T>)request).addHeaders(headers);
@@ -103,6 +106,7 @@ public abstract class SimpleAbstractServiceImpl <T extends PlatformServiceReques
 		// signal end of execution to the service context
 		this.serviceContext.notifyServiceExecutionEnd(request, serviceResponse, Long.valueOf(request.getHeaderByKey(SERVICE_INVOCATION_TIMESTAMP).getValue()), System.currentTimeMillis());
 
+		context.stop(); // stop the timer
         return serviceResponse;
 	}
 	
