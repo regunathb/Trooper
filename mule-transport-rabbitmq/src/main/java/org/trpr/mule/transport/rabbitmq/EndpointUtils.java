@@ -99,6 +99,13 @@ public class EndpointUtils {
     }
     
     /**
+     * Returns if this end-point uses a pre-existing queue i.e. should not create one
+     */
+	public static boolean isUsePredeclaredQueue(ImmutableEndpoint e) {
+        return MapUtils.getBooleanValue(e.getProperties(), "isUsePredeclaredQueue", false);
+	}
+    
+    /**
      * Declares an Exchange on the specified Channel using the exchange details derived from the specified Endpoint
      */
     public static String declareExchange(Channel channel, ImmutableEndpoint e) throws IOException {

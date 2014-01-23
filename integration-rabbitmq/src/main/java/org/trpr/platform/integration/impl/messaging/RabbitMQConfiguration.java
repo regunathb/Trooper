@@ -15,6 +15,9 @@
  */
 package org.trpr.platform.integration.impl.messaging;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The <code>RabbitMQConfiguration</code> class is a data holder for RabbitMQ connection details. This implementation is 
  * compatible with Java client API of RabbitMQ version 2.2.0. Backward/Forward compatibility with other versions requires verification. 
@@ -64,6 +67,12 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 	 * every published message will be committed. Consider setting a higher value for better performance.
 	 */
 	private int durableMessageCommitCount = DEFAULT_DURABLE_MSG_COMMIT_COUNT;
+
+	/** Setting to indicate use of pre-declared queues default behavior is to create the queues using properties specified*/
+	private boolean usePredeclaredQueues;
+	
+	/** Override properties for individual queues, if any*/
+	private Map<String,Object> queueOverrideProperties = new HashMap<String, Object>();
 	
 	/**
 	 * No args constructor
@@ -94,6 +103,8 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 		this.noAck=parent.isNoAck();
 		this.durableMessageCommitCount = parent.getDurableMessageCommitCount();
 		this.disableTX = parent.isDisableTX();
+		this.usePredeclaredQueues = parent.isUsePredeclaredQueues();
+		this.queueOverrideProperties = parent.getQueueOverrideProperties();
 	}
 
 	/**
@@ -150,7 +161,19 @@ public class RabbitMQConfiguration extends RabbitMQRpcConfiguration {
 	}
 	public void setDlqEnabled(boolean dlqEnabled) {
 		this.dlqEnabled = dlqEnabled;
-	}	
+	}
+	public boolean isUsePredeclaredQueues() {
+		return this.usePredeclaredQueues;
+	}
+	public void setUsePredeclaredQueues(boolean usePredeclaredQueues) {
+		this.usePredeclaredQueues = usePredeclaredQueues;
+	}
+	public Map<String, Object> getQueueOverrideProperties() {
+		return this.queueOverrideProperties;
+	}
+	public void setQueueOverrideProperties(Map<String, Object> queueOverrideProperties) {
+		this.queueOverrideProperties = queueOverrideProperties;
+	}			
 	/**==== End Spring DI style setters/getters */
 	
 }

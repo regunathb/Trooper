@@ -124,18 +124,19 @@ public class RabbitMessageReceiver extends AbstractMessageReceiver implements Co
             logger.debug("Private queue name: " + queue);
         } else {
             logger.debug("Declaring well-known queue: " + queue);      
-            if (EndpointUtils.isDeadLetterEnabled(endpoint)) { // check if dead lettering is enabled on the endpoint for the queue 
-            	dlQueue = queue + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
-            	dlExchange = EndpointUtils.getExchange(endpoint) + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
-            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
-            	args.put(EndpointUtils.RMQ_DL_ARGUMENT, dlExchange);  
-            	args.put(EndpointUtils.RMQ_DL_RT_KEY, routingKey);
-            	channel.queueDeclare(dlQueue,EndpointUtils.isDurable(endpoint),false,false,null); // create the dead letter queue for the one mentioned in the endpoint
-	    		channel.queueDeclare(queue,EndpointUtils.isDurable(endpoint),false,false,args); // declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
-            } else {
-	    		// Input Queue
-	    		channel.queueDeclare(queue,EndpointUtils.isDurable(endpoint),false,false,null); // no dead lettering
-            }
+        	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ and other arguments
+        	if (!EndpointUtils.isUsePredeclaredQueue(endpoint)) { // declare the queue only if we are required to create queue i.e. not use pre-created queue
+	            if (EndpointUtils.isDeadLetterEnabled(endpoint)) { // check if dead lettering is enabled on the endpoint for the queue 
+	            	dlQueue = queue + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
+	            	dlExchange = EndpointUtils.getExchange(endpoint) + EndpointUtils.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
+	            	// add the DLQ related properties to the map used to declare the queue
+	            	args.put(EndpointUtils.RMQ_DL_ARGUMENT, dlExchange);  
+	            	args.put(EndpointUtils.RMQ_DL_RT_KEY, routingKey);
+	            	channel.queueDeclare(dlQueue,EndpointUtils.isDurable(endpoint),false,false,null); // create the dead letter queue for the one mentioned in the endpoint
+	            }
+        	}
+    		// Input Queue
+    		channel.queueDeclare(queue,EndpointUtils.isDurable(endpoint),false,false,args); 
         }
         
         if (startOnConnect) { // start the consumer only if set to start on connect

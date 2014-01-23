@@ -17,8 +17,6 @@
 package org.trpr.platform.integration.impl.messaging;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -115,17 +113,18 @@ public class RabbitConnectionHolder implements ShutdownListener {
 					if (rabbitMQConfiguration.isDurable() && !rabbitMQConfiguration.isDisableTX() && !disableTX) {
 						this.channel.txSelect();
 					}
-					if (rabbitMQConfiguration.isDlqEnabled()) {
-		            	dlQueue = rabbitMQConfiguration.getQueueName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
-		            	dlExchange = rabbitMQConfiguration.getExchangeName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
-		            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
-		            	args.put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
-		            	args.put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
-						this.channel.queueDeclare(dlQueue,rabbitMQConfiguration.isDurable(),false,false,null);// create the dead letter queue for the queue
-						this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,args);// declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
-						this.channel.queueBind(dlQueue, dlExchange, rabbitMQConfiguration.getRoutingKey());	// bind the DLQ to the DLQ exchange if dead lettering is enabled					
-					} else {
-						this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,null);
+					if (!rabbitMQConfiguration.isUsePredeclaredQueues()) { // declare the queue only if we are required to create queues i.e. not use pre-created queues
+						if (rabbitMQConfiguration.isDlqEnabled()) {
+			            	dlQueue = rabbitMQConfiguration.getQueueName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
+			            	dlExchange = rabbitMQConfiguration.getExchangeName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
+			            	// add the DLQ related properties to the map used to declare the queue
+			            	rabbitMQConfiguration.getQueueOverrideProperties().put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
+			            	rabbitMQConfiguration.getQueueOverrideProperties().put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
+							this.channel.queueDeclare(dlQueue,rabbitMQConfiguration.isDurable(),false,false,null);// create the dead letter queue for the queue
+							this.channel.queueBind(dlQueue, dlExchange, rabbitMQConfiguration.getRoutingKey());	// bind the DLQ to the DLQ exchange if dead lettering is enabled					
+						}
+						this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),rabbitMQConfiguration.isDurable(),false,false,
+								rabbitMQConfiguration.getQueueOverrideProperties());
 					}
 					this.channel.queueBind(rabbitMQConfiguration.getQueueName(), rabbitMQConfiguration.getExchangeName(), rabbitMQConfiguration.getRoutingKey());
 					
@@ -195,21 +194,21 @@ public class RabbitConnectionHolder implements ShutdownListener {
 	 */
 	public int getMessageCount() throws Exception {
 		try{
+			if (rabbitMQConfiguration.isUsePredeclaredQueues()) { 
+				throw new MessagingException("Cannot determine queue size for pre-created queues. Remove 'usePredeclaredQueues' property on RabbitMQConfiguration for this queue");
+			}
 			if (rabbitMQConfiguration.isDlqEnabled()) {
 		    	// local variables for dead letter queue and exchange
 		    	String dlQueue = null, dlExchange = null;
             	dlQueue = rabbitMQConfiguration.getQueueName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the queue name declared in the endpoint
             	dlExchange = rabbitMQConfiguration.getExchangeName() + RabbitMQConfiguration.DEAD_SUFFIX; // append the DLQ suffix to the exchange name declared in the endpoint
-            	Map<String, Object> args = new HashMap<String, Object>(); //  map for DLQ arguments
-            	args.put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
-            	args.put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
+            	// add the DLQ related properties to the map used to declare the queue            	
+            	rabbitMQConfiguration.getQueueOverrideProperties().put(RabbitMQConfiguration.RMQ_DL_ARGUMENT, dlExchange);  
+            	rabbitMQConfiguration.getQueueOverrideProperties().put(RabbitMQConfiguration.RMQ_DL_RT_KEY, rabbitMQConfiguration.getRoutingKey());
 				this.channel.queueDeclare(dlQueue,rabbitMQConfiguration.isDurable(),false,false,null);// create the dead letter queue for the queue
-				return this.channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
-					rabbitMQConfiguration.isDurable(),false,false,args).getMessageCount();// declare the queue by specifying the AMQP arguments to identify the DLQ routing key and the DLQ exchange
-			} else {
-				return channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
-					rabbitMQConfiguration.isDurable(),false,false,null).getMessageCount();
 			}
+			return channel.queueDeclare(rabbitMQConfiguration.getQueueName(),
+					rabbitMQConfiguration.isDurable(),false,false,rabbitMQConfiguration.getQueueOverrideProperties()).getMessageCount();
 		} catch (IOException e) {
 			LOGGER.error("Error retrieving message count for queue. Returning 0. Configuration is : " + rabbitMQConfiguration);
 		}
