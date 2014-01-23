@@ -1,3 +1,7 @@
+## 1.3.2-SNAPSHOT (Jan 23, 2014)
+  - Enhancement to use pre-created queues in RabbitMQ Integration and Mule transport modules
+<br />  
+
 ## 1.3.1 (Jan 5, 2014)
   - Bug fix for invoking Metrics Timer in service profile
 <br />  
