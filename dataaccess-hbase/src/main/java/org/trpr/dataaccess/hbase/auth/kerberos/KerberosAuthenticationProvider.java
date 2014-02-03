@@ -68,12 +68,21 @@ public class KerberosAuthenticationProvider implements AuthenticationProvider, I
 	
 	/** The TGT renewal frequency in minutes */
 	private int callTGTRenewalCheckMinutes = CALL_TGT_RENEWAL_CHECK_MINUTES;
+	
+	/** Timestamp of the last successful authentication call*/
+	private long lastSuccessfulAuthTimestamp;
+	
+	/** The TGT renewal Thread*/
+	private Thread tgtRenewalThread;
 
 	/**
 	 * Interface method implementation. Initializes the specified HBase configuration with Kerberos authentication properties
 	 * @see org.trpr.dataaccess.hbase.auth.AuthenticationProvider#authenticatePrincipal(org.apache.hadoop.conf.Configuration)
 	 */
 	public void authenticatePrincipal(Configuration configuration) throws SecurityException {
+		if ((System.currentTimeMillis() - (this.callTGTRenewalCheckMinutes * 60000)) < lastSuccessfulAuthTimestamp) {
+			return; // do not authenticate again if the last successful login call is within the TGT renewal time
+		}
 		for (Object key : this.kerberosAuthProperties.keySet()) {
 			configuration.set(key.toString(), this.kerberosAuthProperties.getProperty(key.toString()));
 		}		
@@ -83,7 +92,10 @@ public class KerberosAuthenticationProvider implements AuthenticationProvider, I
 			UserGroupInformation.loginUserFromKeytab(this.kerberosPrincipal, this.kerberosKeytabLocation);
 			UserGroupInformation loggedInUser = UserGroupInformation.getLoginUser();
 			LOGGER.info("Currently logged in Kerberos principal : " + loggedInUser);
-			new TGTRenewalThread(configuration, loggedInUser);
+			this.lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+			if (this.tgtRenewalThread == null) {
+				this.tgtRenewalThread = new TGTRenewalThread(configuration, loggedInUser);
+			}
 		} catch (Exception e) {
 			throw new SecurityException("Error authenticating Kerberos Principal : " + this.kerberosPrincipal + " .Error message : " + e.getMessage(), e);
 		}
@@ -129,12 +141,14 @@ public class KerberosAuthenticationProvider implements AuthenticationProvider, I
 					// try to renew the ticket cache, if it exists and tickets are renewable
 					LOGGER.debug("Try to refresh the Kerberos ticket cache");
 					Shell.execCommand(this.configuration.get(HADOOP_KINIT_COMMAND,HADOOP_KINIT_COMMAND_DEFAULT), HADOOP_KINIT_COMMAND_REFRESH_FLAG);
+					lastSuccessfulAuthTimestamp = System.currentTimeMillis();					
 				} catch (IOException ioe) {
 					LOGGER.debug("Refresh of Kerberos ticket cache failed with reason : " + ioe.getMessage());
 					// try to check and reload the TGT from the keytab
 					try {
 						LOGGER.debug("Check TGT and attempt relogin from Kerberos keytab");
 						ugi.checkTGTAndReloginFromKeytab();
+						lastSuccessfulAuthTimestamp = System.currentTimeMillis();					
 					} catch (IOException ie) {
 						LOGGER.error("Error renewing Kerberos TGT for user : " + ugi.getUserName(), ie); 
 						// just log the error and don't exit the Thread. TGT expiry will eventually cause HBase read/writes to fail. Continue to try until that happens

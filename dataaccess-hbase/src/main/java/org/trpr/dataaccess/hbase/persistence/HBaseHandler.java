@@ -24,9 +24,9 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTableInterface;
-import org.apache.hadoop.hbase.client.HTablePool;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.trpr.dataaccess.hbase.HTablePool;
 import org.trpr.dataaccess.hbase.auth.AuthenticationProvider;
 import org.trpr.dataaccess.hbase.mappings.config.HBaseMappingContainer;
 import org.trpr.dataaccess.hbase.model.config.HbaseMapping;
@@ -101,6 +101,9 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	/** Authentication provider, if any*/
 	private AuthenticationProvider authProvider;
 	
+	/**The connection validity check interval in minutes*/
+	private Integer callConnectionValidityCheckMinutes; 
+	
 	public HBaseHandler() {
 		// Default serializers. It can be overridden by setting new values in
 		// Spring bean definition
@@ -120,13 +123,15 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		if (this.targetHbaseConfigurations.size() == 0 && this.hbaseConfiguration == null) {
 			throw new IllegalArgumentException("targetHbaseConfigurations (or) hbaseConfiguration is required");
 		}
-		// check if an authentication provider has been set and initialize it
-		if (this.getAuthProvider() != null) {
-			this.getAuthProvider().authenticatePrincipal(this.hbaseConfiguration);
-		}
 		// initialize the HTablePool(s) for the HBase configurations
 		if (this.hbaseConfiguration != null) {
 			this.hbaseTablePool = new HTablePool(this.hbaseConfiguration, this.htablePoolSize);
+			// check if an authentication provider has been set and pass it on to the HTablePool
+			if (this.getAuthProvider() != null) {
+				this.hbaseTablePool.setAuthenticationProvider(this.getAuthProvider());
+			}
+			// set the connection validity check interval (or) null if none is specified
+			this.hbaseTablePool.setCallConnectionValidityCheckMinutes(this.getCallConnectionValidityCheckMinutes());
 			this.targetHbaseTablePools.put(ShardedEntity.DEFAULT_SHARD,this.hbaseTablePool);
 		}
 		for (String shard : this.targetHbaseConfigurations.keySet()) {
@@ -296,6 +301,12 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 	public void setAuthProvider(AuthenticationProvider authProvider) {
 		this.authProvider = authProvider;
 	}
+	public void setCallConnectionValidityCheckMinutes(Integer callConnectionValidityCheckMinutes) {
+		this.callConnectionValidityCheckMinutes = callConnectionValidityCheckMinutes;
+	}
+	public Integer getCallConnectionValidityCheckMinutes() {
+		return this.callConnectionValidityCheckMinutes;
+	}	
 	// //////////// UNSUPPORTED operations ////////////////
 
 	@Override
