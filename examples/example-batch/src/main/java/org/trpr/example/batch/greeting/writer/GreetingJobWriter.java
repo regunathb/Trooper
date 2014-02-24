@@ -24,7 +24,7 @@ import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.integration.spi.messaging.MessagePublisher;
 
 /**
- * The <code>GreetingJobWriter</code> class is a simple implementation of the Spring Batch {@link }. This implementation logs the {@link Earthling} attributes
+ * The <code>GreetingJobWriter</code> class is a simple implementation of the Spring Batch {@link ItemWriter}. This implementation logs the {@link Earthling} attributes
  * and sends i.e. writes the data item to a message queue.
  * 
  * @author Regunath B
