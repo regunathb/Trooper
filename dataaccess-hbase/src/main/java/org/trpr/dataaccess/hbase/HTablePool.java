@@ -86,18 +86,23 @@ public class HTablePool implements Closeable {
 	    this(HBaseConfiguration.create(), Integer.MAX_VALUE);
 	}
 	public HTablePool(final Configuration config, final int maxSize) {
-		this(config, maxSize, null, null);
+		this(config, maxSize, null, null, null);
+	}
+	public HTablePool(final Configuration config, final int maxSize, Integer callConnectionValidityCheckMinutes) {
+		this(config, maxSize, null, null, callConnectionValidityCheckMinutes);
 	}
 	public HTablePool(final Configuration config, final int maxSize,final HTableInterfaceFactory tableFactory) {
-		this(config, maxSize, tableFactory, PoolType.Reusable);
+		this(config, maxSize, tableFactory, PoolType.Reusable, null);
 	}
 	public HTablePool(final Configuration config, final int maxSize,final PoolType poolType) {
-		this(config, maxSize, null, poolType);
+		this(config, maxSize, null, poolType, null);
 	}
-	public HTablePool(final Configuration config, final int maxSize,final HTableInterfaceFactory tableFactory, PoolType poolType) {
+	public HTablePool(final Configuration config, final int maxSize,final HTableInterfaceFactory tableFactory, 
+			PoolType poolType,  Integer callConnectionValidityCheckMinutes) {
 		this.config = config == null ? HBaseConfiguration.create() : config;
 		this.maxSize = maxSize;
 		this.tableFactory = tableFactory == null ? new HTableFactory() : tableFactory;
+		this.callConnectionValidityCheckMinutes = callConnectionValidityCheckMinutes;
 		if (poolType == null) {
 			this.poolType = PoolType.Reusable;
 		} else {
@@ -184,9 +189,6 @@ public class HTablePool implements Closeable {
 	}
 	
 	/** Getter/Setter methods*/
-	public void setCallConnectionValidityCheckMinutes(Integer callConnectionValidityCheckMinutes) {
-		this.callConnectionValidityCheckMinutes = callConnectionValidityCheckMinutes;
-	}
 	public Integer getCallConnectionValidityCheckMinutes() {
 		return this.callConnectionValidityCheckMinutes;
 	}
@@ -218,11 +220,14 @@ public class HTablePool implements Closeable {
 					long start = System.currentTimeMillis();
 					LOGGER.debug("Starting to validate connections for tablepool with size : " + this.tablePool.tables.keySet().size());
 					for (String tableName : this.tablePool.tables.keySet()) {
-						HTableInterface table = this.tablePool.tables.get(tableName);
+						HTableInterface table = this.tablePool.tables.get(tableName); // pick up the first available table from the pool. Over time all connections will get picked up and validated
 						try {
 							// Validate the table/connection by calling a Get with row key as System.currentTimeMillis(). This call will exercise the 
 							// network components of the table's connection
-							table.exists(new Get(Bytes.toBytes( System.currentTimeMillis())));
+							if (table != null) { // we can get null if all connections have already been borrowed i.e. are being used
+								table.exists(new Get(Bytes.toBytes( System.currentTimeMillis())));
+								this.tablePool.returnTable(table); // return the table back to the pool
+							}
 						} catch (Exception ex) {
 							LOGGER.info("Error validating connection for : " + tableName + " : " + ex.getMessage() + " . Invalidating all connections for this table.");
 							this.tablePool.closeTablePool(tableName);
@@ -230,7 +235,7 @@ public class HTablePool implements Closeable {
 							table = this.tablePool.createHTable(tableName);
 							table.close(); // calling close will simply return the valid connection to the pool
 						}
-					}					
+					}
 					LOGGER.debug("Completed validating connections. Connections size : " + tables.keySet().size() + 
 							". Completed in : " + (System.currentTimeMillis() - start) + " ms");
 				} catch (Exception e) {

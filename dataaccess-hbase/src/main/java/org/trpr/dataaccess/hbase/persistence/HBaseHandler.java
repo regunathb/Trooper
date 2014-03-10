@@ -125,13 +125,11 @@ public class HBaseHandler extends AbstractPersistenceHandler implements Initiali
 		}
 		// initialize the HTablePool(s) for the HBase configurations
 		if (this.hbaseConfiguration != null) {
-			this.hbaseTablePool = new HTablePool(this.hbaseConfiguration, this.htablePoolSize);
+			this.hbaseTablePool = new HTablePool(this.hbaseConfiguration, this.htablePoolSize, this.getCallConnectionValidityCheckMinutes());
 			// check if an authentication provider has been set and pass it on to the HTablePool
 			if (this.getAuthProvider() != null) {
 				this.hbaseTablePool.setAuthenticationProvider(this.getAuthProvider());
 			}
-			// set the connection validity check interval (or) null if none is specified
-			this.hbaseTablePool.setCallConnectionValidityCheckMinutes(this.getCallConnectionValidityCheckMinutes());
 			this.targetHbaseTablePools.put(ShardedEntity.DEFAULT_SHARD,this.hbaseTablePool);
 		}
 		for (String shard : this.targetHbaseConfigurations.keySet()) {
