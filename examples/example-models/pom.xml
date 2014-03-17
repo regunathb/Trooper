@@ -106,7 +106,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>platform-model</artifactId>
-			                                <version>1.0.0</version>
+			                                <version>${project.version}</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
@@ -125,7 +125,7 @@
 			                            <artifactItem>
 			                                <groupId>org.trpr</groupId>
 			                                <artifactId>service-model</artifactId>
-			                                <version>1.0.0</version>
+			                                <version>${project.version}</version>
 			                                <type>jar</type>
 			                            </artifactItem>
 			                         </artifactItems>
