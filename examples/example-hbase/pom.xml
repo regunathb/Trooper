@@ -86,12 +86,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>batch-core</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>dataaccess-hbase</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>						
 	</dependencies>
 	

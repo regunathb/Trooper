@@ -24,6 +24,65 @@
     	</license>
   	</licenses>
 
+	<repositories> 
+        <repository>
+          <id>jboss-public-repository-group</id>
+          <name>JBoss Public Maven Repository Group</name>
+          <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>maven-public-repository-group</id>
+          <name>Public Maven Repository Group</name>
+          <url>http://repo1.maven.org/maven/mule/dependencies/maven2/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </snapshots>
+        </repository>        
+        <repository>
+          <id>codehaus-public-repository-group</id>
+          <name>CodeHaus Public Maven Repository Group</name>
+          <url>http://dist.codehaus.org/mule/dependencies/maven2/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </snapshots>
+        </repository>	
+        <repository>
+          <id>mule-maven-public-repository-group</id>
+          <name>Mule Maven Repository Group</name>
+          <url>http://repository.muleforge.org/</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </snapshots>
+        </repository>
+	</repositories> 
+
 	<distributionManagement>
     	<repository>
       		<id>clojars</id>

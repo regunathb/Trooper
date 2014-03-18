@@ -61,12 +61,12 @@
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>serviceframework-core</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.trpr</groupId>
 			<artifactId>example-models</artifactId>
-			<version>1.3.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>				
 	</dependencies>
 	

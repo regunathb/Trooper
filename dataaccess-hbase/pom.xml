@@ -21,7 +21,15 @@
       		<distribution>repo</distribution>
     	</license>
   	</licenses>
- 
+  	
+	<repositories> 
+         <repository>
+            <id>cloudera-hadoop</id>
+            <name>Cloudera Hadoop repo</name>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>    
+	</repositories> 
+
 	<distributionManagement>
     	<repository>
       		<id>clojars</id>
