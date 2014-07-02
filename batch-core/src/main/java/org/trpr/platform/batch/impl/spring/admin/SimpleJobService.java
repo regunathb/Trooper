@@ -490,6 +490,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 	public Collection<String> listJobs(int start, int count) {
 		List<String> jobNames = new LinkedList<String>();
 		jobNames.addAll(this.jobRegistry.getJobNames());
+		// sort the jobs in ascending order of names
+		Collections.sort(jobNames);		
 		if (start >= jobNames.size()) {
 			return new LinkedList<String>(); // return empty list instead of a sub-list
 		}

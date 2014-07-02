@@ -45,6 +45,15 @@
 	</form>
 	</tr>
 	</table>
-
+	<#if newjobs?? && newjobs?size!=0>
+		<ul class="controlLinks">
+			<li>Rows: ${startJob}-${endJob} of ${totalJobs}</li> 
+			<#assign job_url><@spring.url relativeUrl="${servletPath}/configuration"/></#assign>
+			<#if nextJob??><li><a href="${job_url}?startJob=${nextJob?c}&pageSize=${pageSize!20}">Next</a></li></#if>
+			<#if previousJob??><li><a href="${job_url}?startJob=${previousJob?c}&pageSize=${pageSize!20}">Previous</a></li></#if>
+			<!-- TODO: enable pageSize editing -->
+			<li>Page Size: ${pageSize!20}</li>
+		</ul>
+	</#if>
 
 </div><!-- configuration -->
