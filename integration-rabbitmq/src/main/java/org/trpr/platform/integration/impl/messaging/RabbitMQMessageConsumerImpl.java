@@ -72,7 +72,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 	
 	/** The wait timeout duration in milliseconds*/
 	private long waitTimeoutMillis = DEFAULT_WAIT_TIMEOUT;
-
+	
 	/**
 	 * No-args constructor
 	 */
@@ -109,7 +109,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 	 * @see MessageConsumer#consumeString()
 	 */
 	public String consumeString() throws MessagingException {
-		return (String)consume(true);
+		return (String)consumeWithRoundRobinPolicy(true).message;
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 	 * @see MessageConsumer#consume()
 	 */
 	public Object consume() throws MessagingException {
-		return consume(false);
+		return consumeWithRoundRobinPolicy(false).message;
 	}
 	
 	/**
@@ -144,17 +144,9 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 		while (attempt < noOfQueues) {
 			int connectionIndex = (int)(totNoOfMessagesConsumed % noOfQueues);
 			RabbitMQConfiguration rabbitMQConfiguration = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
-
 			try {
 				if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
-					synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
-						// check after monitor acquisition in order to ensure that multiple threads do not create
-						// a connection for the same configuration. 
-						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
-							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
-							this.rabbitConnectionHolders[connectionIndex].createConnectionAndConsumer();
-						}
-					}
+					validateAndInitConnection(connectionIndex, rabbitMQConfiguration);
 				}
 				int count = this.rabbitConnectionHolders[connectionIndex].getMessageCount();
 				return count;
@@ -179,14 +171,16 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 	}
 	
 	/**
-	 * Helper method to consume message from queue and convert it to appropriate type - String or generic Object. Applies UTF-8 decoding
-	 * if the type is String. Keeps the connection open after message consumption
+	 * Consumes a message from the configured queue and converts it to appropriate type - String or generic Object. Applies UTF-8 decoding
+	 * if the type is String. Keeps the connection open after message consumption. Follows a round robin policy for message consumption from all
+	 * configurations. If connection is successful it returns the index of the configuration to which connection was successful.
+	 * If connection to all provided configurations are unsuccessful then a Messaging Exception is thrown.
 	 * @param isString determines if the message must be converted to a String
-	 * @return a message from the underlying queue
+	 * @return a MessageHolder instance containing a message from the underlying queue and the connection index used to retrieve the message
 	 * @throws MessagingException in case of errors
 	 */
-	private Object consume(boolean isString) throws MessagingException {
-		Object message = null;
+	protected MessageHolder consumeWithRoundRobinPolicy(boolean isString) throws MessagingException {
+		MessageHolder messageHolder = null;
 		int noOfQueues = rabbitMQConfigurations.size();
 		int attempt = 0;
 		RabbitMQConfiguration lastUsedConfiguration = null;
@@ -194,17 +188,9 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 		while (attempt < noOfQueues) {
 			int connectionIndex = (int)(totNoOfMessagesConsumed % noOfQueues);
 			RabbitMQConfiguration msgPubConfig = lastUsedConfiguration = rabbitMQConfigurations.get(connectionIndex);
-
 			if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { // don't synchronize here as all calls will require monitor acquisition
 				try {
-					synchronized(msgPubConfig) { // synchronized to make connection creation for the configuration a thread-safe operation. 
-						// check after monitor acquisition in order to ensure that multiple threads do not create
-						// a connection for the same configuration. 
-						if (this.rabbitConnectionHolders[connectionIndex] == null) { 
-							this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(msgPubConfig);
-							this.rabbitConnectionHolders[connectionIndex].createConnectionAndConsumer();
-						}
-					}
+					validateAndInitConnection(connectionIndex, msgPubConfig);
 				} catch (Exception e) {
 					LOGGER.error("Error while initializing Rabbit connection. Will try others. Error is : " + e.getMessage(), e);
 					// continue to try with the next configuration
@@ -215,19 +201,12 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 					continue;
 				} 
 			}
-			try {				
-			    QueueingConsumer.Delivery delivery = getWaitTimeoutMillis() > 0 ? this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery(getWaitTimeoutMillis()) 
-			    		: this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery();
-			    if (delivery != null) { // check for null - possible in case of a timeout
-				    message = isString ? new String(delivery.getBody(), ENCODING): PlatformUtils.toObject(delivery.getBody());
-				    if (!msgPubConfig.isNoAck()) { // Client is expected to ack explicitly, else donot as per AMQP spec
-				    	this.rabbitConnectionHolders[connectionIndex].getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(),false);
-				    }
-			    }			    
-				if (message == null) { 
+			try {			
+				messageHolder = consumeFromConnection(isString, connectionIndex);
+				if (messageHolder == null) { 
 					continue; // try other configurations
 				} else {
-					return message;
+					return messageHolder;
 				}
 			} catch (Exception e) {
 				this.rabbitConnectionHolders[connectionIndex] = null; // the connection holder is not working. Remove from array
@@ -243,8 +222,58 @@ public class RabbitMQMessageConsumerImpl implements MessageConsumer, DisposableB
 			throw new MessagingException("Error consuming message from queue. Last used configuration is : " + lastUsedConfiguration, consumptionRootCause, MessagingException.CONNECTION_FAILURE);
 		} else {
 			throw new MessagingException("No messages available for consumption in queue.",  MessagingException.QUEUE_EMPTY);
-		}		
-				
+		}						
 	}
 	
+	/**
+	 * Consumes a single message from the connection identified by the specified connection index.
+	 * @param isString boolean to indicate if the message is an Object or String
+	 * @param connectionIndex the connection index identifier
+	 * @return MessageHolder containing the consumed message and the connection index
+	 * @throws Exception in case of errors from the underlying messaging system 
+	 */
+	protected MessageHolder consumeFromConnection(boolean isString, int connectionIndex) throws Exception {
+		MessageHolder messageHolder = null;
+		RabbitMQConfiguration msgPubConfig = rabbitMQConfigurations.get(connectionIndex);
+	    QueueingConsumer.Delivery delivery = getWaitTimeoutMillis() > 0 ? this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery(getWaitTimeoutMillis()) 
+	    		: this.rabbitConnectionHolders[connectionIndex].getConsumer().nextDelivery();
+	    if (delivery != null) { // check for null - possible in case of a timeout
+	    	messageHolder = isString ? new MessageHolder(connectionIndex, new String(delivery.getBody(), ENCODING))
+	    		: new MessageHolder(connectionIndex,PlatformUtils.toObject(delivery.getBody()));
+		    if (!msgPubConfig.isNoAck()) { // Client is expected to ack explicitly, else donot as per AMQP spec
+		    	this.rabbitConnectionHolders[connectionIndex].getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+		    }
+	    }			    
+		return messageHolder;
+	}
+	
+	/**
+	 * Checks if the connection for the configuration is null or invalid. 
+	 * If yes then creates a new connection as per the configuration.
+	 * @param connectionIndex Index of the configuration and the connection
+	 * @param rabbitMQConfiguration Configuration for which the connection needs to be validated
+	 */
+	private void validateAndInitConnection(int connectionIndex, RabbitMQConfiguration rabbitMQConfiguration) {
+	    synchronized(rabbitMQConfiguration) { // synchronized to make connection creation for the configuration a thread-safe operation. 
+	    	// check after monitor acquisition in order to ensure that multiple threads do not create
+	    	// a connection for the same configuration. \
+	    	if (this.rabbitConnectionHolders[connectionIndex] == null || !this.rabbitConnectionHolders[connectionIndex].isValid()) { //Added code to check if connection is valid ... otherwise create a new connection 
+	    		this.rabbitConnectionHolders[connectionIndex] = new RabbitConnectionHolder(rabbitMQConfiguration);
+	    		this.rabbitConnectionHolders[connectionIndex].createConnection();
+	    	}
+	    }
+    }
+	
+	/**
+	 * Wrapper class for holding the message consumed from queue and the connection index used to consume the message. 
+	 */
+	class MessageHolder {
+		int connectionIndex;
+		Object message;
+		MessageHolder(int connectionIndex, Object message) {
+			this.connectionIndex = connectionIndex;
+			this.message = message;
+		}
+	}
+		
 }
