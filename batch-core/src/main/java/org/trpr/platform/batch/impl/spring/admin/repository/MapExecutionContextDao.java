@@ -17,8 +17,6 @@
 package org.trpr.platform.batch.impl.spring.admin.repository;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.core.JobExecution;
@@ -27,15 +25,20 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
  * Trooper Implementation of {@link org.springframework.batch.core.repository.dao.MapExecutionContextDao}.
- * Added an ability to remove execution contexts and optimized the deep copy by using 
- * {@link XStreamExecutionContextStringSerializer}
+ * Added an ability to remove execution contexts
+ * 
+ * --- version 2.0 changelog ----
+ * Reverted the copy() implementation to use Spring batch SerializationUtils 
  * 
  * @author devashishshankar
+ * @author Regunath B
  * @version 1.0, 6th March, 2013
+ * @version 2.0, 9th July, 2014 
  */
 
 @SuppressWarnings("serial")
@@ -120,18 +123,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	}
 
 	private ExecutionContext copy(ExecutionContext original) {
-		if(original==null)
-			return null;
-		Map<String, Object> m = new HashMap<String, Object>();
-		for (java.util.Map.Entry<String, Object> me : original.entrySet()) {
-			m.put(me.getKey(), me.getValue());
-		}		
-		ExecutionContext copy = new ExecutionContext();
-		Map<String, Object> map = serializer.deserialize(serializer.serialize(m));
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			copy.put(entry.getKey(), entry.getValue());
-		}
-		return copy;
+		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
 
 	@Override
