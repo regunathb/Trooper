@@ -26,10 +26,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.util.Assert;
-import org.trpr.platform.batch.impl.spring.admin.SimpleJobConfigurationService;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 

@@ -33,7 +33,8 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * Added an ability to remove execution contexts
  * 
  * --- version 2.0 changelog ----
- * Reverted the copy() implementation to use Spring batch SerializationUtils 
+ * Reverted the copy() implementation to use Spring batch SerializationUtils. Also avoiding copy in read
+ * calls. 
  * 
  * @author devashishshankar
  * @author Regunath B
@@ -128,7 +129,9 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 	@Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		return copy(contexts.get(ContextKey.step(stepExecution.getId())));
+		//return copy(contexts.get(ContextKey.step(stepExecution.getId())));
+		// returning the reference to the stored ExecutionContext i.e. avoiding the expensive copy operation 
+		return contexts.get(ContextKey.step(stepExecution.getId()));
 	}
 
 	@Override
@@ -141,7 +144,9 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 	@Override
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-		return copy(contexts.get(ContextKey.job(jobExecution.getId())));
+		//return copy(contexts.get(ContextKey.job(jobExecution.getId())));
+		// returning the reference to the stored ExecutionContext i.e. avoiding the expensive copy operation 		
+		return contexts.get(ContextKey.job(jobExecution.getId()));
 	}
 
 	@Override
