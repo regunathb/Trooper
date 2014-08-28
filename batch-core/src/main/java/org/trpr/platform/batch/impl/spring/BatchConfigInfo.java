@@ -17,9 +17,12 @@ package org.trpr.platform.batch.impl.spring;
 
 import java.io.File;
 
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.trpr.platform.batch.BatchFrameworkConstants;
+import org.trpr.platform.batch.impl.spring.job.ChainingJobExecutionListener;
 
 /**
  * The <code>BatchConfigInfo</code> class is a structure that holds job configuration information and the ApplicationContext for the job
@@ -72,6 +75,15 @@ public class BatchConfigInfo {
 		// to relative path
 		this.jobContext = new FileSystemXmlApplicationContext(new String[]{FILE_PREFIX + jobConfigXML.getAbsolutePath()}, 
 				SpringBatchComponentContainer.getCommonBatchBeansContext());
+		// register the ChainingJobExecutionListener with all jobs defined in the application context
+		ChainingJobExecutionListener chainingJobExecutionListener = this.jobContext.getBean(ChainingJobExecutionListener.class);
+		String[] jobNames = this.jobContext.getBeanNamesForType(Job.class);
+		for (String jobName : jobNames) {
+			Job job = ((Job)this.jobContext.getBean(jobName));
+			if (AbstractJob.class.isAssignableFrom(job.getClass())) {
+				((AbstractJob)job).registerJobExecutionListener(chainingJobExecutionListener);
+			}
+		}
 		// now reset the thread's TCCL to the one that existed prior to loading the job
 		Thread.currentThread().setContextClassLoader(existingTCCL);
 		return this.jobContext;
