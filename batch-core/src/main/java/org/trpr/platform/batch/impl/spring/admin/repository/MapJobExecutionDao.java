@@ -112,19 +112,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			}
 		}
 		Collections.sort(executions, new Comparator<JobExecution>() {
-
-			@Override
+			// sort by descending order of ID
 			public int compare(JobExecution e1, JobExecution e2) {
-				long result = (e1.getId() - e2.getId());
-				if (result > 0) {
-					return -1;
-				}
-				else if (result < 0) {
-					return 1;
-				}
-				else {
-					return 0;
-				}
+				return Long.signum(e2.getId() - e1.getId());
 			}
 		});
 		return executions;
