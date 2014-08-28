@@ -16,8 +16,10 @@
 package org.trpr.platform.batch.spi.quartz;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.quartz.Scheduler;
+import org.quartz.Trigger;
 
 /**
  * An interface to hold information about the JobScheduler and trigger.
@@ -54,4 +56,18 @@ public interface ScheduleRepository {
 	 * @param scheduler Quartz scheduler related to the job
 	 */
 	public void addScheduler(String jobName, Scheduler scheduler);
+	
+	/**
+	 * Gets the Trigger for the specified job name
+	 * @param requiredJobName the job name
+	 * @return the Trigger for the scheduled job or null if not found
+	 */
+	public Trigger getTriggerFromScheduler(String requiredJobName);
+	
+	/**
+	 * Returns the map of all registered schedulers and the jobs that they are schedule
+	 * @return Map of Scheduler instances keyed by job names
+	 */
+	public Map<String, Scheduler> getJobSchedulers();
+	
 }
