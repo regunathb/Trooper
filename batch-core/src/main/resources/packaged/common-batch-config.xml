@@ -72,7 +72,12 @@
 	
 	<!-- Configuring Common ScheduleRepository  -->
 	<bean id ="scheduleRepository" class="org.trpr.platform.batch.impl.quartz.SimpleScheduleRepository" />
-	
+
+	<!-- The common ChainingJobExecutionListener  -->
+	<bean id ="chainingJobExecutionListener" class="org.trpr.platform.batch.impl.spring.job.ChainingJobExecutionListener">
+		<property name="jobAdministrator" ref="jobAdministrator"/>		
+	</bean>
+			
 	<!-- Configuring Common Batch Job Registry.  -->
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />	
 	
