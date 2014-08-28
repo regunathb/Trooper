@@ -18,6 +18,7 @@ package org.trpr.platform.batch.impl.spring.admin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -429,6 +430,12 @@ public class SimpleJobService implements JobService, DisposableBean {
 				executionList.addAll(this.jobExplorer.getJobExecutions(jobInstance));				
 			}
 		}
+		// sort the executions by recency of execution. More useful as users are normally interested in latest executions
+		Collections.sort(executionList,  new Comparator<JobExecution>() {
+			public int compare(JobExecution je1, JobExecution je2) {
+				return je2.getStartTime().compareTo(je1.getStartTime());
+			}
+		});
 		if (start >= executionList.size()) {
 			return new LinkedList<JobExecution>(); // return empty list instead of a sub-list
 		}
