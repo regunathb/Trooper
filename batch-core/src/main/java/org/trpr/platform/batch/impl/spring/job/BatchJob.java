@@ -50,8 +50,8 @@ public class BatchJob implements StatefulJob {
 	 * The Job Name and Job Launcher constants to be accessed from Bean are
 	 * declared.
 	 */
-	private static final String JOB_NAME = "jobName";
-	private static final String JOB_LAUNCHER = "jobLauncher";
+	public static final String JOB_NAME = "jobName";
+	public static final String JOB_LAUNCHER = "jobLauncher";
 	
 	/**
 	 * Interface method implementation. Launches the job specified by the "jobName" job data parameter
