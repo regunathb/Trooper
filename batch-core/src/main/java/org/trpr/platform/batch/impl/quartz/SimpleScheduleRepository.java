@@ -44,7 +44,7 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 * A Map holding the Trigger information related to the job. The key is the jobName 
 	 * and the value is org.quartz.Scheduler
 	 */
-	private Map<String, Scheduler> jobScheculer;
+	private Map<String, Scheduler> jobSchedulers;
 	
 	/** Logger instance for this class*/
 	private static final Logger LOGGER = LogFactory.getLogger(SimpleScheduleRepository.class);
@@ -53,7 +53,7 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 * Default constructor. Initializes jobTrigger Map as a new HashMap
 	 */
 	public SimpleScheduleRepository() {		
-		this.jobScheculer = new HashMap<String, Scheduler> ();
+		this.jobSchedulers = new HashMap<String, Scheduler> ();
 	}
 	
 	/**
@@ -63,8 +63,8 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	@Override
 	public String getCronExpression(String jobName) {
 		String cronExpr = null;		
-		if(this.jobScheculer.containsKey(jobName)) {			
-			Trigger trigger = this.getTriggerFromScheduler(this.jobScheculer.get(jobName), jobName);
+		if(this.jobSchedulers.containsKey(jobName)) {			
+			Trigger trigger = this.getTriggerFromScheduler(jobName);
 			if (trigger instanceof CronTrigger) {
 		        CronTrigger cronTrigger = (CronTrigger) trigger;
 		        cronExpr = cronTrigger.getCronExpression();
@@ -80,8 +80,8 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	@Override
 	public Date getNextFireDate(String jobName) {		
 		Date nextFireTime = null;		
-		if(this.jobScheculer.containsKey(jobName)){
-			Trigger trigger = this.getTriggerFromScheduler(this.jobScheculer.get(jobName), jobName);
+		if(this.jobSchedulers.containsKey(jobName)){
+			Trigger trigger = this.getTriggerFromScheduler(jobName);
 			nextFireTime = trigger.getNextFireTime();
 		}
 		return nextFireTime;
@@ -93,7 +93,7 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 */
 	@Override
 	public boolean doesJobExists(String jobName) {
-		if(this.jobScheculer.containsKey(jobName)) {
+		if(this.jobSchedulers.containsKey(jobName)) {
 			return true;
 		}
 		return false;
@@ -105,13 +105,15 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	 */
 	@Override
 	public void addScheduler(String jobName, Scheduler scheduler) {
-		this.jobScheculer.put(jobName, scheduler);
+		this.jobSchedulers.put(jobName, scheduler);
 	}
-	
+
 	/**
-	 * Helper method to get the Trigger from the Scheduler
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.quartz.ScheduleRepository#getTriggerFromScheduler(java.lang.String)
 	 */
-	private Trigger getTriggerFromScheduler(Scheduler sch, String requiredJobName) {
+	public Trigger getTriggerFromScheduler(String requiredJobName) {
+		Scheduler sch = this.jobSchedulers.get(requiredJobName);
 		try {
 			for (String groupName : sch.getJobGroupNames()) {
 				//loop all jobs by groupname
@@ -135,4 +137,13 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		}
 		return null;
 	}
+
+	/**
+	 * Interface Method Implementation.
+	 * @see org.trpr.platform.batch.spi.quartz.ScheduleRepository#getJobSchedulers()
+	 */
+	public Map<String, Scheduler> getJobSchedulers() {
+		return jobSchedulers;
+	}
+		
 }
