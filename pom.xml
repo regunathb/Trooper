@@ -51,6 +51,11 @@
       		<name>Devashish Shankar</name>
       		<email>devashish.shankar@gmail.com</email>
     	</developer>
+   		<developer>
+      		<id>jagadeesh-huliyar</id>
+      		<name>Jagadeesh Huliyar</name>
+      		<email>jagadeesh.huliyar@flipkart.com</email>
+    	</developer>
   	</developers>
 
 	<properties>

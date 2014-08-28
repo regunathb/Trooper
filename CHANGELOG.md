@@ -1,4 +1,6 @@
-## 1.3.2-SNAPSHOT (Jul 2, 2014)
+## 1.3.2-SNAPSHOT (Aug 28, 2014)
+  - Added support for chaining batch jobs
+  - Job executions are sorted by recency of execution 
   - Enhancement to use pre-created queues in RabbitMQ Integration and Mule transport modules
   - New HTablePool implementation that validates connections periodically
   - Fix to Trooper batch for pagination (issue #34) and alphabetical sorting (issue #35)

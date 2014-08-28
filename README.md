@@ -13,7 +13,7 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
-| Version 1.3.2-SNAPSHOT    | Feb 2014       |     Bug fix, Feature enhancements release
+| Version 1.3.2-SNAPSHOT    | Aug 2014       |     Bug fix, Feature enhancements release
 | Version 1.3.1    | Jan 2014       |     Bug fix release
 | Version 1.3.0    | Nov 2013       |     Upgrade to Spring 3.2.5.RELEASE
 | Version 1.2.9    | Nov 2013       |     Bug-fix release for batch & seda/service profiles, Rabbit consumer
@@ -45,6 +45,7 @@ Trooper is licensed under : The Apache Software License, Version 2.0. Here is a 
 * Shashikant Soni ([@shashiks](https://github.com/shashiks))
 * Srikanth PS ([@srikanthps](http://twitter.com/srikanthps))
 * Devashish Shankar ([@devashishshankar](https://github.com/devashishshankar))
+* Jagadeesh Huliyar ([@jagadeesh-huliyar](https://github.com/jagadeesh-huliyar))
 
 ## Trooper users
 
