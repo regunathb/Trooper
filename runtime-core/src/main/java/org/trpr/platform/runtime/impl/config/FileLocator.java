@@ -144,7 +144,12 @@ public class FileLocator {
 		File projectRootFolder = null;
 		
 		if(path!=null) {
-			projectRootFolder = new File(RuntimeVariables.getProjectsRoot(),path);
+			File pathFile = new File(path);
+			if (pathFile.isAbsolute() || pathFile.isDirectory()) { // use the path as-is if it is absolute or a directory by itself
+				projectRootFolder = pathFile;
+			} else {
+				projectRootFolder = new File(RuntimeVariables.getProjectsRoot(),path);
+			}
 		} else {
 			projectRootFolder = new File(RuntimeVariables.getProjectsRoot());
 		}
