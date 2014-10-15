@@ -5,6 +5,7 @@
   - New HTablePool implementation that validates connections periodically
   - Fix to Trooper batch for pagination (issue #34) and alphabetical sorting (issue #35)
   - Fix to Trooper batch admin page performance issue (issue #36)
+  - Fix in FileLocator to use absolute path of files if specified
 <br />  
 
 ## 1.3.1 (Jan 5, 2014)
