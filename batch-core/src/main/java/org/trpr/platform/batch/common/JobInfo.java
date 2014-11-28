@@ -15,12 +15,12 @@
  */
 package org.trpr.platform.batch.common;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.FastDateFormat;
 import org.trpr.platform.batch.impl.spring.web.JobController;
 
 /**
@@ -33,7 +33,7 @@ import org.trpr.platform.batch.impl.spring.web.JobController;
 public class JobInfo extends org.springframework.batch.admin.web.JobInfo {
 
 	/** The Date format*/
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy hh:mm:ss zzz");
+	private static final FastDateFormat DATE_FORMAT = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT;
 
 	/** Holds the Cron Expression of the job trigger */
 	private final String cronExpression;

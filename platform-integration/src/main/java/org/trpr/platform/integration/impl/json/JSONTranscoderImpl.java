@@ -30,15 +30,12 @@ import org.trpr.platform.integration.spi.marshalling.MarshallingException;
  * @version 1.0, 18/09/2012
  */
 public class JSONTranscoderImpl implements JSONTranscoder {
-	
-	/** The default DateFormat for Date serialization*/
-	private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat();
-	
+		
 	/** The ObjectMapper instance for JSON marshalling/unmarshalling*/
 	private ObjectMapper mapper = new ObjectMapper();
 	
 	/** The DateFormat for Date serialization */
-	private DateFormat dateFormat = DEFAULT_FORMAT;
+	private DateFormat dateFormat = new SimpleDateFormat();
 	
 	/** Constructor for this class*/
 	public JSONTranscoderImpl() {
