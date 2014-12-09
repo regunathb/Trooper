@@ -135,19 +135,25 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 			this.start();
 			// Register this Bootstrap with the platform's MBean server after start() has been called and any app specific JMX name suffix has been loaded
 			new BootstrapModelMBeanExporter().exportBootstrapMBean(this);
+			
+			// Start up the background thread which will keep the JVM alive when #stop() is called on this Bootstrap via a management console/interface
+			Thread backgroundThread = new Thread(this);
+			backgroundThread.setName(RuntimeConstants.BOOTSTRAP_BACKGROUND_THREADNAME);
+			backgroundThread.start();
 		} catch (Exception e) {
 			// catch all block to consume and minimally log bootstrap errors
 			// Log to both logger and System.out.println();
 			LOGGER.error("Fatal error in bootstrap sequence. Cannot continue!",	e);
 			System.out.println("Fatal error in bootstrap sequence. Cannot continue!");
 			e.printStackTrace(System.out);
+			try {
+				this.destroy();
+			} catch (Exception error) {
+				// ignore this as we are exiting anyway
+			}
 			return;
 		}
 		
-		// Start up the background thread which will keep the JVM alive when #stop() is called on this Bootstrap via a management console/interface
-		Thread backgroundThread = new Thread(this);
-		backgroundThread.setName(RuntimeConstants.BOOTSTRAP_BACKGROUND_THREADNAME);
-		backgroundThread.start();
 	}
 
 	/**
@@ -212,50 +218,40 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		}
 		
 		runtimeVariables = RuntimeVariables.getInstance();
-		try {
-			
-			// configure the logging framework from a path relative to where the bootstrap config file is specified
-			configureLogging();			
-			
-			// Load the bootstrap config file
-			File bootstrapFile = new File(this.bootstrapConfigFile);
-			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
-			// to relative path
-			this.containerContext = new FileSystemXmlApplicationContext(FILE_PREFIX + bootstrapFile.getAbsolutePath());
-			BootstrapInfo bootstrapInfo = (BootstrapInfo)this.containerContext.getBean(BootstrapInfo.class);
-			
-			// see if the path to projects root has been specified as a relative
-			// path to the bootstrap.config file and
-			// replace it with appropriate value to make it absolute			
-			String path = bootstrapInfo.getProjectsRoot();
-			if (path.startsWith(RuntimeConstants.CONFIG_FILE_NAME_TOKEN)) {
-				path = path.replace(RuntimeConstants.CONFIG_FILE_NAME_TOKEN,
-						new File(this.bootstrapConfigFile).getParent());
-				bootstrapInfo.setProjectsRoot(new File(path).getCanonicalPath());
-			}
-
-			this.container = bootstrapInfo.getContainer();
-			setPlatformVariablesFromConfig(bootstrapInfo);
-			
-			// export the RuntimeConstants.TRPR_APP_NAME property, if set, to System properties for use in JMX export
-			try {
-				System.setProperty(RuntimeConstants.TRPR_APP_NAME,RuntimeVariables.getVariable(RuntimeConstants.TRPR_APP_NAME));
-			} catch (Exception e) {
-				// Catch and consume this Exception. Only impact is on JMX binding name as exported by BootstrapModelMBeanExporter
-			}
-
-			// initialize the container
-			this.container.init();
-
-		} catch (Exception e) {
-			// catch all block to consume and minimally log bootstrap errors
-			// Log to both LOGGER and System.out.println();
-			LOGGER.error("Fatal error in bootstrap sequence. Cannot continue!",	e);
-			System.out.println("Fatal error in bootstrap sequence. Cannot continue!");
-			e.printStackTrace(System.out);
-			return;
+		
+		// configure the logging framework from a path relative to where the bootstrap config file is specified
+		configureLogging();			
+		
+		// Load the bootstrap config file
+		File bootstrapFile = new File(this.bootstrapConfigFile);
+		// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path 
+		// to relative path
+		this.containerContext = new FileSystemXmlApplicationContext(FILE_PREFIX + bootstrapFile.getAbsolutePath());
+		BootstrapInfo bootstrapInfo = (BootstrapInfo)this.containerContext.getBean(BootstrapInfo.class);
+		
+		// see if the path to projects root has been specified as a relative
+		// path to the bootstrap.config file and
+		// replace it with appropriate value to make it absolute			
+		String path = bootstrapInfo.getProjectsRoot();
+		if (path.startsWith(RuntimeConstants.CONFIG_FILE_NAME_TOKEN)) {
+			path = path.replace(RuntimeConstants.CONFIG_FILE_NAME_TOKEN,
+					new File(this.bootstrapConfigFile).getParent());
+			bootstrapInfo.setProjectsRoot(new File(path).getCanonicalPath());
 		}
 
+		this.container = bootstrapInfo.getContainer();
+		setPlatformVariablesFromConfig(bootstrapInfo);
+		
+		// export the RuntimeConstants.TRPR_APP_NAME property, if set, to System properties for use in JMX export
+		try {
+			System.setProperty(RuntimeConstants.TRPR_APP_NAME,RuntimeVariables.getVariable(RuntimeConstants.TRPR_APP_NAME));
+		} catch (Exception e) {
+			// Catch and consume this Exception. Only impact is on JMX binding name as exported by BootstrapModelMBeanExporter
+		}
+
+		// initialize the container
+		this.container.init();
+		
 		// publish an event that this Bootstrap has started
 		publishBootstrapEvent("** Trooper bootstrap complete **", RuntimeConstants.BOOTSTRAP_START_STATE);		
 		
