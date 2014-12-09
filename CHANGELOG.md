@@ -1,4 +1,4 @@
-## 1.3.2-SNAPSHOT (Aug 28, 2014)
+## 1.3.2-SNAPSHOT (Dec 09, 2014)
   - Added support for chaining batch jobs
   - Job executions are sorted by recency of execution 
   - Enhancement to use pre-created queues in RabbitMQ Integration and Mule transport modules
@@ -7,6 +7,7 @@
   - Fix to Trooper batch admin page performance issue (issue #36)
   - Fix in FileLocator to use absolute path of files if specified
   - Fix in JobInfo to make use of date formatter thread safe
+  - Fix in Bootstrap to handle failed init of component container
 <br />  
 
 ## 1.3.1 (Jan 5, 2014)
