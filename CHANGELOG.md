@@ -1,3 +1,5 @@
+## 1.3.2 (May 20, 2015)
+  - Upgrading snapshot release to full release
 ## 1.3.2-SNAPSHOT (Dec 09, 2014)
   - Added support for chaining batch jobs
   - Job executions are sorted by recency of execution 
