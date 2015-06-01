@@ -50,8 +50,7 @@
         </property>
     </bean>
 	<bean class="org.trpr.platform.runtime.impl.config.spring.PropertyPlaceholderConfigurer">
-		<property name="defaultPropertiesOnClasspath">
-			<value>packaged/default-batch-core-config.properties</value>
-		</property>
+		<property name="defaultPropertiesOnClasspath" value="packaged/default-batch-core-config.properties"/>
+		<property name="propertiesOnConfigPath" value="batch-core-config.properties"/>
 	</bean>    
 </beans>
