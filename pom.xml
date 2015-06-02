@@ -89,7 +89,7 @@
 		<module>examples/example-models</module>		
 		<module>examples/example-seda</module>		
 		<module>examples/example-seda-cep</module>		
-		<module>examples/example-services</module>	
+		<module>examples/example-services</module>			
 	</modules>
 			
 </project>
