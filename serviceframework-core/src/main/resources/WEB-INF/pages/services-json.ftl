@@ -49,7 +49,7 @@
 								<#if statistics.lastCalledTimestamp??>
 								"LastCalledTimestamp": "${statistics.lastCalledTimestamp.getTime()?datetime}"
 								<#else>
-								"LastCalledTimestamp": "NULL",
+								"LastCalledTimestamp": "NULL"
 								</#if>
 			}
 	</#list>
