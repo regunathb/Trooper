@@ -13,43 +13,43 @@
 								<#if statistics.p50ResponseTime??>
 								"P50ResponseTime": "${statistics.p50ResponseTime}",
 								<#else>
-								"P50ResponseTime": NA
+								"P50ResponseTime": "NULL",
 								</#if>
 								<#if statistics.p75ResponseTime??>
 								"P75ResponseTime": "${statistics.p75ResponseTime}",
 								<#else>
-								"P75ResponseTime": NA
+								"P75ResponseTime": "NULL",
 								</#if>
 								<#if statistics.p99ResponseTime??>
 								"P99ResponseTime": "${statistics.p99ResponseTime}",
 								<#else>
-								"P99ResponseTime": NA
+								"P99ResponseTime": "NULL",
 								</#if>
 								<#if statistics.p999ResponseTime??>
 								"P999ResponseTime": "${statistics.p999ResponseTime}",
 								<#else>
-								"P999ResponseTime": NA
+								"P999ResponseTime": "NULL",
 								</#if>
 								<#if statistics.oneMinRate??>
 								"OneMinuteRate": "${statistics.oneMinRate}",
 								<#else>
-								"OneMinuteRate": NA
+								"OneMinuteRate": "NULL",
 								</#if>
 								<#if statistics.fiveMinRate??>
 								"FiveMinuteRate": "${statistics.fiveMinRate}",
 								<#else>
-								"FiveMinuteRate": NA
+								"FiveMinuteRate": "NULL",
 								</#if>
 								<#if statistics.fifteenMinRate??>
 								"FifteenMinuteRate": "${statistics.fifteenMinRate}",
 								<#else>
-								"FifteenMinuteRate": NA
+								"FifteenMinuteRate": "NULL",
 								</#if>
 								"StartupTimeStamp": "${statistics.startupTimeStamp.getTime()?datetime}",
 								<#if statistics.lastCalledTimestamp??>
 								"LastCalledTimestamp": "${statistics.lastCalledTimestamp.getTime()?datetime}"
 								<#else>
-								"LastCalledTimestamp": NA
+								"LastCalledTimestamp": "NULL",
 								</#if>
 			}
 	</#list>
