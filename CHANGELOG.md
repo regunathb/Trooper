@@ -1,5 +1,6 @@
 ## 1.3.3-SNAPSHOT (Jun 01, 2015)
   - Added support to change admin port for batch console. Helps to run multiple Trooper batch instances on same machine
+  - Corrected JSON formatting in services console
 
 ## 1.3.2 (May 20, 2015)
   - Upgrading snapshot release to full release
