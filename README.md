@@ -13,11 +13,11 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
+| Version 1.3.3    | Sep 2015       |     Upgrade to Spring 4.x
 | Version 1.3.3-SNAPSHOT    | Jun 2015       |     Bug fix, Feature enhancements release
 | Version 1.3.2    | May 2015       |     Upgrading snapshot to full release
 | Version 1.3.2-SNAPSHOT    | Dec 2014       |     Bug fix, Feature enhancements release
 | Version 1.3.1    | Jan 2014       |     Bug fix release
-| Version 1.3.0    | Nov 2013       |     Upgrade to Spring 3.2.5.RELEASE
 
 ## Changelog
 

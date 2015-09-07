@@ -1,3 +1,8 @@
+## 1.3.3 (Sep 01, 2015)
+  - Upgrade for Spring 4.2.0.RELEASE version
+  - Upgrade to other libraries to be API compatible with Spring upgrade
+  - Code fixes post upgrade
+
 ## 1.3.3-SNAPSHOT (Jun 01, 2015)
   - Added support to change admin port for batch console. Helps to run multiple Trooper batch instances on same machine
   - Corrected JSON formatting in services console
