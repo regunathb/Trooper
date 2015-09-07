@@ -71,7 +71,8 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		if(jobInstance==null) {
 			copy = new JobExecution(original.getId());			
 		}
-		copy = new JobExecution(jobInstance, original.getId());
+		copy = new JobExecution(original.getId());
+		copy.setJobInstance(jobInstance);
 		if(original.getStartTime()!=null) {
 			copy.setStartTime((Date) original.getStartTime().clone());		
 		}

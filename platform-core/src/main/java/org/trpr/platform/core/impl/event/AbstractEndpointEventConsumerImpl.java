@@ -16,10 +16,9 @@
 
 package org.trpr.platform.core.impl.event;
 
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.trpr.platform.core.spi.event.EndpointEventConsumer;
 import org.trpr.platform.model.event.PlatformEvent;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.ApplicationEventMulticaster;
 
 /**
  * The <code>AbstractEndpointEventConsumerImpl</code> is an implementation of {@link EndpointEventConsumer}, which is registered with the
@@ -56,10 +55,10 @@ public abstract class AbstractEndpointEventConsumerImpl implements EndpointEvent
 	}
 
 	/**
-	 * Interface method implementation. Just logs the message
+	 * Interface method implementation. Processes only if the event source is of type {@link PlatformEvent}
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
-	public void onApplicationEvent(ApplicationEvent springEvent) {
+	public void onApplicationEvent(PlatformApplicationEvent springEvent) {
 		if (springEvent.getSource() instanceof PlatformEvent) {
 			handlePlatformEvent((PlatformEvent)springEvent.getSource());
 		}

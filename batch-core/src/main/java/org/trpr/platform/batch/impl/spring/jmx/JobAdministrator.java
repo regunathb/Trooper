@@ -21,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
@@ -37,6 +38,8 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobOperator;
@@ -121,6 +124,9 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	private static CompositeType compositeType;
 	private static TabularType tableType;
 	
+	/** The run ID key in job params*/
+	private static String RUN_ID_KEY = "run.id";
+	
 	// static initializer block for composite and table type initialization
 	static {
 		try {
@@ -140,6 +146,9 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 	
 	/** The JobOperator instance for this job administrator*/
 	private JobOperator jobOperator;
+	
+	/** The Job run id increment*/
+	private AtomicLong jobIdIncrementer = new AtomicLong();
 
 	/** The JobExplorer instance for this job administrator*/
 	private JobExplorer jobExplorer;
@@ -202,7 +211,10 @@ public class JobAdministrator extends AppInstanceAwareMBean {
 			throw new PlatformException(jobDoesnotExist);
 		}
 		try {
-			this.getJobOperator().startNextInstance(registryJobName);
+			// create new job parameters with an auto-incremented run ID
+			JobParameters params = new JobParameters();
+			params = new JobParametersBuilder(params).addLong(RUN_ID_KEY, this.jobIdIncrementer.incrementAndGet()).toJobParameters();
+			this.getJobOperator().start(registryJobName, params.toString());
 		} catch (Exception e) {
 			final String jobExecutionError = "Error triggering job execution: " + e.getMessage();
 			LOGGER.error(jobExecutionError, e);

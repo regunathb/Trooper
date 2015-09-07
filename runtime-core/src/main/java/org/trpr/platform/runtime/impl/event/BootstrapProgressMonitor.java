@@ -75,8 +75,7 @@ public class BootstrapProgressMonitor implements PlatformEventConsumer {
 	 * bootstrap completion. Also updates the internal bootstrap progress state maintained by this class
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
-	@SuppressWarnings("unchecked")
-	public void onApplicationEvent(ApplicationEvent event) {
+	public void onApplicationEvent(PlatformApplicationEvent event) {
 		if (event.getSource() instanceof PlatformEvent) {
 			PlatformEvent platformEvent = (PlatformEvent) event.getSource();
 			if(platformEvent.getEventType()!=null&&platformEvent.getEventType().equalsIgnoreCase(RuntimeConstants.BOOTSTRAPMONITOREDEVENT)){

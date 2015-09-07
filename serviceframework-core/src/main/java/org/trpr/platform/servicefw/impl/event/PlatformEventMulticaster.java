@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.AbstractApplicationEventMulticaster;
+import org.springframework.core.ResolvableType;
 import org.trpr.platform.core.impl.event.PlatformApplicationEvent;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -51,13 +52,21 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 	private String[] subscriptions;
 
 	/**
+	 * Interface method implementation. Calls {@link #multicastEvent(ApplicationEvent)} with resolved default type
+	 * @see org.springframework.context.event.ApplicationEventMulticaster#multicastEvent(org.springframework.context.ApplicationEvent)
+	 */
+	public void multicastEvent(ApplicationEvent event) {
+		this.multicastEvent(event, this.resolveDefaultEventType(event));
+	}
+	
+	/**
 	 * Interface method implementation. Forwards the published event to all event consumers whose subscriptions match the endpointURI
 	 * contained in the specified PlatformApplicationEvent.
 	 * Note that Spring ApplicationEvent instances that are not of type PlatformApplicationEvent are ignored and a warning message is logged.
 	 * @see org.springframework.context.event.ApplicationEventMulticaster#multicastEvent(org.springframework.context.ApplicationEvent)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void multicastEvent(ApplicationEvent event) {
+	public void multicastEvent(ApplicationEvent event, ResolvableType eventType) {
 		if (event instanceof PlatformApplicationEvent) {
 			PlatformApplicationEvent platformApplicationEvent = (PlatformApplicationEvent)event;
 			String eventEndpointURI = platformApplicationEvent.getEndpointURI();
@@ -69,7 +78,7 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 				LOGGER.warn("Endpoint URI doesnot match any of the subscriptions specified on this multi-caster. Event will not be forwarded. Event URI is : " + eventEndpointURI); 
 				return;				
 			}
-			for (Iterator<ApplicationListener> iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
+			for (Iterator<ApplicationListener<?>> iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
 	            ApplicationListener listener = (ApplicationListener) iterator.next();	
 	            if (listener instanceof ServiceEventConsumer) {
 	            	if (isSubscriptionMatch(eventEndpointURI, ((ServiceEventConsumer)listener).getSubscriptions())) {
@@ -108,4 +117,13 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 		return false;
 	}
 
+	/**
+	 * Resolve default event type from the specified ApplicationEvent
+	 * @param event ApplicationEvent
+	 * @return default ResolvableType instance for the supplied ApplicationEvent
+	 */
+	private ResolvableType resolveDefaultEventType(ApplicationEvent event) {
+		return ResolvableType.forClass(event.getClass());
+	}	
+	
 }

@@ -17,8 +17,9 @@ package org.trpr.platform.batch.impl.quartz;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.Trigger;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.context.ApplicationContext;
 import org.trpr.platform.batch.impl.spring.SpringBatchComponentContainer;
@@ -38,6 +39,7 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 	 * Overridden method to inject additional attributes post bean initialization
 	 * @see org.springframework.scheduling.quartz.SchedulerFactoryBean#afterPropertiesSet()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		//Calling the super class method to perform all the functions it was previously performing
@@ -48,21 +50,15 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 		SimpleScheduleRepository rep = context.getBean(SimpleScheduleRepository.class);
 		//Getting the scheduler from super
 		Scheduler sch = super.getScheduler();
-		//loop all groups in the scheduler
-		for (String groupName : sch.getJobGroupNames()) {
-			//loop all jobs by groupname
-			for (String jobName : sch.getJobNames(groupName)) {
-		      //get job's trigger
-			  Trigger[] triggers = sch.getTriggersOfJob(jobName,groupName);	
-			  //get job's JobDetail 
-			  JobDetail jd = sch.getJobDetail(jobName, groupName);
-			  //Extract job's name from JobDetail
-		      JobDataMap jdm = jd.getJobDataMap();
-		      FlowJob fj = (FlowJob)jdm.get("jobName");
-		      //Injecting into SimpleScheduleRepository
-		      rep.addScheduler(fj.getName(), sch);
-			}
-	    }
+		for (JobKey jobKey : sch.getJobKeys(GroupMatcher.anyJobGroup())) {
+		  //get job's JobDetail 
+		  JobDetail jd = sch.getJobDetail(jobKey);
+		  //Extract job's name from JobDetail
+	      JobDataMap jdm = jd.getJobDataMap();
+	      FlowJob fj = (FlowJob)jdm.get("jobName");
+	      //Injecting into SimpleScheduleRepository
+	      rep.addScheduler(fj.getName(), sch);
+		}
 	}
 }
 

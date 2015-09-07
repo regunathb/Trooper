@@ -112,7 +112,6 @@ public class Criteria {
 	 * Overriden super class method. Does a verbose print of all information contained in this Criteria
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("unchecked")
 	public String toString() {
 		//Print all the information of the criteria.
 		StringBuffer sb = new StringBuffer();

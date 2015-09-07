@@ -17,14 +17,17 @@ package org.trpr.platform.batch.impl.quartz;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.trpr.platform.batch.spi.quartz.ScheduleRepository;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -82,7 +85,9 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 		Date nextFireTime = null;		
 		if(this.jobSchedulers.containsKey(jobName)){
 			Trigger trigger = this.getTriggerFromScheduler(jobName);
-			nextFireTime = trigger.getNextFireTime();
+			if (trigger != null) {
+				nextFireTime = trigger.getNextFireTime();
+			}
 		}
 		return nextFireTime;
 	}
@@ -115,22 +120,19 @@ public class SimpleScheduleRepository implements ScheduleRepository {
 	public Trigger getTriggerFromScheduler(String requiredJobName) {
 		Scheduler sch = this.jobSchedulers.get(requiredJobName);
 		try {
-			for (String groupName : sch.getJobGroupNames()) {
-				//loop all jobs by groupname
-				for (String jobName : sch.getJobNames(groupName)) {
-			      //get job's trigger
-				  Trigger[] triggers = sch.getTriggersOfJob(jobName,groupName);	
-				  //get job's JobDetail 
-				  JobDetail jd = sch.getJobDetail(jobName, groupName);
-				  //Extract job's name from JobDetail
-			      JobDataMap jdm = jd.getJobDataMap();
-			      FlowJob fj = (FlowJob)jdm.get("jobName");
-			      String fjName = fj.getName();
-			      //Injecting into SimpleScheduleRepository
-				  if(fjName.equals(requiredJobName)) {
-					  return triggers[0];
-				  }
-				}
+			for (JobKey jobKey : sch.getJobKeys(GroupMatcher.anyJobGroup())) {
+		      //get job's trigger
+			  List<? extends Trigger> triggers = sch.getTriggersOfJob(jobKey);	
+			  //get job's JobDetail 
+			  JobDetail jd = sch.getJobDetail(jobKey);
+			  //Extract job's name from JobDetail
+		      JobDataMap jdm = jd.getJobDataMap();
+		      FlowJob fj = (FlowJob)jdm.get("jobName");
+		      String fjName = fj.getName();
+		      //Injecting into SimpleScheduleRepository
+			  if(fjName.equals(requiredJobName)) {
+				  return triggers.get(0);
+			  }
 			}
 		} catch (SchedulerException e) {
 			LOGGER.error("Error getting Trigger from scheduler",e);

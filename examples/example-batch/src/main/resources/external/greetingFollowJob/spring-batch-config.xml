@@ -5,7 +5,7 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
-    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-3.0.xsd
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
@@ -17,7 +17,7 @@
 	<!--
 		Configuring the Greeting Job Scheduler Bean that will be executed when the trigger fires.
 	-->
-	<bean name="greetingFollowJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+	<bean name="greetingFollowJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="org.trpr.platform.batch.impl.spring.job.BatchJob" />
 		<property name="group" value="sample-batch" />
 		<property name="jobDataAsMap">
@@ -33,11 +33,11 @@
 		Associating the Greeting Job with a Job completion trigger that specifies the preceding job, on completion of which, the job will execute
 	-->
 	<bean id="greetingFollowTrigger" class="org.trpr.platform.batch.impl.quartz.JobCompletionTriggerBean">
-		<property name="followJob" value="shellTaskletsJob" />
+	    <property name="followJob" value="shellTaskletsJob" />
 		<property name="startDelay" value="5000" />
 		<property name="jobDetail" ref="greetingFollowJobDetailBean" />
 	</bean>
-		
+			
 	<!--
 		A list of Triggers to be scheduled and executed by Quartz for
 	-->
@@ -77,7 +77,7 @@
 			</batch:partition>
 		</batch:step>
 	</batch:job>
-
+	
 	<batch:step id="step1" xmlns="http://www.springframework.org/schema/batch">
 		<batch:tasklet task-executor="greetingJobTaskExecutor">
 			<batch:chunk reader="compositeGreetingDataReader" processor="compositeGreetingDataProcessor" writer="compositeGreetingDataWriter" commit-interval="10"/>

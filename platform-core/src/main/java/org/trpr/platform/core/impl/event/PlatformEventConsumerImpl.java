@@ -18,7 +18,6 @@ package org.trpr.platform.core.impl.event;
 
 import org.trpr.platform.core.spi.event.PlatformEventConsumer;
 import org.trpr.platform.model.event.PlatformEvent;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * The <code>PlatformEventProducerImpl</code> is a simple implementation of the PlatformEventConsumer interface.
@@ -38,7 +37,7 @@ public abstract class PlatformEventConsumerImpl implements PlatformEventConsumer
 	 * Interface method implementation. Extract the PlatformEvent and calls #processPlatformEvent(PlatformEvent) for subsequent processing.
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
-	public void onApplicationEvent(ApplicationEvent event) {
+	public void onApplicationEvent(PlatformApplicationEvent event) {
 		// process only PlatformApplicationEvent type events
 		if (event instanceof PlatformApplicationEvent) {
 			processPlatformEvent((PlatformEvent)event.getSource());

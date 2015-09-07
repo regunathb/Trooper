@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.trpr.platform.batch.common.JobHost;
 import org.trpr.platform.batch.impl.job.ha.JobInstanceDetails;
-import org.trpr.platform.batch.impl.spring.JobRegistryBeanPostProcessor;
 import org.trpr.platform.batch.spi.spring.admin.JobConfigurationService;
 import org.trpr.platform.batch.spi.spring.admin.SyncService;
+import org.trpr.platform.core.impl.event.PlatformApplicationEvent;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.event.PlatformEventConsumer;
 import org.trpr.platform.core.spi.logging.Logger;
@@ -245,7 +245,7 @@ public class CuratorJobSyncHandler implements InitializingBean, PlatformEventCon
 	 * @see PlatformEventConsumer#onApplicationEvent(ApplicationEvent)
 	 */
 	@Override
-	public void onApplicationEvent(ApplicationEvent event) {
+	public void onApplicationEvent(PlatformApplicationEvent event) {
 		if (event.getSource() instanceof PlatformEvent) {
 			PlatformEvent platformEvent = (PlatformEvent) event.getSource(); //Event should be platformEvent
 			if(platformEvent.getEventType()!=null&&platformEvent.getEventType().equalsIgnoreCase(RuntimeConstants.BOOTSTRAPMONITOREDEVENT)){

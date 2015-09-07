@@ -24,6 +24,7 @@ import org.trpr.platform.core.spi.logging.Logger;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.AbstractApplicationEventMulticaster;
+import org.springframework.core.ResolvableType;
 
 /**
  * The <code>PlatformEventMulticaster</code> is a sub-type of the Spring {@link AbstractApplicationEventMulticaster} that permits specifying 
@@ -37,7 +38,7 @@ import org.springframework.context.event.AbstractApplicationEventMulticaster;
  * This allows the danger of a rogue listener blocking the entire application. 
  * 
  * @author Regunath B
- * @version 1.0, 16/05/2012
+ * @version 2.0, 25/08/2015
  */
 public class PlatformEventMulticaster extends AbstractApplicationEventMulticaster {
 
@@ -50,12 +51,20 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 	private String[] subscriptions;
 
 	/**
-	 * Interface method implementation. Forwards the published event to all event consumers whose subscriptions match the endpointURI
-	 * contained in the specified PlatformApplicationEvent.
-	 * Note that Spring ApplicationEvent instances that are not of type PlatformApplicationEvent are ignored and a warning message is logged.
+	 * Interface method implementation. Calls {@link #multicastEvent(ApplicationEvent)} with resolved default type
 	 * @see org.springframework.context.event.ApplicationEventMulticaster#multicastEvent(org.springframework.context.ApplicationEvent)
 	 */
 	public void multicastEvent(ApplicationEvent event) {
+		this.multicastEvent(event, this.resolveDefaultEventType(event));
+	}
+
+	/**
+	 * Interface method implementation. Forwards the published event to all event consumers whose subscriptions match the endpointURI
+	 * contained in the specified PlatformApplicationEvent.
+	 * Note that Spring ApplicationEvent instances that are not of type PlatformApplicationEvent are ignored and a warning message is logged.
+	 * @see org.springframework.context.event.ApplicationEventMulticaster#multicastEvent(org.springframework.context.ApplicationEvent, org.springframework.core.ResolvableType)
+	 */
+	public void multicastEvent(ApplicationEvent event, ResolvableType eventType) {
 		if (event instanceof PlatformApplicationEvent) {
 			PlatformApplicationEvent platformApplicationEvent = (PlatformApplicationEvent)event;
 			String eventEndpointURI = platformApplicationEvent.getEndpointURI();
@@ -67,11 +76,11 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 				LOGGER.debug("Endpoint URI doesnot match any of the subscriptions specified on this multi-caster. Event will not be forwarded. Event URI is : " + eventEndpointURI); 
 				return;				
 			}
-			for (Iterator iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
-	            ApplicationListener listener = (ApplicationListener) iterator.next();	
+			for (Iterator<ApplicationListener<?>> iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
+	            ApplicationListener<?> listener = (ApplicationListener<?>) iterator.next();	
 	            if (listener instanceof EndpointEventConsumer) {
 	            	if (isSubscriptionMatch(eventEndpointURI, ((EndpointEventConsumer)listener).getSubscriptions())) {
-	            		listener.onApplicationEvent(event);
+	            		((EndpointEventConsumer)listener).onApplicationEvent(platformApplicationEvent);
 	            	}
 	            }
 			}
@@ -105,5 +114,14 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 		}
 		return false;
 	}
+	
+	/**
+	 * Resolve default event type from the specified ApplicationEvent
+	 * @param event ApplicationEvent
+	 * @return default ResolvableType instance for the supplied ApplicationEvent
+	 */
+	private ResolvableType resolveDefaultEventType(ApplicationEvent event) {
+		return ResolvableType.forClass(event.getClass());
+	}	
 
 }

@@ -20,12 +20,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.util.Assert;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -38,9 +44,15 @@ import org.trpr.platform.core.spi.logging.Logger;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private Queue<JobInstance> jobInstances = new ConcurrentLinkedQueue<JobInstance>();
+	private static final String STAR_WILDCARD = "\\*";
+	private static final String STAR_WILDCARD_PATTERN = ".*";
+	
+	private final Map<String, JobInstance> jobInstances = new ConcurrentHashMap<String, JobInstance>();
+	private Queue<String> jobKeys = new ConcurrentLinkedQueue<String>();
 
-	private long currentId = 0;
+	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	
+	private AtomicLong currentId = new AtomicLong(0L);
 	
 	private int maxJobInstanceCount;
 
@@ -65,11 +77,12 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		JobInstance jobInstance = new JobInstance(currentId++, jobParameters, jobName);
+		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobName);
 		jobInstance.incrementVersion();
+		
 		//Removes the older jobInstances
-		if(this.jobInstances.size()>=maxJobInstanceCount) {
-			JobInstance toRemove = this.jobInstances.remove();
+		if(this.jobKeys.size()>=maxJobInstanceCount) {
+			JobInstance toRemove = this.jobInstances.remove(this.jobKeys.remove());
 			LOGGER.info("Removing jobInstance: "+toRemove.toString());
 			List<JobExecution> executions = this.jobExecutionDao.findJobExecutions(toRemove);
 			for(JobExecution execution : executions) {
@@ -81,23 +94,19 @@ public class MapJobInstanceDao implements JobInstanceDao {
 				this.executionContextDao.removeExecutionContext(execution);
 			}
 		}
-		jobInstances.add(jobInstance);
+		
+		String jobKey = jobName + "|" + jobKeyGenerator.generateKey(jobParameters);
+		jobInstances.put(jobKey, jobInstance);
+		jobKeys.add(jobKey);
 		return jobInstance;
 	}
 
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-
-		for (JobInstance instance : jobInstances) {
-			if (instance.getJobName().equals(jobName) && instance.getJobParameters().equals(jobParameters)) {
-				return instance;
-			}
-		}
-		return null;
-
+		return jobInstances.get(jobName + "|" + jobKeyGenerator.generateKey(jobParameters));
 	}
 
 	public JobInstance getJobInstance(Long instanceId) {
-		for (JobInstance instance : jobInstances) {
+		for (JobInstance instance : jobInstances.values()) {
 			if (instance.getId().equals(instanceId)) {
 				return instance;
 			}
@@ -107,7 +116,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	public List<String> getJobNames() {
 		List<String> result = new ArrayList<String>();
-		for (JobInstance instance : jobInstances) {
+		for (JobInstance instance : jobInstances.values()) {
 			result.add(instance.getJobName());
 		}
 		Collections.sort(result);
@@ -116,7 +125,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		List<JobInstance> result = new ArrayList<JobInstance>();
-		for (JobInstance instance : jobInstances) {
+		for (JobInstance instance : jobInstances.values()) {
 			if (instance.getJobName().equals(jobName)) {
 				result.add(instance);
 			}
@@ -160,4 +169,56 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	public void setExecutionContextDao(MapExecutionContextDao executionContextDao) {
 		this.executionContextDao = executionContextDao;
 	}
+
+	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+		int count = 0;
+
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			String key = instanceEntry.getKey();
+			String curJobName = key.substring(0, key.lastIndexOf("|"));
+
+			if(curJobName.equals(jobName)) {
+				count++;
+			}
+		}
+
+		if(count == 0) {
+			throw new NoSuchJobException("No job instances for job name " + jobName + " were found");
+		} else {
+			return count;
+		}
+	}
+
+	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		List<JobInstance> result = new ArrayList<JobInstance>();
+		String convertedJobName = jobName.replaceAll(STAR_WILDCARD, STAR_WILDCARD_PATTERN);
+
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			JobInstance instance = instanceEntry.getValue();
+
+			if(instance.getJobName().matches(convertedJobName)) {
+				result.add(instance);
+			}
+		}
+
+		sortDescending(result);
+
+		return subset(result, start, count);
+	}
+
+	private void sortDescending(List<JobInstance> result) {
+		Collections.sort(result, new Comparator<JobInstance>() {
+			@Override
+			public int compare(JobInstance o1, JobInstance o2) {
+				return Long.signum(o2.getId() - o1.getId());
+			}
+		});
+	}
+
+	private List<JobInstance> subset(List<JobInstance> jobInstances, int start, int count) {
+		int startIndex = Math.min(start, jobInstances.size());
+		int endIndex = Math.min(start + count, jobInstances.size());
+
+		return jobInstances.subList(startIndex, endIndex);
+	}	
 }

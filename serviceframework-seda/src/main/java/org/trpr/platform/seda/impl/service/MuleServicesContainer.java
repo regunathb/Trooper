@@ -151,17 +151,10 @@ public class MuleServicesContainer extends SpringServicesContainer {
 	 * @throws PlatformException
 	 */
 	protected void loadServiceContexts() throws PlatformException {
-		// locate and load the individual service bean XML files using the common batch beans context as parent
+		// locate and load the individual service bean XML files using the common services beans context as parent
 		File[] serviceBeansFiles = FileLocator.findFiles(ServiceFrameworkConstants.SPRING_SERVICES_CONFIG);	
 		List<String> fileNamesList = new LinkedList<String>();		
 		for (File serviceBeansFile : serviceBeansFiles) {
-			// dont load the individual service context, just register an empty context for display purposes
-			GenericApplicationContext nonRefreshedServiceContext = new GenericApplicationContext();
-			XmlBeanDefinitionReader beanDefReader = new XmlBeanDefinitionReader(nonRefreshedServiceContext);
-			// add the "file:" prefix to file names to explicitly state that it is on the file system and not a classpath resource
-			beanDefReader.loadBeanDefinitions(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());
-			ServiceConfigInfo nonInitedServiceConfigInfo = new ServiceConfigInfo(serviceBeansFile, null, nonRefreshedServiceContext);
-			super.registerServiceContext(nonInitedServiceConfigInfo); 
 			// add the "file:" prefix to file names to get around strange behavior of FileSystemXmlApplicationContext that converts absolute path to relative path
             fileNamesList.add(ServiceConfigInfo.FILE_PREFIX + serviceBeansFile.getAbsolutePath());		            
 		}	

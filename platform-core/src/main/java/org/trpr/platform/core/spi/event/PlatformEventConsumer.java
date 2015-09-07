@@ -17,6 +17,7 @@
 package org.trpr.platform.core.spi.event;
 
 import org.springframework.context.ApplicationListener;
+import org.trpr.platform.core.impl.event.PlatformApplicationEvent;
 
 /**
  * Interface <code>PlatformEventConsumer</code> is a simple marker consumer interface for processing events. It extends the Spring
@@ -28,5 +29,5 @@ import org.springframework.context.ApplicationListener;
  * @version 1.0, 16/05/2012
  */
 
-public interface PlatformEventConsumer extends ApplicationListener {
+public interface PlatformEventConsumer extends ApplicationListener<PlatformApplicationEvent> {
 }

@@ -17,16 +17,18 @@
 package org.trpr.platform.batch.impl.spring.admin.repository;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.util.Assert;
+import org.springframework.util.SerializationUtils;
 
 /**
  * Trooper Implementation of {@link org.springframework.batch.core.repository.dao.MapExecutionContextDao}.
@@ -48,7 +50,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	private final ConcurrentMap<ContextKey, ExecutionContext> contexts = TransactionAwareProxyFactory
 			.createAppendOnlyTransactionalMap();
 
-	private ExecutionContextStringSerializer serializer;
+	private ExecutionContextSerializer serializer;
 	
 	public MapExecutionContextDao() throws Exception {
 		serializer = new XStreamExecutionContextStringSerializer();
@@ -186,6 +188,14 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		for(StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			this.removeExecutionContext(stepExecution);
 		}
+	}
+
+	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions,"Attempt to save a nulk collection of step executions");
+		for (StepExecution stepExecution: stepExecutions) {
+			saveExecutionContext(stepExecution);
+			saveExecutionContext(stepExecution.getJobExecution());
+		}		
 	}
 
 }

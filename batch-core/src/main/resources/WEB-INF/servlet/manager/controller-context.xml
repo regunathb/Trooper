@@ -12,6 +12,7 @@
 		<constructor-arg index="0"><ref bean="jobService" /></constructor-arg>
 		<constructor-arg index="1"><ref bean="jobConfigService" /></constructor-arg>
 	</bean>
+	<bean class="org.codehaus.jackson.map.ObjectMapper" />		
 	<bean class="org.springframework.batch.admin.web.StepExecutionController" />
 	<bean class="org.springframework.batch.admin.web.JobExecutionController" />
 	<bean class="org.trpr.platform.batch.impl.spring.web.SynchronizationController">

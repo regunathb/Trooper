@@ -5,7 +5,7 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
-    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-3.0.xsd
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
@@ -37,7 +37,7 @@
 		Cron Trigger. Triggers define when a job is executed.
 		Executes every 1 minute
 	-->
-	<bean id="hbaseTestJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	<bean id="hbaseTestJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="hbaseTestJobDetailBean" />
 		<property name="cronExpression" value="0 0/120 * * * ?" />
 	</bean>

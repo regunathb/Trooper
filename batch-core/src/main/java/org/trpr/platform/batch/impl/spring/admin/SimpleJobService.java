@@ -47,6 +47,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.CollectionUtils;
 import org.trpr.platform.batch.spi.quartz.ScheduleRepository;
 import org.trpr.platform.batch.spi.spring.admin.JobService;
 import org.trpr.platform.core.impl.logging.LogFactory;
@@ -309,15 +310,24 @@ public class SimpleJobService implements JobService, DisposableBean {
 	 * @see org.springframework.batch.admin.service.JobService#getLastJobParameters(java.lang.String)
 	 */
 	public JobParameters getLastJobParameters(String jobName) throws NoSuchJobException {
+		JobParameters oldParameters = new JobParameters();
 		for (String name : this.jobRegistry.getJobNames()) {
 			if (name.contains(jobName)) {
 				// get the last run JobInstance if any
 				for (JobInstance jobInstance : this.jobExplorer.getJobInstances(jobName, 0, 1)) {  // end is set as 1 to get a single element List
-					return jobInstance.getJobParameters();
+					Collection<JobExecution> executions = this.jobExplorer.getJobExecutions(jobInstance);
+					JobExecution lastExecution = null;
+					if (!CollectionUtils.isEmpty(executions)) {
+						lastExecution = executions.iterator().next();
+					}
+					if (lastExecution != null) {
+						oldParameters = lastExecution.getJobParameters();
+						break;
+					}
 				}
 			}
 		}			
-		return null;
+		return oldParameters;
 	}
 
 	/**
@@ -432,8 +442,8 @@ public class SimpleJobService implements JobService, DisposableBean {
 		}
 		// sort the executions by recency of execution. More useful as users are normally interested in latest executions
 		Collections.sort(executionList,  new Comparator<JobExecution>() {
-			public int compare(JobExecution je1, JobExecution je2) {
-				return je2.getStartTime().compareTo(je1.getStartTime());
+			public int compare(JobExecution je1, JobExecution je2) {				
+				return (je2.getStartTime() != null && je1.getStartTime() != null) ? je2.getStartTime().compareTo(je1.getStartTime()) : 0;
 			}
 		});
 		if (start >= executionList.size()) {
@@ -551,7 +561,7 @@ public class SimpleJobService implements JobService, DisposableBean {
 		JobExecution target = getJobExecution(jobExecutionId);
 		JobInstance lastInstance = target.getJobInstance();
 		Job job = this.jobRegistry.getJob(lastInstance.getJobName());
-		JobExecution jobExecution = this.jobLauncher.run(job, lastInstance.getJobParameters());
+		JobExecution jobExecution = this.jobLauncher.run(job, target.getJobParameters());
 		if (jobExecution.isRunning()) {
 			this.activeExecutions.add(jobExecution);
 		}

@@ -5,7 +5,7 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.5.xsd	
-    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-2.1.xsd
+    http://www.springframework.org/schema/batch classpath:packaged/xsd/spring-batch-3.0.xsd
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
     http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-2.5.xsd">
 
@@ -17,7 +17,7 @@
 	<!--
 		Configuring the Greeting Job Scheduler Bean that will be executed when the trigger fires.
 	-->
-	<bean name="greetingJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+	<bean name="greetingJobDetailBean" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="org.trpr.platform.batch.impl.spring.job.BatchJob" />
 		<property name="group" value="sample-batch" />
 		<property name="jobDataAsMap">
@@ -33,7 +33,7 @@
 		Associating the Greeting Job with a Quartz
 		Cron Trigger. Triggers define when a job is executed.
 	-->
-	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	<bean id="greetingJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="greetingJobDetailBean" />
 		<property name="cronExpression" value="0/30 10 * * * ?" />
 	</bean>

@@ -54,7 +54,7 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
 {
 
     @Override
-    protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate)
+    protected BeanDefinitionParserDelegate createDelegate(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate)
     {
         BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
         delegate.initDefaults(root, parentDelegate);

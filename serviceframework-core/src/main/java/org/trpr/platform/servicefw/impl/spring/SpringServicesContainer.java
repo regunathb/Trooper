@@ -154,7 +154,7 @@ public class SpringServicesContainer<T extends PlatformServiceRequest, S extends
 		}
 		
 		SpringServicesContainer.commonServiceBeansContext =  new ClassPathXmlApplicationContext(new String[]{ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG},
-				defaultCtxFactory.getCommonBeansContext());			
+				defaultCtxFactory.getCommonBeansContext());	
 		
 		// add the common batch beans to the contexts list
 		this.registerServiceContext(new ServiceConfigInfo(new File(ServiceFrameworkConstants.COMMON_SPRING_SERVICES_CONFIG), null, SpringServicesContainer.commonServiceBeansContext));

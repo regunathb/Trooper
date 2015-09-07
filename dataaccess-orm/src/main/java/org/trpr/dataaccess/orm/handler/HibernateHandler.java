@@ -79,8 +79,8 @@ public class HibernateHandler extends RDBMSHandler {
 		Collection<PersistentEntity> results = new LinkedList<PersistentEntity>(); // create an empty list
 		
 		if (criteria.getMaxResults() > 0) {
-			results = (Collection<PersistentEntity>) this.getTemplate().execute(new HibernateCallback(){
-				public Object doInHibernate(Session session) throws HibernateException, SQLException { 
+			results = (Collection<PersistentEntity>) this.getTemplate().execute(new HibernateCallback<List<PersistentEntity>>(){
+				public List<PersistentEntity> doInHibernate(Session session) throws HibernateException, SQLException { 
 					Query query = null;
 					if(Criteria.NAMED_QUERY == criteria.getQueryType()){
 						query = session.getNamedQuery(criteria.getQuery()); 
@@ -92,7 +92,7 @@ public class HibernateHandler extends RDBMSHandler {
 
 					for(String paramKey : criteria.getParamsMap().keySet()) {
 						if (criteria.getParamsMap().get(paramKey) instanceof Collection) {
-							query.setParameterList(paramKey, (Collection)criteria.getParamsMap().get(paramKey));
+							query.setParameterList(paramKey, (Collection<Object>)criteria.getParamsMap().get(paramKey));
 						}
 						else if (criteria.getParamsMap().get(paramKey) instanceof Object[]) {
 							query.setParameterList(paramKey, (Object[])criteria.getParamsMap().get(paramKey));
@@ -101,15 +101,15 @@ public class HibernateHandler extends RDBMSHandler {
 							query.setParameter(paramKey, criteria.getParamsMap().get(paramKey));
 						}
 					}
-					List result = query.list();
+					List<PersistentEntity> result = query.list();
 					return result;
 				}
 			});
 		} else {
 			if(Criteria.NAMED_QUERY == criteria.getQueryType()){
-				results = this.getTemplate().findByNamedQueryAndNamedParam(criteria.getQuery(), criteria.getParamNamesArray(), criteria.getParamValuesArray());
+				results = (Collection<PersistentEntity>)this.getTemplate().findByNamedQueryAndNamedParam(criteria.getQuery(), criteria.getParamNamesArray(), criteria.getParamValuesArray());
 			} else {
-				results =  this.getTemplate().findByNamedParam(criteria.getQuery(), criteria.getParamNamesArray(), criteria.getParamValuesArray());
+				results =  (Collection<PersistentEntity>)this.getTemplate().findByNamedParam(criteria.getQuery(), criteria.getParamNamesArray(), criteria.getParamValuesArray());
 			}
 		}
 		
@@ -264,8 +264,8 @@ public class HibernateHandler extends RDBMSHandler {
 	 */
 	@SuppressWarnings("unchecked")
 	private List<PersistentEntity> findObjectBySQLQuery(final Criteria criteria) {		
-		return (List<PersistentEntity>) this.getTemplate().execute(new HibernateCallback(){
-			public Object doInHibernate(Session session) throws HibernateException, SQLException { 
+		return (List<PersistentEntity>) this.getTemplate().execute(new HibernateCallback<List<PersistentEntity>>(){
+			public List<PersistentEntity> doInHibernate(Session session) throws HibernateException, SQLException { 
 				SQLQuery sqlQueryObject = session.createSQLQuery(criteria.getQuery());				
 				sqlQueryObject.addEntity(criteria.getManagedClass());
 				sqlQueryObject.setFirstResult(criteria.getFirstResult());
