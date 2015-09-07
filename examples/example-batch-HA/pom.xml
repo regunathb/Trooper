@@ -11,7 +11,7 @@
 	</parent>
 	
 	<groupId>org.trpr</groupId>
-	<artifactId>example-batch-HA</artifactId>
+	<artifactId>example-batch-ha</artifactId>
 	<name>Example Batch HA</name>
 	<version>1.3.3</version>
 	<description>Trooper Example Batch HA</description>
