@@ -1,3 +1,6 @@
+## 1.3.4 (Feb 26, 2016)
+  - Support for multiple component containers
+
 ## 1.3.3 (Sep 01, 2015)
   - Upgrade for Spring 4.2.0.RELEASE version
   - Upgrade to other libraries to be API compatible with Spring upgrade
