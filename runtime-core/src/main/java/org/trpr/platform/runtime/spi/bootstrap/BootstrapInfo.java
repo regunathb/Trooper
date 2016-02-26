@@ -34,9 +34,6 @@ public class BootstrapInfo {
 	/**The runtime nature */
 	private String runtimeNature;
 	
-	/**The fully qualified ComponentContainer class name*/
-	private String componentContainerClassName;
-	
 	/** The Container instance*/
 	private Container container;
 	
@@ -59,12 +56,6 @@ public class BootstrapInfo {
 	public void setRuntimeNature(String runtimeNature) {
 		this.runtimeNature = runtimeNature;
 	}
-	public String getComponentContainerClassName() {
-		return this.componentContainerClassName;
-	}
-	public void setComponentContainerClassName(String componentContainerClassName) {
-		this.componentContainerClassName = componentContainerClassName;
-	}	
 	public Container getContainer() {
 		return this.container;
 	}

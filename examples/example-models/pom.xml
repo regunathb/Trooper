@@ -7,14 +7,14 @@
 	<parent>
 		<groupId>org.trpr</groupId>
 		<artifactId>trooper</artifactId>
-		<version>1.3.3</version>
+		<version>1.3.4</version>
 		<relativePath>../../</relativePath>
 	</parent>
 	
 	<groupId>org.trpr</groupId>
 	<artifactId>example-models</artifactId>
 	<name>Example Models</name>
-	<version>1.3.3</version>
+	<version>1.3.4</version>
 	<description>Trooper Example Models</description>
 
 	<licenses>

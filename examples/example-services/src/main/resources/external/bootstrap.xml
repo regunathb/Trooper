@@ -9,10 +9,14 @@
 		<property name="applicationName" value="Test Runtime" />
 		<property name="runtimeNature" value="server" />
 		<property name="container" ref="containerImpl" />
-		<property name="componentContainerClassName" value="org.trpr.platform.servicefw.impl.spring.SpringServicesContainer" />
 	</bean>
 
 	<bean id="containerImpl" class="org.trpr.platform.runtime.impl.container.spring.SpringContainerImpl">
+	    <property name="componentContainers">
+		    <list>
+		        <bean id="sedaComponentContainer" class="org.trpr.platform.servicefw.impl.spring.SpringServicesContainer"/>
+		    </list>
+		</property>
 	</bean>
- 
+		
 </beans>

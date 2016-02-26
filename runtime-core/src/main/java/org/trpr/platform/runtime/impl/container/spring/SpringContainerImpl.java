@@ -22,20 +22,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
-import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrapext.BootstrapExtensionInfo;
 import org.trpr.platform.runtime.impl.bootstrapext.spring.ApplicationContextFactory;
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrapext.BootstrapExtension;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
 import org.trpr.platform.runtime.spi.container.Container;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * The <code>SpringContainerImpl</code> is a concrete implementation of the {@link Container} interface. This implementation loads the configured {@link ComponentContainer},
@@ -57,8 +56,8 @@ public class SpringContainerImpl implements Container {
 	 */
 	private static final Logger LOGGER = LogFactory.getLogger(SpringContainerImpl.class);
 
-	/**  Component Container */
-	private ComponentContainer componentContainer;
+	/**  Component Container instances managed by this container */
+	private List<ComponentContainer> componentContainers;
 	
 	/** Bootstrap Extensions */
 	private BootstrapExtension[] bootstrapExtensions;
@@ -87,19 +86,12 @@ public class SpringContainerImpl implements Container {
 		// extensions like ApplicationContextFactory		
 		initializeBootstrapExtensions();
 
-		// instantiate the ComponentContainer if it has been configured in bootstrap config
-	    String componentType = RuntimeVariables.getContainerType();		
-		if(componentType != null){
-    		try {
-    			componentContainer = (ComponentContainer)Class.forName(componentType).newInstance();
-    		} catch (Exception e) {
-    			LOGGER.error("Error while instantiating component container : " + e.getMessage(),e);
-    		}	
-		}			
-		if(this.componentContainer != null){
-			LOGGER.info("** Starting a component container of type : " + this.componentContainer.getClass().getName() + " **");
-			this.componentContainer.setLoadedBootstrapExtensions(this.bootstrapExtensions);
-			this.componentContainer.init();
+		if(this.componentContainers.size() > 0) {
+			for (ComponentContainer componentContainer : this.componentContainers) {
+				LOGGER.info("** Starting a component container of type : " + componentContainer.getClass().getName() + " **");
+				componentContainer.setLoadedBootstrapExtensions(this.bootstrapExtensions);
+				componentContainer.init();
+			}
 		} else {
 			LOGGER.info("No component container configured for this runtime instance.");			
 		}				
@@ -110,18 +102,10 @@ public class SpringContainerImpl implements Container {
 	 * Container#destroy()
 	 */
 	public void destroy() throws PlatformException {
-		if(this.componentContainer != null){
-			this.componentContainer.destroy();
+		for (ComponentContainer componentContainer : this.componentContainers) {
+			componentContainer.destroy();
 		}
 		this.destroyBootstrapExtensions();		
-	}
-
-	/**
-	 * Interface method implementation. Gets the ComponentContainer, if any, loaded by this Container.
-	 * @see Container#getComponentContainer()
-	 */
-	public ComponentContainer getComponentContainer() {
-		return this.componentContainer;
 	}
 
 	/**
@@ -129,8 +113,8 @@ public class SpringContainerImpl implements Container {
 	 * @see org.trpr.platform.runtime.spi.container.Container#publishBootstrapEvent(org.trpr.platform.model.event.PlatformEvent)
 	 */
 	public void publishBootstrapEvent(PlatformEvent bootstrapEvent) {
-		if (this.getComponentContainer() != null) { // check if a ComponentContainer has been set and publish the bootstrap event to it
-			this.getComponentContainer().publishBootstrapEvent(bootstrapEvent);
+		for (ComponentContainer componentContainer : this.componentContainers) { //  publish the bootstrap event to all component containers
+			componentContainer.publishBootstrapEvent(bootstrapEvent);
 		}
 	}
 
@@ -311,5 +295,13 @@ public class SpringContainerImpl implements Container {
 			loadedBEListNames.add(beInfo.getBeName());
 		}
 	}
+
+	/** Getter/Setter methods*/
+	public List<ComponentContainer> getComponentContainers() {
+		return componentContainers;
+	}
+	public void setComponentContainers(List<ComponentContainer> componentContainers) {
+		this.componentContainers = componentContainers;
+	}	
 	
 }

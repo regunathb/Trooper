@@ -17,8 +17,6 @@ package org.trpr.platform.runtime.common;
 
 import java.util.HashMap;
 
-import org.trpr.platform.runtime.spi.component.ComponentContainer;
-
 /**
  * The <code>ServerVariables</code> class is a container for core framework runtime meta data.
 
@@ -102,14 +100,6 @@ public class RuntimeVariables {
 	 */
 	public static String getRuntimeNature() {
 		return getVariable(RuntimeConstants.NATURE).toUpperCase();
-	}
-
-	/**
-	 * Convenience method to return the type of {@link ComponentContainer}
-	 * @return null or the 
-	 */
-	public static String getContainerType() {
-		return getVariable(RuntimeConstants.CONTAINER_TYPE);
 	}
 
 }

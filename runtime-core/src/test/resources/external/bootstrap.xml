@@ -9,9 +9,6 @@
 		<property name="applicationName" value="Test Runtime" />
 		<property name="runtimeNature" value="standalone" />
 		<property name="container" ref="containerImpl" />
-		<!-- 
-		<property name="componentContainerClassName" value="" />
-		-->		
 	</bean>
 
 	<bean id="containerImpl" class="org.trpr.platform.runtime.impl.container.spring.SpringContainerImpl">

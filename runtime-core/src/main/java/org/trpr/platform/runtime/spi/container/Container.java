@@ -15,8 +15,11 @@
  */
 package org.trpr.platform.runtime.spi.container;
 
+import java.util.List;
+
 import org.trpr.platform.core.PlatformException;
 import org.trpr.platform.model.event.PlatformEvent;
+import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
 
 /**
@@ -47,10 +50,10 @@ public interface Container {
 	public void destroy() throws PlatformException;
 		
 	/**
-	 * Get the {@link ComponentContainer}, if any, that has been initialized by this Container
-	 * @return ComponentContainer, if any, that has been configured to be loaded by this Container
+	 * Get the list of {@link ComponentContainer}S, if any, that has been initialized by this Container
+	 * @return ComponentContainerS, if any, that has been configured to be loaded by this Container
 	 */
-	public ComponentContainer getComponentContainer();
+	public List<ComponentContainer> getComponentContainers();
 	
 	/**
 	 * Publishes the specified event using the {@link ComponentContainer} interface, if any, that has been configured to be loaded by this

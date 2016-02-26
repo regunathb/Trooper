@@ -61,7 +61,6 @@ public abstract class RuntimeConstants {
 	 */
 	public static final String PROJECTS_ROOT = "org.trpr.platform.runtime.projects.root";
 	public static final String NATURE = "org.trpr.platform.runtime.nature";
-	public static final String CONTAINER_TYPE = "org.trpr.platform.runtime.componentContainer";
 	
 	/**
 	 * Constant to identify the resource folder names under different projects

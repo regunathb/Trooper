@@ -33,6 +33,7 @@ import org.trpr.platform.runtime.impl.bootstrap.management.jmx.BootstrapModelMBe
 import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrap.BootstrapInfo;
 import org.trpr.platform.runtime.spi.bootstrap.management.jmx.BootstrapManagedBean;
+import org.trpr.platform.runtime.spi.component.ComponentContainer;
 import org.trpr.platform.runtime.spi.container.Container;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -57,7 +58,7 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	    "\n*************************************************************************\n" +
         " Trooper __\n" +
         "      __/  \\" +  "         Runtime Nature : {0}" + "\n" +
-        "   __/  \\__/" +  "         Component Container : {1}" + "\n" +
+        "   __/  \\__/" +  "         Component Container(s) : {1}" + "\n" +
         "  /  \\__/  \\" + "         Startup Time : {2}" + " ms\n" +
         "  \\__/  \\__/" + "         Host Name: {3}" + "\n" +
         "     \\__/" + "\n" +
@@ -256,7 +257,10 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		publishBootstrapEvent("** Trooper bootstrap complete **", RuntimeConstants.BOOTSTRAP_START_STATE);		
 		
 		// Log successful start up details
-		String ccDisplay = RuntimeVariables.getContainerType() == null ? "None" :  RuntimeVariables.getContainerType();
+		String ccDisplay = this.container.getComponentContainers().size() > 0 ? "" : "None";
+		for (ComponentContainer componentContainer : this.container.getComponentContainers()) {
+			ccDisplay += "["+ componentContainer.getClass().getName() + "] ";
+		}
 		final Object[] displayArgs =         {
 				RuntimeVariables.getRuntimeNature(),
 				ccDisplay,
@@ -355,9 +359,6 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		runtimeVariables.setVariable(RuntimeConstants.TRPR_APP_NAME, bootstrapInfo.getApplicationName());
 		runtimeVariables.setVariable(RuntimeConstants.PROJECTS_ROOT, bootstrapInfo.getProjectsRoot());
 		runtimeVariables.setVariable(RuntimeConstants.NATURE, bootstrapInfo.getRuntimeNature());
-		if (bootstrapInfo.getComponentContainerClassName() != null) {
-			runtimeVariables.setVariable(RuntimeConstants.CONTAINER_TYPE, bootstrapInfo.getComponentContainerClassName());
-		}
 	}
 	
 	/** Helper method to publish {@link PlatformEvent} for bootstrap life-cycle */
