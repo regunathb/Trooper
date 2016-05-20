@@ -1,3 +1,8 @@
+## 2.0.0 (May 20, 2016)
+  - Removed logback as packaged logging implementation. Uses only the slf4j logging facade. Users of Trooper, including Trooper profiles, now provide their own logging binding
+  - JDK version is 1.8
+  - Changes to all profile dependencies due to above logging change
+
 ## 1.3.4 (Feb 26, 2016)
   - Support for multiple component containers
 
