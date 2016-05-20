@@ -12,6 +12,10 @@
 	</bean>
 
 	<bean id="containerImpl" class="org.trpr.platform.runtime.impl.container.spring.SpringContainerImpl">
+	    <property name="componentContainers">
+		    <list>
+		    </list>
+		</property>
 	</bean>
  
 </beans>

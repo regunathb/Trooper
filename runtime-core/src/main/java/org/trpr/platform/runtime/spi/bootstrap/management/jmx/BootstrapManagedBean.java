@@ -45,11 +45,6 @@ public interface BootstrapManagedBean extends InstanceAwareMBean {
 	public void destroy() throws Exception;
 
 	/**
-	 * Reloads logging configurations for the runtime  
-	 */
-	public void reloadLoggingConfigurations();
-	
-	/**
 	 * Returns the configuration file path used to configure the runtime
 	 * @return String the configuration file path 
 	 */

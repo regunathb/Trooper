@@ -23,6 +23,8 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.core.spi.management.jmx.AppInstanceAwareMBean;
@@ -30,13 +32,10 @@ import org.trpr.platform.model.event.PlatformEvent;
 import org.trpr.platform.runtime.common.RuntimeConstants;
 import org.trpr.platform.runtime.common.RuntimeVariables;
 import org.trpr.platform.runtime.impl.bootstrap.management.jmx.BootstrapModelMBeanExporter;
-import org.trpr.platform.runtime.impl.config.FileLocator;
 import org.trpr.platform.runtime.spi.bootstrap.BootstrapInfo;
 import org.trpr.platform.runtime.spi.bootstrap.management.jmx.BootstrapManagedBean;
 import org.trpr.platform.runtime.spi.component.ComponentContainer;
 import org.trpr.platform.runtime.spi.container.Container;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * The <code>Bootstrap</code> class starts up the Trooper runtime as per the configured nature. This class is initialized using 
@@ -158,42 +157,11 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 	}
 
 	/**
-	 * Method to configure logging properties based on bootstrap location
-	 */
-	public void configureLogging() {
-		File[] loggingConfigFiles = FileLocator.findFiles(RuntimeConstants.LOGGING_FILE, new File(this.bootstrapConfigFile).getParent());
-		if (loggingConfigFiles.length == 0) {
-			System.out.println("Logging configuration file : " + RuntimeConstants.LOGGING_FILE + " not found!. Unable to initialize logging framework");
-			return;
-		}
-		if (loggingConfigFiles.length > 1) { // multiple logging configurations found. 
-			// Prefer the logging config co-located with bootstrap config. Use first occurrence otherwise.
-			for (File loggingFile : loggingConfigFiles) {
-				if (loggingFile.getParent().equals(new File(getBootstrapConfigPath()).getParent())) {
-					System.out.println("Multiple ( Total: "	+ loggingConfigFiles.length	+ " ) logging config files found. Using the occurence co-located with bootstrap config file.");
-					configureLoggingFromFile(loggingFile);
-					return;
-				}
-			}
-		}
-		System.out.println("Using logging config file : " + loggingConfigFiles[0].getAbsolutePath());
-		configureLoggingFromFile(loggingConfigFiles[0]);
-	}
-	
-	/**
 	 * Interface method implementation
 	 * @see BootstrapManagedBean#getBootstrapConfigPath()
 	 */
 	public String getBootstrapConfigPath() {
 		return this.bootstrapConfigFile;
-	}
-
-	/**
-	 * Interface method implementation
-	 * @see BootstrapManagedBean#reloadLoggingConfigurations()
-	 */
-	public void reloadLoggingConfigurations(){
-		this.configureLogging();
 	}
 
 	/**
@@ -219,9 +187,6 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		}
 		
 		runtimeVariables = RuntimeVariables.getInstance();
-		
-		// configure the logging framework from a path relative to where the bootstrap config file is specified
-		configureLogging();			
 		
 		// Load the bootstrap config file
 		File bootstrapFile = new File(this.bootstrapConfigFile);
@@ -337,21 +302,6 @@ public class Bootstrap extends AppInstanceAwareMBean implements BootstrapManaged
 		}
 	}
 	
-	/**
-	 * Helper method to initialize the underlying logging system with the config file specified
-	 */
-	private void configureLoggingFromFile(File loggingConfigFile) {
-		try {
-			LogFactory.configureLogging(loggingConfigFile);
-		} catch (Exception e) {
-			System.err.println("Error initializing logging framework!. Error message : " + e.getMessage());
-			e.printStackTrace(System.err);
-			return;
-		}
-		// logging is ready now
-		LOGGER.info("Logging framework is now initialized!");		
-	}
-
 	/**
 	 * Populates all the bootstrap variables from the bootstrap configuration
 	 */

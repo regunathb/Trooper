@@ -16,8 +16,6 @@
 
 package org.trpr.platform.core.impl.logging;
 
-import java.io.File;
-
 import org.trpr.platform.core.spi.logging.LogConfigurationException;
 import org.trpr.platform.core.spi.logging.Logger;
 
@@ -31,19 +29,6 @@ import org.trpr.platform.core.spi.logging.Logger;
  */
 public abstract class LogFactory {
 	
-	/**
-	 * Configures the underling logging system using the config file specified
-	 * @param logConfigFile the logging configuration file
-	 * @throws Exception in case of exceptions in configuring the logging system
-	 */
-	public static void configureLogging(File logConfigFile) throws Exception {
-		ch.qos.logback.classic.LoggerContext context = (ch.qos.logback.classic.LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
-		ch.qos.logback.classic.joran.JoranConfigurator jc = new ch.qos.logback.classic.joran.JoranConfigurator();
-		jc.setContext(context); 
-		context.reset();
-		jc.doConfigure(logConfigFile);
-	}
-
 	/**
 	 * Returns a <code>Logger<code> instance for the specified Class. Delegates the call to the LogFactory instance of the underlying logging
 	 * framework. 
