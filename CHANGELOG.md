@@ -1,3 +1,6 @@
+## 2.0.1 (Oct 14, 2016)
+  - Removed bottleneck in PlatformEventMultiCaster
+  
 ## 2.0.0 (May 20, 2016)
   - Removed logback as packaged logging implementation. Uses only the slf4j logging facade. Users of Trooper, including Trooper profiles, now provide their own logging binding
   - JDK version is 1.8
