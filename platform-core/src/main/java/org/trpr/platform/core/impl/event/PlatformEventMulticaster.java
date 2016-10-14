@@ -23,11 +23,10 @@ import org.trpr.platform.core.spi.event.EndpointEventConsumer;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.AbstractApplicationEventMulticaster;
 import org.springframework.core.ResolvableType;
 
 /**
- * The <code>PlatformEventMulticaster</code> is a sub-type of the Spring {@link AbstractApplicationEventMulticaster} that permits specifying 
+ * The <code>PlatformEventMulticaster</code> is a sub-type of {@link AbstractApplicationEventMulticaster} that permits specifying
  * URI endpoints of all subscriptions that this multi-caster entertains. 
  * 
  * Platform {@link EndpointEventConsumer} instances registered in the same ApplicationContext may specify subscription URIs. This multi-caster
@@ -77,7 +76,7 @@ public class PlatformEventMulticaster extends AbstractApplicationEventMulticaste
 				return;				
 			}
 			for (Iterator<ApplicationListener<?>> iterator = getApplicationListeners().iterator(); iterator.hasNext();) {
-	            ApplicationListener<?> listener = (ApplicationListener<?>) iterator.next();	
+	            ApplicationListener<?> listener = iterator.next();
 	            if (listener instanceof EndpointEventConsumer) {
 	            	if (isSubscriptionMatch(eventEndpointURI, ((EndpointEventConsumer)listener).getSubscriptions())) {
 	            		((EndpointEventConsumer)listener).onApplicationEvent(platformApplicationEvent);
