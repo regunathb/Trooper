@@ -20,15 +20,15 @@ import java.util.Iterator;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.AbstractApplicationEventMulticaster;
 import org.springframework.core.ResolvableType;
+import org.trpr.platform.core.impl.event.AbstractApplicationEventMulticaster;
 import org.trpr.platform.core.impl.event.PlatformApplicationEvent;
 import org.trpr.platform.core.impl.logging.LogFactory;
 import org.trpr.platform.core.spi.logging.Logger;
 import org.trpr.platform.servicefw.spi.event.ServiceEventConsumer;
 
 /**
- * The <code>PlatformEventMulticaster</code> is a sub-type of the Spring {@link AbstractApplicationEventMulticaster} that permits specifying 
+ * The <code>PlatformEventMulticaster</code> is a sub-type of {@link AbstractApplicationEventMulticaster} that permits specifying
  * URI endpoints of all subscriptions that this multi-caster entertains. 
  * 
  * Platform {@link ServiceEventConsumer} instances registered in the same ApplicationContext may specify subscription URIs. This multi-caster
