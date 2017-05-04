@@ -69,8 +69,8 @@ public class JettyWebAppContextFactory  implements FactoryBean<WebAppContext> {
 		for (File file : files) {
 			// we need only WEB-INF from batch-core project and none else even by mistake
 			String fileToString = file.toString();
-			if (fileToString.contains(".jar!") && fileToString.startsWith("file:/")) {
-				fileToString = fileToString.replace("file:/","jar:file:/");
+			if (fileToString.contains(".jar!") && fileToString.startsWith("file:"+File.separator)) {
+				fileToString = fileToString.replace("file:"+File.separator,"jar:file:"+File.separator);
 				if (fileToString.contains("batch-core-")) {
 					path = fileToString;
 					break;
