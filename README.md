@@ -13,10 +13,10 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
+| Version 2.0.2    | May 2017       |     Bug fix for Jetty loading in non-Unix OS
 | Version 2.0.1    | Oct 2016       |     Removed bottleneck in PlatformEventMultiCaster
 | Version 2.0.0    | May 2016       |     Jdk 1.8, Removed logback as default. Uses only slf4j
 | Version 1.3.4    | Feb 2016       |     Support for multiple component containers
-| Version 1.3.3    | Sep 2015       |     Upgrade to Spring 4.x
 
 ## Changelog
 

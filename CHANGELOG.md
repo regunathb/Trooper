@@ -1,3 +1,6 @@
+## 2.0.2 (May 04, 2017)
+  - Using File.separator in JettyWebAppContextFactory for being OS agnostic
+  
 ## 2.0.1 (Oct 14, 2016)
   - Removed bottleneck in PlatformEventMultiCaster
   
