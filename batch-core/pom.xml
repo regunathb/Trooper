@@ -61,7 +61,7 @@
 
 	<properties>
 		<org.springframework.batch.version>3.0.5.RELEASE</org.springframework.batch.version>
-		<jetty.version>8.1.11.v20130520</jetty.version>
+		<jetty.version>10.0.10</jetty.version>
   		<jetty.jsp.version>8.1.11.v20130520</jetty.jsp.version>
 	</properties>
 	
