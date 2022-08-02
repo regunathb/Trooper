@@ -1,3 +1,6 @@
+## 2.0.3 (Aug 02, 2022)
+  - Fix for deprecated method in runtime-core
+
 ## 2.0.2 (May 04, 2017)
   - Using File.separator in JettyWebAppContextFactory for being OS agnostic
   
