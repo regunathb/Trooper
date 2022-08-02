@@ -141,7 +141,7 @@ public class SpringContainerImpl implements Container {
 					beManager.addBootstrapExtensionInfo((BootstrapExtensionInfo)beDefinitionsContext.getBean(beInfo));
 				}
 				// destroy the beDefinitionsContext as we dont need it anymore
-				beDefinitionsContext.destroy();
+				beDefinitionsContext.close();
 			} catch (Exception e) {
 				LOGGER.error("Error in loading BootStrap Extension File. Ignoring contents of : " + beFile.getAbsolutePath() + " .Error message : " + e.getMessage(), e);
 			}
