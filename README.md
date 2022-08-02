@@ -13,6 +13,7 @@ It is an umbrella project for a number of things:
 
 | Release | Date | Description |
 |:------------|:----------------|:------------|
+| Version 2.0.3    | Aug 2022       |     Fix for deprecated method in runtime-core
 | Version 2.0.2    | May 2017       |     Bug fix for Jetty loading in non-Unix OS
 | Version 2.0.1    | Oct 2016       |     Removed bottleneck in PlatformEventMultiCaster
 | Version 2.0.0    | May 2016       |     Jdk 1.8, Removed logback as default. Uses only slf4j
